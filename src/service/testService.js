@@ -6,13 +6,13 @@ await userDao.createUser(id, password)
 
 const { testDao } = require('../db');
 
-const testLogin = async () => {
-  const name = await testDao.getUserNameById();
-  let data = {
-    id: 'playtogether',
-    name,
-  };
-  return data;
+const testLogin = async (client, userId) => {
+  try {
+    const data = await testDao.getUserNameById(client, userId);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const testSignup = async () => {
