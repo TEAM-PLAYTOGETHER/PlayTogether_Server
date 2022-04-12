@@ -1,0 +1,33 @@
+{
+  "name": "playtogether_server",
+  "version": "1.0.0",
+  "description": "⚡ 플투 서버 ⚡️",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js --delay 1",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TEAM-PLAYTOGETHER/PlayTogether_Server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TEAM-PLAYTOGETHER/PlayTogether_Server/issues"
+  },
+  "homepage": "https://github.com/TEAM-PLAYTOGETHER/PlayTogether_Server#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "express": "^4.17.3",
+    "helmet": "^5.0.2",
+    "hpp": "^0.2.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}
