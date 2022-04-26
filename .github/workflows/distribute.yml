@@ -21,4 +21,4 @@ jobs:
             sudo git checkout .
             sudo git pull origin main
             sudo npm install
-            sudo npx pm2 restart index
+            pm2 reload all
