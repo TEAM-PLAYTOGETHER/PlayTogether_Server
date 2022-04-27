@@ -47,6 +47,23 @@ const sendMessage = async (req, res) => {
   }
 };
 
+const getAllMessageById = async (req, res) => {
+  let client;
+
+  try {
+    client = await db.connect(req);
+
+    const result = await messageService.getAllMessageById(client, req.user.id);
+    return res.status(statusCode.OK).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   sendMessage,
+  getAllMessageById,
 };
