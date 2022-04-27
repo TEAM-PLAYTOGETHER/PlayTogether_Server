@@ -3,6 +3,7 @@ const { messageDao } = require('../db');
 const { serviceReturn } = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
+const util = require('../lib/util');
 
 const sendMessage = async (client, sendId, recvId, content) => {
   try {
@@ -40,6 +41,25 @@ const sendMessage = async (client, sendId, recvId, content) => {
   }
 };
 
+const getAllMessageById = async (client, userId) => {
+  const rowMessages = await messageDao.getAllMessageById(client, userId);
+
+  const messages = rowMessages.map((rowMessage) => {
+    let message = {
+      roomId: rowMessage.roomId,
+      audience: rowMessage.audience,
+      audienceId: rowMessage.audienceId,
+      send: Number(rowMessage.sendId) === Number(userId) ? true : false,
+      createdAt: rowMessage.createdAt,
+      content: rowMessage.content,
+    };
+    return message;
+  });
+
+  return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+};
+
 module.exports = {
   sendMessage,
+  getAllMessageById,
 };
