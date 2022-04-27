@@ -10,6 +10,17 @@ const getUserNameById = async (client, userId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
+const getUserById = async (client, userId) => {
+  const { rows } = await client.query(
+    `
+    select * from "user" where id = $1
+    `,
+    [userId],
+  );
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
+
 module.exports = {
   getUserNameById,
+  getUserById,
 };
