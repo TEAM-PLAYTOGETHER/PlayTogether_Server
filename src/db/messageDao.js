@@ -40,6 +40,7 @@ const getAllMessageById = async (client, userId) => {
   const { rows } = await client.query(
     `
         select room_id,
+              send_id,
               m.created_at,
               content,
               case
@@ -62,7 +63,8 @@ const getAllMessageById = async (client, userId) => {
                     from message
                     where room_id in (select id from room where member_one_id = $1 or member_two_id = $1)
                 ) as ranking
-            where ranking.rn = 1);
+            where ranking.rn = 1)
+        order by created_at desc;
     `,
     [userId],
   );
