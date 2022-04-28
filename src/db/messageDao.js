@@ -71,9 +71,25 @@ const getAllMessageById = async (client, userId) => {
   return convertSnakeToCamel.keysToCamel(rows);
 };
 
+const getAllMessageByRoomId = async (client, roomId) => {
+  const { rows } = await client.query(
+    `
+    select m.id, m.created_at, m.content, m.send_id
+    from room r
+             left join message m
+                       on r.id = m.room_id
+    where r.id = $1
+    order by created_at desc;
+    `,
+    [roomId],
+  );
+  return convertSnakeToCamel.keysToCamel(rows);
+};
+
 module.exports = {
   getRoom,
   createRoom,
   sendMessage,
   getAllMessageById,
+  getAllMessageByRoomId,
 };

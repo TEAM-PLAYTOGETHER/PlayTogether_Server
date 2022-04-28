@@ -54,7 +54,27 @@ const getAllMessageById = async (req, res) => {
     client = await db.connect(req);
 
     const result = await messageService.getAllMessageById(client, req.user.id);
-    return res.status(statusCode.OK).json(result);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
+const getAllMessageByRoomId = async (req, res) => {
+  let client;
+
+  try {
+    client = await db.connect(req);
+
+    const { roomId } = req.params;
+    const userId = req.user.id;
+
+    const result = await messageService.getAllMessageByRoomId(client, roomId, userId);
+
+    return res.status(result.status).json(result);
   } catch (error) {
     console.log(error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
@@ -66,4 +86,5 @@ const getAllMessageById = async (req, res) => {
 module.exports = {
   sendMessage,
   getAllMessageById,
+  getAllMessageByRoomId,
 };
