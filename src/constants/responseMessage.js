@@ -24,6 +24,11 @@ module.exports = {
   TOKEN_INVALID: '토큰이 유효하지 않습니다.',
   TOKEN_EMPTY: '토큰이 없습니다.',
 
+  // 메시지
+  MESSAGE_SEND_SUCCESS: '메시지 전송에 성공했습니다.',
+  MESSAGE_SEND_FAIL: '메시지 전송에 실패했습니다.',
+  NO_MESSAGE: '메시지 내용이 없습니다.',
+
   // 그룹
   READ_ALL_GROUP: '그룹 정보 불러오기 성공',
   READ_USER_NAME: '유저 이름 불러오기 성공',
