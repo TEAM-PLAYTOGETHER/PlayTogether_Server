@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/TEAM-PLAYTOGETHER/PlayTogether_Server#readme",
   "dependencies": {
+    "aws-sdk": "^2.1123.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dayjs": "^1.11.1",
@@ -26,8 +27,11 @@
     "express": "^4.17.3",
     "helmet": "^5.0.2",
     "hpp": "^0.2.3",
+    "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
+    "pg": "^8.7.3",
+    "release": "^6.3.1"
     "jsonwebtoken": "^8.5.1",
-    "pg": "^8.7.3"
   },
   "devDependencies": {
     "eslint": "^8.13.0",
