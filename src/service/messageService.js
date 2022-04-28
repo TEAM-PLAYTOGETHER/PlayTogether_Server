@@ -36,43 +36,53 @@ const sendMessage = async (client, sendId, recvId, content) => {
     // 성공
     return serviceReturn(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
   } catch (error) {
-    console.log(error);
+    console.log('Service에서 error 발생: ' + error);
     return serviceReturn(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
 
 const getAllMessageById = async (client, userId) => {
-  const rowMessages = await messageDao.getAllMessageById(client, userId);
+  try {
+    const rowMessages = await messageDao.getAllMessageById(client, userId);
 
-  const messages = rowMessages.map((rowMessage) => {
-    let message = {
-      roomId: rowMessage.roomId,
-      audience: rowMessage.audience,
-      audienceId: rowMessage.audienceId,
-      send: Number(rowMessage.sendId) === Number(userId) ? true : false,
-      createdAt: rowMessage.createdAt,
-      content: rowMessage.content,
-    };
-    return message;
-  });
+    const messages = rowMessages.map((rowMessage) => {
+      let message = {
+        roomId: rowMessage.roomId,
+        audience: rowMessage.audience,
+        audienceId: rowMessage.audienceId,
+        send: Number(rowMessage.sendId) === Number(userId) ? true : false,
+        createdAt: rowMessage.createdAt,
+        content: rowMessage.content,
+      };
+      return message;
+    });
 
-  return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+    return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+  } catch (error) {
+    console.log('Service에서 error 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  }
 };
 
 const getAllMessageByRoomId = async (client, roomId, userId) => {
-  const rowMessages = await messageDao.getAllMessageByRoomId(client, roomId);
+  try {
+    const rowMessages = await messageDao.getAllMessageByRoomId(client, roomId);
 
-  const messages = rowMessages.map((rowMessage) => {
-    let message = {
-      messageId: rowMessage.id,
-      send: Number(rowMessage.sendId) === Number(userId) ? true : false,
-      createdAt: rowMessage.createdAt,
-      content: rowMessage.content,
-    };
-    return message;
-  });
+    const messages = rowMessages.map((rowMessage) => {
+      let message = {
+        messageId: rowMessage.id,
+        send: Number(rowMessage.sendId) === Number(userId) ? true : false,
+        createdAt: rowMessage.createdAt,
+        content: rowMessage.content,
+      };
+      return message;
+    });
 
-  return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+    return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+  } catch (error) {
+    console.log('Service에서 error 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  }
 };
 
 module.exports = {
