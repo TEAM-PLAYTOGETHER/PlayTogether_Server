@@ -11,7 +11,7 @@ const sendMessage = async (req, res) => {
   try {
     client = await db.connect(req);
 
-    const sendId = 3; // TODO: 미들웨어 추가해서 req.user.id로 가져오는 것으로 변경
+    const sendId = req.user.id;
     const { recvId, content } = req.body;
 
     // 수신자 id 빈 값 처리
