@@ -13,7 +13,9 @@ const getUserNameById = async (client, userId) => {
 const getUserById = async (client, userId) => {
   const { rows } = await client.query(
     `
-    select * from "user" where id = $1
+    select * from "user"
+    where id = $1
+    and is_deleted = false
     `,
     [userId],
   );

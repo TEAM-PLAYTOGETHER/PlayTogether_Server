@@ -1,4 +1,4 @@
-const { messageDao } = require('../db');
+const { messageDao, testDao } = require('../db');
 
 const { serviceReturn } = require('../lib/util');
 const statusCode = require('../constants/statusCode');
@@ -7,13 +7,12 @@ const util = require('../lib/util');
 
 const sendMessage = async (client, sendId, recvId, content) => {
   try {
-    // TODO: recvId - userDao 생기면 실제로 존재하는 유저인지 검사
-    /*
-    const exist = await userDao.exist(recvId);
+    // TODO: testDao -> userDao로 변경하기 (작업 안겹치게 임시)
+    // recvId가 존재하는 유저인지 검사
+    const exist = await testDao.getUserById(client, recvId);
     if (!exist) {
-      return serviceReturn(존재X 유저)
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
-    */
 
     // Dao에서 Room 가져오기 (getRoom(senderId, receiverId) : roomId)
     let roomExist = await messageDao.getRoom(client, sendId, recvId);
@@ -30,14 +29,14 @@ const sendMessage = async (client, sendId, recvId, content) => {
 
     // insert 쿼리의 결과가 1이 아니라면 에러 처리
     if (cnt !== 1) {
-      return serviceReturn(statusCode.INTERNAL_SERVER_ERROR, responseMessage.MESSAGE_SEND_FAIL);
+      return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.MESSAGE_SEND_FAIL);
     }
 
     // 성공
-    return serviceReturn(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
+    return util.success(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
   } catch (error) {
     console.log('Service에서 error 발생: ' + error);
-    return serviceReturn(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
 

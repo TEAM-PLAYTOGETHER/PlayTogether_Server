@@ -11,7 +11,7 @@ const sendMessage = async (req, res) => {
   try {
     client = await db.connect(req);
 
-    const sendId = 3; // TODO: 미들웨어 추가해서 req.user.id로 가져오는 것으로 변경
+    const sendId = req.user.id;
     const { recvId, content } = req.body;
 
     // 수신자 id 빈 값 처리
@@ -30,17 +30,11 @@ const sendMessage = async (req, res) => {
     }
 
     // 메시지 전송
-    const serviceReturn = await messageService.sendMessage(client, sendId, recvId, content);
+    const result = await messageService.sendMessage(client, sendId, recvId, content);
 
-    // serviceReturn의 데이터가 없다면, 실패 반환
-    if (serviceReturn.data === null) {
-      return res.status(serviceReturn.statusCode).json(util.fail(serviceReturn.statusCode, serviceReturn.message));
-    }
-
-    // 성공
-    return res.status(statusCode.OK).json(util.success(serviceReturn.statusCode, serviceReturn.message, serviceReturn.data));
+    return res.status(result.status).json(result);
   } catch (error) {
-    console.log(error);
+    console.log('Controller에서 error 발생: ', error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
@@ -56,7 +50,7 @@ const getAllMessageById = async (req, res) => {
     const result = await messageService.getAllMessageById(client, req.user.id);
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log(error);
+    console.log('Controller에서 error 발생: ', error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
@@ -76,7 +70,7 @@ const getAllMessageByRoomId = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log(error);
+    console.log('Controller에서 error 발생: ', error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
