@@ -5,5 +5,6 @@ const upload = require('../middlewares/multer');
 const router = express.Router();
 
 router.post('/add/:crewId/:organizerId', upload.single('image'), lightConroller.addLight);
+router.put('/:lightId', lightConroller.putLight);
 
 module.exports = router;
