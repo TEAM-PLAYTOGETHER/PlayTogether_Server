@@ -59,7 +59,24 @@ const getAllMessageById = async (client, userId) => {
   return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
 };
 
+const getAllMessageByRoomId = async (client, roomId, userId) => {
+  const rowMessages = await messageDao.getAllMessageByRoomId(client, roomId);
+
+  const messages = rowMessages.map((rowMessage) => {
+    let message = {
+      messageId: rowMessage.id,
+      send: Number(rowMessage.sendId) === Number(userId) ? true : false,
+      createdAt: rowMessage.createdAt,
+      content: rowMessage.content,
+    };
+    return message;
+  });
+
+  return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+};
+
 module.exports = {
   sendMessage,
   getAllMessageById,
+  getAllMessageByRoomId,
 };
