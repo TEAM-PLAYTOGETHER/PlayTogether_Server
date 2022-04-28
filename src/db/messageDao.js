@@ -36,8 +36,44 @@ const sendMessage = async (client, roomId, sendId, recvId, content) => {
   return rowCount;
 };
 
+const getAllMessageById = async (client, userId) => {
+  const { rows } = await client.query(
+    `
+        select room_id,
+              send_id,
+              m.created_at,
+              content,
+              case
+                  when send_id = $1 then receiver.name
+                  else sender.name
+                  end as audience,
+              case
+                  when send_id = $1 then recv_id
+                  else send_id
+                  end as audience_id
+        from message m
+                left join "user" sender
+                          on m.send_id = sender.id
+                left join "user" receiver
+                          on m.recv_id = receiver.id
+        where m.id in (
+            select id
+            from (
+                    select id, rank() over (partition by room_id order by created_at desc, id desc) as rn
+                    from message
+                    where room_id in (select id from room where member_one_id = $1 or member_two_id = $1)
+                ) as ranking
+            where ranking.rn = 1)
+        order by created_at desc;
+    `,
+    [userId],
+  );
+  return convertSnakeToCamel.keysToCamel(rows);
+};
+
 module.exports = {
   getRoom,
   createRoom,
   sendMessage,
+  getAllMessageById,
 };
