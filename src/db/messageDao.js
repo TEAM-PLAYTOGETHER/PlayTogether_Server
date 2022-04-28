@@ -91,4 +91,5 @@ module.exports = {
   createRoom,
   sendMessage,
   getAllMessageById,
+  getAllMessageByRoomId,
 };
