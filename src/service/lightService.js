@@ -10,7 +10,18 @@ const addLight = async (client, category, title, date, place, people_cnt, descri
   }
 };
 
+const putLight = async (client, lightId, category, title, date, place, people_cnt, description, time) => {
+  try {
+    const data = await lightDao.putLight(client, lightId, category,title, date, place
+      , people_cnt, description, time);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 module.exports = {
     addLight,
+    putLight
 };

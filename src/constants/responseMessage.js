@@ -75,5 +75,6 @@ module.exports = {
   ALREADY_POST_STICKER: '이미 스티커를 전송했습니다.',
 
   // 번개
-  LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.'
+  LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',
+  LIGHT_PUT_SUCCESS: '번개 수정이 완료되었습니다.'
 };
