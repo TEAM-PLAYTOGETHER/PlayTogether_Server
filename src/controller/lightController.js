@@ -18,12 +18,17 @@ const addLight = async (req, res) => {
 
     const result = await lightService.addLight(client, category, title, date, place,
        people_cnt, description, image,organizerId, crewId, time);
-    
-    if(result.data == null){
-      return res.status(result.statusCode).json(util.fail(result.statusCode, result.message))
-    }
+       
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS, result));
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
 
-    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS));
+
   } catch (error) {
     console.log(error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
