@@ -9,6 +9,7 @@ module.exports = {
   ALREADY_EMAIL: '이미 사용중인 이메일입니다.',
   ALREADY_NICKNAME: '이미 사용중인 닉네임입니다.',
   USEABLE_NICKNAME: '사용 가능한 닉네임입니다.',
+  ALREADY_USER_ID: '이미 사용중인 아이디입니다',
 
   // 로그인
   LOGIN_SUCCESS: '로그인 성공',
@@ -76,5 +77,5 @@ module.exports = {
 
   // 번개
   LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',
-  LIGHT_PUT_SUCCESS: '번개 수정이 완료되었습니다.'
+  LIGHT_PUT_SUCCESS: '번개 수정이 완료되었습니다.',
 };

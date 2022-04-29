@@ -1,4 +1,4 @@
-const { messageDao, testDao } = require('../db');
+const { messageDao, testDao, userDao } = require('../db');
 
 const { serviceReturn } = require('../lib/util');
 const statusCode = require('../constants/statusCode');
@@ -7,9 +7,8 @@ const util = require('../lib/util');
 
 const sendMessage = async (client, sendId, recvId, content) => {
   try {
-    // TODO: testDao -> userDao로 변경하기 (작업 안겹치게 임시)
     // recvId가 존재하는 유저인지 검사
-    const exist = await testDao.getUserById(client, recvId);
+    const exist = await userDao.getUserById(recvId);
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }

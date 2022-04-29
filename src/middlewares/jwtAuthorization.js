@@ -5,7 +5,7 @@ const config = require('../config');
 const util = require('../lib/util');
 const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
-const { testDao } = require('../db');
+const { testDao, userDao } = require('../db');
 
 const authMiddleware = async (req, res, next) => {
   // 토큰이 없는 경우
@@ -13,16 +13,10 @@ const authMiddleware = async (req, res, next) => {
     return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_EMPTY));
   }
 
-  let client;
-
   try {
-    client = await db.connect(req);
-
     const token = req.headers.authorization;
     const decoded = jwt.verify(token, config.jwt.secret);
-
-    // TODO: testDao -> userDao로 변경하기 (작업 안겹치게 임시)
-    const user = await testDao.getUserById(client, decoded.user.id);
+    const user = await userDao.getUserById(decoded.user.id);
 
     // decoded된 userId가 가르키는 회원이 없는 경우
     if (!user) {
@@ -38,8 +32,6 @@ const authMiddleware = async (req, res, next) => {
     } else {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_INVALID));
     }
-  } finally {
-    client.release();
   }
 };
 
