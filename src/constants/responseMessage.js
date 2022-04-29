@@ -32,6 +32,9 @@ module.exports = {
   MESSAGE_READ_SUCCESS: '메시지 불러오기 성공',
   MESSAGE_READ_FAIL: '메시지 불러오기 실패',
 
+  // 동아리
+  CREW_CREATE_SUCCESS: '동아리 만들기 성공',
+
   // 그룹
   READ_ALL_GROUP: '그룹 정보 불러오기 성공',
   READ_USER_NAME: '유저 이름 불러오기 성공',
