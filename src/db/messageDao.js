@@ -4,8 +4,8 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
 const getRoom = async (sendId, recvId) => {
   let client;
+  const log = `messageDao.getRoom | sendId = ${sendId}, recvId = ${recvId}`;
   try {
-    const log = `messageDao.getRoom | sendId = ${sendId}, recvId = ${recvId}`;
     client = await db.connect(log);
 
     const { rows } = await client.query(
@@ -19,8 +19,8 @@ const getRoom = async (sendId, recvId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(error);
-    // return 고민
+    console.log(log + '에서 에러 발생');
+    return null;
   } finally {
     client.release();
   }
@@ -28,8 +28,8 @@ const getRoom = async (sendId, recvId) => {
 
 const createRoom = async (sendId, recvId) => {
   let client;
+  const log = `messageDao.createRoom | sendId = ${sendId}, recvId = ${recvId}`;
   try {
-    const log = `messageDao.createRoom | sendId = ${sendId}, recvId = ${recvId}`;
     client = await db.connect(log);
 
     const { rows } = await client.query(
@@ -42,8 +42,8 @@ const createRoom = async (sendId, recvId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(error);
-    // return
+    console.log(log + '에서 에러 발생');
+    return null;
   } finally {
     client.release();
   }
@@ -51,8 +51,8 @@ const createRoom = async (sendId, recvId) => {
 
 const sendMessage = async (roomId, sendId, recvId, content) => {
   let client;
+  const log = `messageDao.sendMessage | roomId = ${roomId}, sendId = ${sendId}, recvId = ${recvId}, content = ${content}`;
   try {
-    const log = `messageDao.sendMessage | roomId = ${roomId}, sendId = ${sendId}, recvId = ${recvId}, content = ${content}`;
     client = await db.connect(log);
     const { rowCount } = await client.query(
       `
@@ -63,8 +63,8 @@ const sendMessage = async (roomId, sendId, recvId, content) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(error);
-    // return
+    console.log(log + '에서 에러 발생');
+    return null;
   } finally {
     client.release();
   }
@@ -72,8 +72,8 @@ const sendMessage = async (roomId, sendId, recvId, content) => {
 
 const getAllMessageById = async (userId) => {
   let client;
+  const log = `messageDao.getAllMessageById | userId = ${userId}`;
   try {
-    const log = `messageDao.getAllMessageById | userId = ${userId}`;
     client = await db.connect(log);
     const { rows } = await client.query(
       `
@@ -108,8 +108,8 @@ const getAllMessageById = async (userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(error);
-    // return
+    console.log(log + '에서 에러 발생');
+    return null;
   } finally {
     client.release();
   }
@@ -117,8 +117,8 @@ const getAllMessageById = async (userId) => {
 
 const getAllMessageByRoomId = async (roomId) => {
   let client;
+  const log = `messageDao.getAllMessageByRoomId | roomId = ${roomId}`;
   try {
-    const log = `messageDao.getAllMessageByRoomId | roomId = ${roomId}`;
     client = await db.connect(log);
 
     const { rows } = await client.query(
@@ -134,8 +134,8 @@ const getAllMessageByRoomId = async (roomId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(error);
-    // return
+    console.log(log + '에서 에러 발생');
+    return null;
   } finally {
     client.release();
   }

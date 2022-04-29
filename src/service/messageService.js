@@ -15,16 +15,19 @@ const sendMessage = async (sendId, recvId, content) => {
 
     // Dao에서 Room 가져오기 (getRoom(senderId, receiverId) : roomId)
     let roomExist = await messageDao.getRoom(sendId, recvId);
+    if (roomExist === null) throw new Error();
 
     // 만약 room이 없다면 생성
     if (!roomExist) {
       roomExist = await messageDao.createRoom(sendId, recvId);
     }
+    if (roomExist === null) throw new Error();
 
     const roomId = roomExist.id;
 
     // messageDao에서 message 보내기
     const cnt = await messageDao.sendMessage(roomId, sendId, recvId, content);
+    if (cnt === null) throw new Error();
 
     // insert 쿼리의 결과가 1이 아니라면 에러 처리
     if (cnt !== 1) {
@@ -34,7 +37,7 @@ const sendMessage = async (sendId, recvId, content) => {
     // 성공
     return util.success(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
   } catch (error) {
-    console.log('Service에서 error 발생: ' + error);
+    console.log('sendMessage에서 error 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
@@ -42,6 +45,7 @@ const sendMessage = async (sendId, recvId, content) => {
 const getAllMessageById = async (userId) => {
   try {
     const rowMessages = await messageDao.getAllMessageById(userId);
+    if (rowMessages === null) throw new Error();
 
     const messages = rowMessages.map((rowMessage) => {
       let message = {
@@ -57,7 +61,7 @@ const getAllMessageById = async (userId) => {
 
     return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
   } catch (error) {
-    console.log('Service에서 error 발생: ' + error);
+    console.log('getAllMessageById에서 error 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
@@ -65,6 +69,7 @@ const getAllMessageById = async (userId) => {
 const getAllMessageByRoomId = async (roomId, userId) => {
   try {
     const rowMessages = await messageDao.getAllMessageByRoomId(roomId);
+    if (rowMessages === null) throw new Error();
 
     const messages = rowMessages.map((rowMessage) => {
       let message = {
@@ -78,7 +83,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
 
     return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
   } catch (error) {
-    console.log('Service에서 error 발생: ' + error);
+    console.log('getAllMessageByRoomId에서 error 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
