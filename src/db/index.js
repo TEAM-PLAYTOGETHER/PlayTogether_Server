@@ -10,6 +10,7 @@ const userDao = require('./userDao');
 
 // 동아리 관련 dao
 const crewDao = require('./crewDao');
+const crewUserDao = require('./crewUserDao');
 
 module.exports = {
   testDao,
@@ -18,4 +19,5 @@ module.exports = {
   lightDao,
   messageDao,
   crewDao,
+  crewUserDao,
 };
