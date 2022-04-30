@@ -39,14 +39,8 @@ const pool = new Pool({
 // 위에서 생성한 커넥션 풀에서 커넥션을 빌려오는 함수를 재정의합니다.
 // 기본적으로 제공되는 pool.connect()와 pool.connect().release() 함수에 디버깅용 메시지를 추가하는 작업입니다.
 // 어디서 온 요청인지 파악하기 위해 req를 먹임
-const connect = async (req) => {
+const connect = async (log) => {
   const now = dayjs();
-  const string =
-    !!req && !!req.method
-      ? `[${req.method}] ${!!req.user ? `${req.user.id}` : ``} ${req.originalUrl}\n ${!!req.query && `query: ${JSON.stringify(req.query)}`} ${!!req.body && `body: ${JSON.stringify(req.body)}`} ${
-          !!req.params && `params ${JSON.stringify(req.params)}`
-        }`
-      : `request 없음`;
   const callStack = new Error().stack;
   const client = await pool.connect();
   const query = client.query;
@@ -70,10 +64,9 @@ const connect = async (req) => {
   client.release = () => {
     clearTimeout(releaseChecker);
     const time = dayjs().diff(now, 'millisecond');
-    if (time > 4000) {
-      const message = `[RELEASE] in ${time} | ${string}`;
-      devMode && console.log(message);
-    }
+    const message = `[RELEASE] in ${time}ms | ${log}`;
+    devMode && console.log(message);
+
     client.query = query;
     client.release = release;
     return release.apply(client);
