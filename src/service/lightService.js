@@ -1,4 +1,4 @@
-const { lightDao } = require('../db');
+const { lightDao, lightUserDao } = require('../db');
 const db = require('../loaders/db');
 
 const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
@@ -22,22 +22,21 @@ const putLight = async (lightId, category, title, date, place, people_cnt, descr
 }
 const postEnterLight = async (lightId, memberId) => {
   try {
-    await lightDao.postEnterLight(lightId, memberId);
-
+    await lightUserDao.postEnterLight(lightId, memberId);
   } catch (error) {
     console.log('postEnterLight error 발생'+ error);
   }
 }
 const deleteCancelLight = async (lightId, memberId) => {
   try {
-    await lightDao.deleteCancelLight(lightId, memberId);
+    await lightUserDao.deleteCancelLight(lightId, memberId);
   } catch (error) {
     console.log('deleteCancelLight error 발생'+ error);
   }
 }
 const getEnterLightMember = async (lightId, memberId) => {
   try {
-    const data = await lightDao.getEnterLightMember(lightId, memberId);
+    const data = await lightUserDao.getEnterLightMember(lightId, memberId);
     return data
   } catch (error) {
     console.log('getEnterLightMember error 발생'+ error);

@@ -1,6 +1,5 @@
 const { lightService } = require('../service');
 
-const db = require('../loaders/db');
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');

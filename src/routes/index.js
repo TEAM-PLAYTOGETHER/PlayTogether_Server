@@ -10,4 +10,7 @@ router.use('/light', require('./lightApi'));
 router.use('/message', require('./messageAPI'));
 router.use('/crew', require('./crewAPI'));
 
+// 스크랩 관련 라우터
+router.use('/scrap', require('./scrapApi'));
+
 module.exports = router;
