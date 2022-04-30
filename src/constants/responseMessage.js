@@ -34,6 +34,9 @@ module.exports = {
 
   // 동아리
   CREW_CREATE_SUCCESS: '동아리 만들기 성공',
+  CREW_REGISTER_SUCCESS: '동아리 가입 성공',
+  NO_CREW: '존재하지 않는 동아리입니다.',
+  ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
 
   // 그룹
   READ_ALL_GROUP: '그룹 정보 불러오기 성공',
@@ -83,5 +86,5 @@ module.exports = {
   LIGHT_PUT_SUCCESS: '번개 수정이 완료되었습니다.',
   LIGHT_ENTER_SUCCESS: '번개 참여가 완료되었습니다.',
   LIGHT_CANCEL_SUCCESS: '번개 참여 취소가 완료되었습니다.',
-  LIGHT_DELETE_SUCCESS: '번개 삭제가 완료되었습니다.'
+  LIGHT_DELETE_SUCCESS: '번개 삭제가 완료되었습니다.',
 };
