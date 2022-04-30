@@ -20,24 +20,27 @@ const putLight = async (lightId, category, title, date, place, people_cnt, descr
     console.log('putLight에서 error 발생'+ error);
   }
 }
-
-
 const postEnterLight = async (lightId, memberId) => {
   try {
     await lightDao.postEnterLight(lightId, memberId);
+
   } catch (error) {
     console.log('postEnterLight error 발생'+ error);
   }
 }
-const checkLightEnterd = async (lightId, memberId) => {
+const deleteCancelLight = async (lightId, memberId) => {
   try {
-    const data = await lightDao.checkLightEnterd(lightId, memberId);
-    const enterd = data === 0 ? false : true;
-    return {
-      enterd
-    };
+    await lightDao.deleteCancelLight(lightId, memberId);
   } catch (error) {
-    console.log('checkLightEnterd error 발생'+ error);
+    console.log('deleteCancelLight error 발생'+ error);
+  }
+}
+const getEnterLightMember = async (lightId, memberId) => {
+  try {
+    const data = await lightDao.getEnterLightMember(lightId, memberId);
+    return data
+  } catch (error) {
+    console.log('getEnterLightMember error 발생'+ error);
   }
 }
 
@@ -46,5 +49,6 @@ module.exports = {
     addLight,
     putLight,
     postEnterLight,
-    checkLightEnterd
+    deleteCancelLight,
+    getEnterLightMember
 };
