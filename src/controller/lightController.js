@@ -40,15 +40,19 @@ const putLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
-const postEnterLight = async (req, res) => {
+const postLight = async (req, res) => {
   const { lightId, memberId } = req.params;
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
+    const existedEnter = await lightService.getEnterLightMember(lightId, memberId);
+    if(existedEnter) {
+      await lightService.deleteCancelLight(lightId, memberId);
+      return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_CANCEL_SUCCESS));    
+    }
     await lightService.postEnterLight(lightId, memberId);
     
-    const checkLightEnterd = await lightService.checkLightEnterd(lightId, memberId);
-    
-    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_ENTER_SUCCESS, checkLightEnterd));    
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_ENTER_SUCCESS));    
   } catch (error) {
     console.log(error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
@@ -61,5 +65,5 @@ const postEnterLight = async (req, res) => {
 module.exports = {
     addLight,
     putLight,
-    postEnterLight
+    postLight
 };
