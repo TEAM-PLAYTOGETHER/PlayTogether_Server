@@ -61,7 +61,7 @@ const getAllCrewByUserId = async (userId) => {
       `,
       [userId],
     );
-    return convertSnakeToCamel.keysToCamel(rows[0]);
+    return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     console.log(log + '에서 오류 발생' + error);
     return null;
