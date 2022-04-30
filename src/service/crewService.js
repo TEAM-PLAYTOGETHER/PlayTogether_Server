@@ -33,6 +33,30 @@ const createCrew = async (name, masterId) => {
   }
 };
 
+const registerMember = async (userId, crewCode) => {
+  try {
+    const crew = await crewDao.getCrewByCode(crewCode);
+    if (crew === null) throw new Error();
+    if (!crew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+
+    const alreadyRegistered = await crewUserDao.getRegisteredMember(crew.id, userId);
+    if (alreadyRegistered === null) throw new Error();
+    if (alreadyRegistered) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_REGISTERED);
+    }
+
+    const cnt = await crewUserDao.registerCrewMember(crew.id, userId);
+    if (cnt !== 1) throw new Error();
+
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS);
+  } catch (error) {
+    console.log('registerMember에서 오류 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  }
+};
+
 module.exports = {
   createCrew,
 };
