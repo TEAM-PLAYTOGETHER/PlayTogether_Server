@@ -70,8 +70,31 @@ const getAllCrewByUserId = async (userId) => {
   }
 };
 
+const withdrawAllMemberByCrewId = async (crewId) => {
+  let client;
+  const log = `crewUserDao.withdrawAllMemberByCrewId | crewId = ${crewId}`;
+  try {
+    client = await db.connect(log);
+
+    const { rowCount } = await client.query(
+      `
+      delete from crew_user
+      where crew_id = $1;
+      `,
+      [crewId],
+    );
+    return rowCount;
+  } catch (error) {
+    console.log(log + '에서 오류 발생' + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   registerCrewMember,
   getRegisteredMember,
   getAllCrewByUserId,
+  withdrawAllMemberByCrewId,
 };
