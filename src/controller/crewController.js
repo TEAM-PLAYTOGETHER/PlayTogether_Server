@@ -17,6 +17,20 @@ const createCrew = async (req, res) => {
   }
 };
 
+const registerMember = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const crewCode = req.body.crewCode;
+
+    const result = await crewService.registerMember(userId, crewCode);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.log('registerMember Controller 에러: ', error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createCrew,
+  registerMember,
 };

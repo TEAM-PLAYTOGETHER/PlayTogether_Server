@@ -50,7 +50,7 @@ const registerMember = async (userId, crewCode) => {
     const cnt = await crewUserDao.registerCrewMember(crew.id, userId);
     if (cnt !== 1) throw new Error();
 
-    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS);
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
   } catch (error) {
     console.log('registerMember에서 오류 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
@@ -59,4 +59,5 @@ const registerMember = async (userId, crewCode) => {
 
 module.exports = {
   createCrew,
+  registerMember,
 };
