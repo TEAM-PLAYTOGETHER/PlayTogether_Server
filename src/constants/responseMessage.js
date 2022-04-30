@@ -37,6 +37,7 @@ module.exports = {
   CREW_REGISTER_SUCCESS: '동아리 가입 성공',
   NO_CREW: '존재하지 않는 동아리입니다.',
   ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
+  READ_REGISTER_INFO_SUCCESS: '동아리 가입정보 가져오기 성공',
 
   // 그룹
   READ_ALL_GROUP: '그룹 정보 불러오기 성공',
