@@ -49,6 +49,10 @@ const getAllMessageByRoomId = async (req, res) => {
     const { roomId } = req.params;
     const userId = req.user.id;
 
+    if (!roomId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
     const result = await messageService.getAllMessageByRoomId(roomId, userId);
 
     return res.status(result.status).json(result);
