@@ -57,7 +57,18 @@ const registerMember = async (userId, crewCode) => {
   }
 };
 
+const getAllCrewByUserId = async (userId) => {
+  try {
+    const crews = await crewUserDao.getAllCrewByUserId(userId);
+    return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: crews });
+  } catch (error) {
+    console.log('registerMember에서 오류 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  }
+};
+
 module.exports = {
   createCrew,
   registerMember,
+  getAllCrewByUserId,
 };
