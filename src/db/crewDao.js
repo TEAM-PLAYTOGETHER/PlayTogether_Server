@@ -47,7 +47,30 @@ const getCrewByCode = async (code) => {
   }
 };
 
+const deleteCrewByCrewId = async (crewId) => {
+  let client;
+  const log = `crewDao.deleteCrewByCrewId | crewId = ${crewId}`;
+  try {
+    client = await db.connect(log);
+
+    const { rowCount } = await client.query(
+      `
+        delete from crew
+        where id = $1
+            `,
+      [crewId],
+    );
+    return rowCount;
+  } catch (error) {
+    console.log(log + '에서 오류 발생' + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   createCrew,
   getCrewByCode,
+  deleteCrewByCrewId,
 };

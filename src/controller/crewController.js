@@ -43,8 +43,24 @@ const getAllCrewByUserId = async (req, res) => {
   }
 };
 
+const deleteCrewByCrewId = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { crewCode } = req.body;
+
+    const result = await crewService.deleteCrewByCrewId(userId, crewCode);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.log('deleteCrewByCrewId Controller 에러: ', error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
+// TODO: null check
+
 module.exports = {
   createCrew,
   registerMember,
   getAllCrewByUserId,
+  deleteCrewByCrewId,
 };
