@@ -1,22 +1,27 @@
 const { lightDao } = require('../db');
+const db = require('../loaders/db');
 
-const addLight = async (client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
+const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   try {
-    const data = await lightDao.addLight(client, category, title, date, place
+    const data = await lightDao.addLight(category, title, date, place
         , people_cnt, description,image, organizerId, crewId, time);
     return data;
   } catch (error) {
-    console.log(error);
+    console.log('addLight에서 error 발생'+ error);
   }
 };
 
-const putLight = async (client, lightId, category, title, date, place, people_cnt, description, time) => {
+const putLight = async (lightId, category, title, date, place, people_cnt, description, time) => {
   try {
-    const data = await lightDao.putLight(client, lightId, category,title, date, place
+    const data = await lightDao.putLight(lightId, category,title, date, place
       , people_cnt, description, time);
     return data;
   } catch (error) {
-    console.log(error);
+    console.log('putLight에서 error 발생'+ error);
+  }
+}
+
+
 const postEnterLight = async (lightId, memberId) => {
   try {
     await lightDao.postEnterLight(lightId, memberId);
@@ -39,7 +44,7 @@ const checkLightEnterd = async (lightId, memberId) => {
 
 module.exports = {
     addLight,
-    putLight
+    putLight,
     postEnterLight,
     checkLightEnterd
 };
