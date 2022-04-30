@@ -70,6 +70,7 @@ const getAllCrewByUserId = async (userId) => {
   }
 };
 
+// TODO: 일단 soft delete 적용 안했습니다.
 const withdrawAllMemberByCrewId = async (crewId) => {
   let client;
   const log = `crewUserDao.withdrawAllMemberByCrewId | crewId = ${crewId}`;
