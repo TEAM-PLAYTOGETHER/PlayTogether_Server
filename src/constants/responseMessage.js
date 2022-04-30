@@ -88,4 +88,8 @@ module.exports = {
   LIGHT_ENTER_SUCCESS: '번개 참여가 완료되었습니다.',
   LIGHT_CANCEL_SUCCESS: '번개 참여 취소가 완료되었습니다.',
   LIGHT_DELETE_SUCCESS: '번개 삭제가 완료되었습니다.',
+
+  // 스크랩
+  SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
+  SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.'
 };

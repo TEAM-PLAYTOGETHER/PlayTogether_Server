@@ -12,6 +12,7 @@ const userDao = require('./userDao');
 const crewDao = require('./crewDao');
 const crewUserDao = require('./crewUserDao');
 
+const scrapDao = require('./scrapDao');
 module.exports = {
   testDao,
   authDao,
@@ -20,4 +21,5 @@ module.exports = {
   messageDao,
   crewDao,
   crewUserDao,
+  scrapDao
 };
