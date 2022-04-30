@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/', authMiddleware, crewController.createCrew);
 router.post('/register', authMiddleware, crewController.registerMember);
+router.get('/list', authMiddleware, crewController.getAllCrewByUserId);
 
 module.exports = router;
