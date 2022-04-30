@@ -20,8 +20,6 @@ const addLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
-
-
 const putLight = async (req, res) => {
   const { lightId } = req.params;
   const { category, title, date, place, people_cnt, description, time  } = req.body;
@@ -40,7 +38,7 @@ const putLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
-const postLight = async (req, res) => {
+const postEnterLight = async (req, res) => {
   const { lightId, memberId } = req.params;
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
@@ -58,6 +56,19 @@ const postLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
+const deleteLight = async (req, res) => {
+  const { lightId, organizerId } = req.params;
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  try {
+    await lightService.deleteLight(lightId, organizerId);
+    
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_DELETE_SUCCESS));    
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
 
 
 
@@ -65,5 +76,7 @@ const postLight = async (req, res) => {
 module.exports = {
     addLight,
     putLight,
-    postLight
+    postEnterLight,
+    deleteLight
+
 };

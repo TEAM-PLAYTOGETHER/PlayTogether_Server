@@ -130,6 +130,26 @@ const deleteCancelLight = async(lightId, memberId) => {
     client.release();
   }
 };
+const deleteLight = async(lightId, organizerId) => {
+  let client;
+
+  const log = `lightDao.deleteLight | lightId = ${lightId}, organizerId = ${organizerId}`;
+  try {
+    client = await db.connect(log);
+    await client.query(
+      `
+      DELETE FROM light 
+      WHERE id = $1 AND organizer_id = $2
+      `,
+      [lightId, organizerId],
+    );
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
     addLight,
@@ -137,4 +157,5 @@ module.exports = {
     postEnterLight,
     getEnterLightMember,
     deleteCancelLight,
+    deleteLight
 };
