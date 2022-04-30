@@ -40,7 +40,7 @@ const putLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
-const postLight = async (req, res) => {
+const postEnterLight = async (req, res) => {
   const { lightId, memberId } = req.params;
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
@@ -65,5 +65,5 @@ const postLight = async (req, res) => {
 module.exports = {
     addLight,
     putLight,
-    postLight
+    postEnterLight,
 };
