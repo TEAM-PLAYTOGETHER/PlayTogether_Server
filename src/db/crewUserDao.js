@@ -46,7 +46,32 @@ const getRegisteredMember = async (crewId, memberId) => {
   }
 };
 
+const getAllCrewByUserId = async (userId) => {
+  let client;
+  const log = `crewUserDao.getAllCrewByUserId | userId = ${userId}`;
+  try {
+    client = await db.connect(log);
+
+    const { rows } = await client.query(
+      `
+      select c.id, c.name
+      from crew_user cu
+      left join crew c on cu.crew_id = c.id
+      where member_id = $1;
+      `,
+      [userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + '에서 오류 발생' + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   registerCrewMember,
   getRegisteredMember,
+  getAllCrewByUserId,
 };
