@@ -1,5 +1,5 @@
 const express = require('express');
-const { lightConroller } = require('../controller');
+const { lightController } = require('../controller');
 const upload = require('../middlewares/multer');
 
 const router = express.Router();

@@ -9,6 +9,7 @@ module.exports = {
   ALREADY_EMAIL: '이미 사용중인 이메일입니다.',
   ALREADY_NICKNAME: '이미 사용중인 닉네임입니다.',
   USEABLE_NICKNAME: '사용 가능한 닉네임입니다.',
+  ALREADY_USER_ID: '이미 사용중인 아이디입니다',
 
   // 로그인
   LOGIN_SUCCESS: '로그인 성공',
@@ -30,6 +31,9 @@ module.exports = {
   NO_MESSAGE: '메시지 내용이 없습니다.',
   MESSAGE_READ_SUCCESS: '메시지 불러오기 성공',
   MESSAGE_READ_FAIL: '메시지 불러오기 실패',
+
+  // 동아리
+  CREW_CREATE_SUCCESS: '동아리 만들기 성공',
 
   // 그룹
   READ_ALL_GROUP: '그룹 정보 불러오기 성공',

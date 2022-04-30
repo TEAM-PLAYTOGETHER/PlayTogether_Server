@@ -1,31 +1,32 @@
-const { messageDao, testDao } = require('../db');
+const { messageDao, testDao, userDao } = require('../db');
 
-const { serviceReturn } = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const util = require('../lib/util');
 
-const sendMessage = async (client, sendId, recvId, content) => {
+const sendMessage = async (sendId, recvId, content) => {
   try {
-    // TODO: testDao -> userDao로 변경하기 (작업 안겹치게 임시)
     // recvId가 존재하는 유저인지 검사
-    const exist = await testDao.getUserById(client, recvId);
+    const exist = await userDao.getUserById(recvId);
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
 
     // Dao에서 Room 가져오기 (getRoom(senderId, receiverId) : roomId)
-    let roomExist = await messageDao.getRoom(client, sendId, recvId);
+    let roomExist = await messageDao.getRoom(sendId, recvId);
+    if (roomExist === null) throw new Error();
 
     // 만약 room이 없다면 생성
     if (!roomExist) {
-      roomExist = await messageDao.createRoom(client, sendId, recvId);
+      roomExist = await messageDao.createRoom(sendId, recvId);
     }
+    if (roomExist === null) throw new Error();
 
     const roomId = roomExist.id;
 
     // messageDao에서 message 보내기
-    const cnt = await messageDao.sendMessage(client, roomId, sendId, recvId, content);
+    const cnt = await messageDao.sendMessage(roomId, sendId, recvId, content);
+    if (cnt === null) throw new Error();
 
     // insert 쿼리의 결과가 1이 아니라면 에러 처리
     if (cnt !== 1) {
@@ -35,14 +36,15 @@ const sendMessage = async (client, sendId, recvId, content) => {
     // 성공
     return util.success(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
   } catch (error) {
-    console.log('Service에서 error 발생: ' + error);
+    console.log('sendMessage에서 error 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
 
-const getAllMessageById = async (client, userId) => {
+const getAllMessageById = async (userId) => {
   try {
-    const rowMessages = await messageDao.getAllMessageById(client, userId);
+    const rowMessages = await messageDao.getAllMessageById(userId);
+    if (rowMessages === null) throw new Error();
 
     const messages = rowMessages.map((rowMessage) => {
       let message = {
@@ -58,14 +60,15 @@ const getAllMessageById = async (client, userId) => {
 
     return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
   } catch (error) {
-    console.log('Service에서 error 발생: ' + error);
+    console.log('getAllMessageById에서 error 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };
 
-const getAllMessageByRoomId = async (client, roomId, userId) => {
+const getAllMessageByRoomId = async (roomId, userId) => {
   try {
-    const rowMessages = await messageDao.getAllMessageByRoomId(client, roomId);
+    const rowMessages = await messageDao.getAllMessageByRoomId(roomId);
+    if (rowMessages === null) throw new Error();
 
     const messages = rowMessages.map((rowMessage) => {
       let message = {
@@ -79,7 +82,7 @@ const getAllMessageByRoomId = async (client, roomId, userId) => {
 
     return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
   } catch (error) {
-    console.log('Service에서 error 발생: ' + error);
+    console.log('getAllMessageByRoomId에서 error 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   }
 };

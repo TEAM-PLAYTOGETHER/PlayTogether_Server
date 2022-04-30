@@ -1,9 +1,15 @@
 const testController = require('./testController');
-const lightConroller = require('./lightController');
+const lightController = require('./lightController');
 const messageController = require('./messageController');
+const crewController = require('./crewController');
+
+// 유저 관련 컨트롤러
+const authController = require('./authController');
 
 module.exports = {
   testController,
-  lightConroller,
+  authController,
+  lightController,
   messageController,
+  crewController,
 };
