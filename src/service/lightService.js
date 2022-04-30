@@ -43,6 +43,13 @@ const getEnterLightMember = async (lightId, memberId) => {
     console.log('getEnterLightMember error 발생'+ error);
   }
 }
+const deleteLight = async (lightId, organizerId) => {
+  try {
+    await lightDao.deleteLight(lightId, organizerId);
+  } catch (error) {
+    console.log('deleteCancelLight error 발생'+ error);
+  }
+}
 
 
 module.exports = {
@@ -50,5 +57,6 @@ module.exports = {
     putLight,
     postEnterLight,
     deleteCancelLight,
-    getEnterLightMember
+    getEnterLightMember,
+    deleteLight
 };
