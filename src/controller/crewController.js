@@ -6,10 +6,14 @@ const responseMessage = require('../constants/responseMessage');
 
 const createCrew = async (req, res) => {
   try {
-    const masterId = req.user.id;
+    const userId = req.user.id;
     const name = req.body.crewName;
 
-    const result = await crewService.createCrew(name, masterId);
+    if (!name) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    const result = await crewService.createCrew(name, userId);
     return res.status(result.status).json(result);
   } catch (error) {
     console.log('createCrew Controller 에러: ', error);
@@ -21,6 +25,10 @@ const registerMember = async (req, res) => {
   try {
     const userId = req.user.id;
     const crewCode = req.body.crewCode;
+
+    if (!crewCode) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
 
     const result = await crewService.registerMember(userId, crewCode);
     return res.status(result.status).json(result);
@@ -48,6 +56,10 @@ const deleteCrewByCrewId = async (req, res) => {
     const userId = req.user.id;
     const { crewCode } = req.body;
 
+    if (!crewCode) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
     const result = await crewService.deleteCrewByCrewId(userId, crewCode);
     return res.status(result.status).json(result);
   } catch (error) {
@@ -55,8 +67,6 @@ const deleteCrewByCrewId = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
-
-// TODO: null check
 
 module.exports = {
   createCrew,
