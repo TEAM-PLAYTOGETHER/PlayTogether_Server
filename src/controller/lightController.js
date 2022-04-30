@@ -45,11 +45,18 @@ const putLight = async (req, res) => {
     if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
       
     return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS));
+const postEnterLight = async (req, res) => {
+  const { lightId, memberId } = req.params;
+
+  try {
+    await lightService.postEnterLight(lightId, memberId);
+    
+    const checkLightEnterd = await lightService.checkLightEnterd(lightId, memberId);
+    
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_ENTER_SUCCESS, checkLightEnterd));    
   } catch (error) {
     console.log(error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
-  } finally {
-    client.release();
   }
 };
 
@@ -58,4 +65,5 @@ const putLight = async (req, res) => {
 module.exports = {
     addLight,
     putLight
+    postEnterLight
 };

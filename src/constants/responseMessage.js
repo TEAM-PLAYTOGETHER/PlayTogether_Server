@@ -76,5 +76,6 @@ module.exports = {
 
   // 번개
   LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',
-  LIGHT_PUT_SUCCESS: '번개 수정이 완료되었습니다.'
+  LIGHT_PUT_SUCCESS: '번개 수정이 완료되었습니다.',
+  LIGHT_ENTER_SUCCESS: '번개 참여가 완료되었습니다.'
 };
