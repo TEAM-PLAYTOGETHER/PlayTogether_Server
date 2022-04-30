@@ -67,8 +67,38 @@ const getAllCrewByUserId = async (userId) => {
   }
 };
 
+// 삭제 로직
+// 1. 내가 대빵인지 확인
+// 2. 멤버 모두 탈퇴시키기
+// 3. 동아리 삭제하기
+const deleteCrewByCrewId = async (userId, crewCode) => {
+  try {
+    const crew = await crewDao.getCrewByCode(crewCode);
+    if (crew === null) throw new Error();
+    if (!crew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+
+    if (userId !== crew.masterId) {
+      return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_MASTER_USER);
+    }
+
+    let cnt = await crewUserDao.withdrawAllMemberByCrewId(crew.id);
+    if (cnt === null) throw new Error();
+
+    cnt = await crewDao.deleteCrewByCrewId(crew.id);
+    if (cnt !== 1) throw new Error();
+
+    return util.success(statusCode.OK, responseMessage.CREW_DELETE_SUCCESS);
+  } catch (error) {
+    console.log('deleteCrewByCrewId에서 오류 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  }
+};
+
 module.exports = {
   createCrew,
   registerMember,
   getAllCrewByUserId,
+  deleteCrewByCrewId,
 };
