@@ -6,8 +6,10 @@ module.exports = {
   // 회원가입
   CREATED_USER: '회원 가입 성공',
   DELETE_USER: '회원 탈퇴 성공',
+  ALREADY_ID: '이미 사용중인 아이디입니다.',
   ALREADY_EMAIL: '이미 사용중인 이메일입니다.',
   ALREADY_NICKNAME: '이미 사용중인 닉네임입니다.',
+  USEABLE_ID: '중복되는 아이디가 없습니다.',
   USEABLE_NICKNAME: '사용 가능한 닉네임입니다.',
   ALREADY_USER_ID: '이미 사용중인 아이디입니다',
 
@@ -93,5 +95,5 @@ module.exports = {
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
-  SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.'
+  SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.',
 };

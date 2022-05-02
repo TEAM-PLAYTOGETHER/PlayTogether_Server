@@ -52,7 +52,18 @@ const login = async (userLoginId, password) => {
   }
 };
 
+const isUser = async (userLoginId) => {
+  const userExist = await userDao.getUserByUserLoginId(userLoginId);
+
+  if (userExist) {
+    return util.success(statusCode.OK, responseMessage.ALREADY_ID, { isUser: true });
+  }
+
+  return util.success(statusCode.OK, responseMessage.USEABLE_ID, { isUser: false });
+};
+
 module.exports = {
   createUser,
   login,
+  isUser,
 };

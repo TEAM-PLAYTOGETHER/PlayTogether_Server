@@ -40,7 +40,25 @@ const signup = async (req, res) => {
   }
 };
 
+const isUser = async (req, res) => {
+  try {
+    const { userLoginId } = req.body;
+
+    // 유저 아이디 입력 시 에러 처리
+    if (!userLoginId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    const userExist = await authService.isUser(userLoginId);
+
+    return res.status(userExist.status).json(userExist);
+  } catch (error) {
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   signup,
   login,
+  isUser,
 };
