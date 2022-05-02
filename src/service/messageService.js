@@ -78,7 +78,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
       let message = {
         messageId: rowMessage.id,
         send: Number(rowMessage.sendId) === Number(userId),
-        read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
+        read: Number(rowMessage.sendId) === Number(userId) ? rowMessage.read && true : false,
         createdAt: rowMessage.createdAt,
         content: rowMessage.content,
       };
