@@ -55,6 +55,7 @@ module.exports = {
   LIGHT_GET_ORGANIZER_SUCCESS: '내가 만든 번개 리스트 조회 성공',
   LIGHT_GET_ENTER_SUCCECSS: '내가 참여한 번개 리스트 조회 성공',
   LIGHT_GET_SCRAP_SUCCECSS: '내가 찜한 번개 리스트 조회 성공',
+  LIGHT_GET_CATEGORY_SUCCESS: '카테고리별 번개 리스트 조회 성공',
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',

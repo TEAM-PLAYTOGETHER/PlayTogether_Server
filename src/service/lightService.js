@@ -83,7 +83,7 @@ const getEnterLight = async (memberId) => {
 
     return data;
   } catch (error) {
-    console.log('getOranizerLight error 발생'+ error);
+    console.log('getEnterLight error 발생'+ error);
   }
 }
 const getScrapLight = async (memberId) => {
@@ -101,7 +101,26 @@ const getScrapLight = async (memberId) => {
 
     return data;
   } catch (error) {
-    console.log('getOranizerLight error 발생'+ error);
+    console.log('getScrapLight error 발생'+ error);
+  }
+}
+const getCategoryLight = async (category, sort) => {
+  //to do 현재인원 보내기주기
+  try {
+    const result = await lightDao.getCategoryLight(category,sort);
+    const data = result.map(light => ({
+        light_id : light.id,
+        category : light.category,
+        title: light.title,
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0,-3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+    }))
+
+    return data;
+  } catch (error) {
+    console.log('getCategoryLight error 발생'+ error);
   }
 }
 
@@ -115,5 +134,6 @@ module.exports = {
     deleteLight,
     getOranizerLight,
     getEnterLight,
-    getScrapLight
+    getScrapLight,
+    getCategoryLight
 };

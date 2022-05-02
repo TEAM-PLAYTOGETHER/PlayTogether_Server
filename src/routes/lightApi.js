@@ -11,6 +11,6 @@ router.post('/remove/:lightId/:organizerId', lightController.deleteLight);
 router.get('/open/:organizerId', lightController.getOranizerLight);
 router.get('/enter/:memberId', lightController.getEnterLight);
 router.get('/scrap/:memberId', lightController.getScrapLight);
-
+router.get('/', lightController.getCategoryLight);
 
 module.exports = router;
