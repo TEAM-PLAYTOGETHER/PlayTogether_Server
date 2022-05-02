@@ -4,6 +4,7 @@ const router = express.Router();
 
 // 유저 관련 라우터
 router.use('/auth', require('./authApi'));
+router.use('/user', require('./userAPi'));
 
 router.use('/test', require('./testAPI'));
 router.use('/light', require('./lightApi'));
