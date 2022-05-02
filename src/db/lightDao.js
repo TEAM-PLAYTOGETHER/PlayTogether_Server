@@ -131,11 +131,34 @@ const getEnterLight = async(memberId) => {
     client.release();
   }
 };
+const getScrapLight = async(memberId) => {
+  let client;
+
+  const log = `lightDao.getScrapLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select l.id, title, date, time, people_cnt, place from light l
+      inner join scrap s on l.id = s.light_id
+      where s.member_id = $1;
+      `,
+      [memberId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
     addLight,
     putLight,
     deleteLight,
     getOranizerLight,
-    getEnterLight
+    getEnterLight,
+    getScrapLight
 };
