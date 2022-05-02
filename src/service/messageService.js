@@ -51,7 +51,8 @@ const getAllMessageById = async (userId) => {
         roomId: rowMessage.roomId,
         audience: rowMessage.audience,
         audienceId: rowMessage.audienceId,
-        send: Number(rowMessage.sendId) === Number(userId) ? true : false,
+        send: Number(rowMessage.sendId) === Number(userId),
+        read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
         createdAt: rowMessage.createdAt,
         content: rowMessage.content,
       };
@@ -67,13 +68,17 @@ const getAllMessageById = async (userId) => {
 
 const getAllMessageByRoomId = async (roomId, userId) => {
   try {
+    const cnt = await messageDao.readAllMessage(roomId, userId);
+    if (cnt === null) throw new Error();
+
     const rowMessages = await messageDao.getAllMessageByRoomId(roomId);
     if (rowMessages === null) throw new Error();
 
     const messages = rowMessages.map((rowMessage) => {
       let message = {
         messageId: rowMessage.id,
-        send: Number(rowMessage.sendId) === Number(userId) ? true : false,
+        send: Number(rowMessage.sendId) === Number(userId),
+        read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
         createdAt: rowMessage.createdAt,
         content: rowMessage.content,
       };
