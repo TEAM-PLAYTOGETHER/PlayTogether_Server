@@ -86,6 +86,24 @@ const getEnterLight = async (memberId) => {
     console.log('getOranizerLight error 발생'+ error);
   }
 }
+const getScrapLight = async (memberId) => {
+  //to do 현재인원 보내기주기
+  try {
+    const result = await lightDao.getScrapLight(memberId);
+    const data = result.map(light => ({
+        light_id : light.id,
+        title: light.title,
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0,-3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+    }))
+
+    return data;
+  } catch (error) {
+    console.log('getOranizerLight error 발생'+ error);
+  }
+}
 
 
 module.exports = {
@@ -96,5 +114,6 @@ module.exports = {
     getEnterLightMember,
     deleteLight,
     getOranizerLight,
-    getEnterLight
+    getEnterLight,
+    getScrapLight
 };

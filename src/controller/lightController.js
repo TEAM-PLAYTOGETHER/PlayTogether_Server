@@ -94,6 +94,19 @@ const getEnterLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
+const getScrapLight = async (req, res) => {
+  const { memberId } = req.params;
+  if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  try {
+    const lights = await lightService.getScrapLight(memberId);
+    
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_GET_SCRAP_SUCCECSS, lights));    
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
 
 
 
@@ -104,5 +117,6 @@ module.exports = {
     postEnterLight,
     deleteLight,
     getOranizerLight,
-    getEnterLight
+    getEnterLight,
+    getScrapLight
 };
