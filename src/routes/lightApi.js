@@ -8,5 +8,6 @@ router.post('/add/:crewId/:organizerId', upload.single('image'), lightController
 router.put('/:lightId', lightController.putLight);
 router.post('/enter/:lightId/:memberId', lightController.postEnterLight);
 router.post('/remove/:lightId/:organizerId', lightController.deleteLight);
+router.get('/:organizerId', lightController.getOranizerLight);
 
 module.exports = router;

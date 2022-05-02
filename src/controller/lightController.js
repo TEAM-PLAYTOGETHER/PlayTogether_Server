@@ -68,6 +68,19 @@ const deleteLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
+const getOranizerLight = async (req, res) => {
+  const { organizerId } = req.params;
+  if (!organizerId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  try {
+    const lights = await lightService.getOranizerLight(organizerId);
+    
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_GET_ORGANIZER_SUCCESS, lights));    
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
 
 
 
@@ -76,6 +89,6 @@ module.exports = {
     addLight,
     putLight,
     postEnterLight,
-    deleteLight
-
+    deleteLight,
+    getOranizerLight
 };
