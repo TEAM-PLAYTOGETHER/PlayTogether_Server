@@ -109,10 +109,33 @@ const getOranizerLight = async(organizerId) => {
     client.release();
   }
 };
+const getEnterLight = async(memberId) => {
+  let client;
+
+  const log = `lightDao.getOranizerLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select l.id, title, date, time, people_cnt, place from light l
+      inner join light_user lu on l.id = lu.light_id
+      where lu.member_id = $1;
+      `,
+      [memberId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
     addLight,
     putLight,
     deleteLight,
-    getOranizerLight
+    getOranizerLight,
+    getEnterLight
 };
