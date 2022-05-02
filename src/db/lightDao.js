@@ -153,6 +153,28 @@ const getScrapLight = async(memberId) => {
     client.release();
   }
 };
+const getCategoryLight = async(category, sort) => {
+  let client;
+
+  const log = `lightDao.getCategoryLight | category = ${category}, sort = ${category}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select l.id, category, title, date, time, people_cnt, place from light l
+      where category = $1
+      order by $2 DESC;
+      `,
+      [category, sort],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
     addLight,
@@ -160,5 +182,6 @@ module.exports = {
     deleteLight,
     getOranizerLight,
     getEnterLight,
-    getScrapLight
+    getScrapLight,
+    getCategoryLight
 };
