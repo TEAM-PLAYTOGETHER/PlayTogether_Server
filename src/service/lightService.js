@@ -124,7 +124,39 @@ const getCategoryLight = async (category, sort) => {
     console.log('getCategoryLight error 발생'+ error);
   }
 }
+const getLightDetail = async (lightId) => {
+  //to do 현재인원 보내기주기
+  try {
+    const result = await lightDao.getLightDetail(lightId);
+    const members = await lightDao.getLightDetailMember(lightId);
+    const organizer = await lightDao.getLightDetailOrganizer(lightId);
+    
+    const data2 = members.map(o => ({
+      mbti : o.mbti,
+      gender: o.gender,
+      name : o.name,
       age : Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))) + 1
+  }))
+
+    const data = result.map(light => ({
+        light_id : light.id,
+        category : light.category,
+        title: light.title,
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0,-3),
+        description: light.description,
+        image: light.image,
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        members: data2,
+        organizer: organizer
+    }))
+
+    return data;
+  } catch (error) {
+    console.log('getCategoryLight error 발생'+ error);
+  }
+}
 
 
 module.exports = {
@@ -137,5 +169,6 @@ module.exports = {
     getOranizerLight,
     getEnterLight,
     getScrapLight,
-    getCategoryLight
+    getCategoryLight,
+    getLightDetail
 };

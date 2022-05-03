@@ -175,6 +175,73 @@ const getCategoryLight = async(category, sort) => {
     client.release();
   }
 };
+const getLightDetail = async(lightId) => {
+  let client;
+
+  const log = `lightDao.getLightDetail | lightId = ${lightId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select l.id, category, title, date, time, people_cnt, description, image, place from light l
+      inner join light_user lu on l.id = lu.light_id
+      where l.id = $1;
+      `,
+      [lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
+const getLightDetailMember = async(lightId) => {
+  let client;
+
+  const log = `lightDao.getLightDetailMember | lightId = ${lightId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select mbti, gender, name, birth_day from "user"
+      inner join light_user lu on "user".id = lu.member_id
+      inner join light l on l.id = lu.light_id
+      where l.id = $1;
+      `,
+      [lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
+const getLightDetailOrganizer = async(lightId) => {
+  let client;
+
+  const log = `lightDao.getLightDetailOrganizer | lightId = ${lightId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select name from "user"
+      inner join light l on "user".id = l.organizer_id
+      where l.id = $1;
+      `,
+      [lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + "에서 에러 발생");
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
     addLight,
@@ -183,5 +250,8 @@ module.exports = {
     getOranizerLight,
     getEnterLight,
     getScrapLight,
-    getCategoryLight
+    getCategoryLight,
+    getLightDetail,
+    getLightDetailMember,
+    getLightDetailOrganizer
 };

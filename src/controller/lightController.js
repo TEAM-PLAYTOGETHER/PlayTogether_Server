@@ -121,6 +121,19 @@ const getCategoryLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
+const getLightDetail = async (req, res) => {
+  const { lightId } = req.params;
+  if(!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  try {
+    const lights = await lightService.getLightDetail(lightId);
+    
+    return res.status(statusCode.OK).json(util.success(statusCode.OK, responseMessage.LIGHT_GET_DETAIL_SUCCESS, lights));    
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
 
 
 
@@ -133,5 +146,6 @@ module.exports = {
     getOranizerLight,
     getEnterLight,
     getScrapLight,
-    getCategoryLight
+    getCategoryLight,
+    getLightDetail
 };
