@@ -1,6 +1,7 @@
 const { lightDao, lightUserDao } = require('../db');
 const db = require('../loaders/db');
 const dayjs = require('dayjs');
+const { calculateAge } = require('../lib/calculateAge');
 
 const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   try {
@@ -123,6 +124,7 @@ const getCategoryLight = async (category, sort) => {
     console.log('getCategoryLight error 발생'+ error);
   }
 }
+      age : Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))) + 1
 
 
 module.exports = {
