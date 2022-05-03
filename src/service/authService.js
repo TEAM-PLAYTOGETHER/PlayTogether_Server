@@ -7,7 +7,7 @@ const { jwtGenerator } = require('../lib/jwtHandler');
 
 const createUser = async (userLoginId, password, userName, gender, birth, mbti) => {
   // 이미 존재하는 유저인지 확인
-  const isUser = await userDao.getUserByUserId(userLoginId);
+  const isUser = await userDao.getUserByUserLoginId(userLoginId);
 
   try {
     if (isUser) {
