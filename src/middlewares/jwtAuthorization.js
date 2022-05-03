@@ -16,7 +16,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
     const decoded = jwt.verify(token, config.jwt.secret);
-    const user = await userDao.getUserById(decoded.user.id);
+    const user = await userDao.getUserById(decoded.id);
 
     // decoded된 userId가 가르키는 회원이 없는 경우
     if (!user) {
