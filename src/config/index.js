@@ -15,4 +15,7 @@ require('dotenv').config();
 
 module.exports = {
   port: parseInt(process.env.PORT, 10),
+  jwt: {
+    secret: process.env.JWT_SECRET,
+  },
 };
