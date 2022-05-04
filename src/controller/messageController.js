@@ -47,7 +47,7 @@ const getAllMessageById = async (req, res) => {
 const getAllMessageByRoomId = async (req, res) => {
   try {
     const { roomId } = req.params;
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     if (!roomId) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
