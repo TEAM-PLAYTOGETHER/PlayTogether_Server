@@ -68,9 +68,31 @@ const deleteCrewByCrewId = async (crewId) => {
     client.release();
   }
 };
+const getExistCrew = async (crewId) => {
+  let client;
+  const log = `crewDao.getExistCrew | crewId = ${crewId}`;
+  try {
+    client = await db.connect(log);
+
+    const { rows } = await client.query(
+      `
+        select * from crew
+        where id = $1
+            `,
+      [crewId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + '에서 오류 발생' + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   createCrew,
   getCrewByCode,
   deleteCrewByCrewId,
+  getExistCrew
 };
