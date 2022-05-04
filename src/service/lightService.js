@@ -114,7 +114,6 @@ const getOrganizerLight = async (organizerId) => {
   if (!exist) {
     return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
   }
-// TODO: 번개 현재 인원 보내주기
   try {
     const result = await lightDao.getOrganizerLight(organizerId);
     const data = result.map(light => ({
@@ -124,6 +123,7 @@ const getOrganizerLight = async (organizerId) => {
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
         place: light.place,
+        LightMemberCnt: light.joinCnt
     }))
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_ORGANIZER_SUCCESS, data);
@@ -137,7 +137,6 @@ const getEnterLight = async (memberId) => {
   if (!exist) {
     return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
   }
-// TODO: 번개 현재 인원 보내주기
   try {
     const result = await lightDao.getEnterLight(memberId);
     const data = result.map(light => ({
@@ -147,6 +146,7 @@ const getEnterLight = async (memberId) => {
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
         place: light.place,
+        LightMemberCnt: light.joinCnt
     }))
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_ENTER_SUCCESS, data);
@@ -160,7 +160,6 @@ const getScrapLight = async (memberId) => {
   if (!exist) {
     return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
   }
-// TODO: 번개 현재 인원 보내주기
   try {
     const result = await lightDao.getScrapLight(memberId);
     const data = result.map(light => ({
@@ -170,6 +169,7 @@ const getScrapLight = async (memberId) => {
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
         place: light.place,
+        LightMemberCnt: light.joinCnt
     }))
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_SCRAP_SUCCESS, data);
@@ -186,13 +186,14 @@ const getCategoryLight = async (category, sort) => {
   try {
     const result = await lightDao.getCategoryLight(category,sort);
     const data = result.map(light => ({
-        light_id : light.id,
-        category : light.category,
-        title: light.title,
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0,-3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+      light_id : light.id,
+      category: light.category,
+      title: light.title,
+      date: dayjs(light.date).format('YYYY-MM-DD'),
+      time: light.time.slice(0,-3),
+      people_cnt: light.peopleCnt,
+      place: light.place,
+      LightMemberCnt: light.joinCnt
     }))
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_CATEGORY_SUCCESS, data);
@@ -230,6 +231,7 @@ const getLightDetail = async (lightId) => {
         image: light.image,
         people_cnt: light.peopleCnt,
         place: light.place,
+        LightMemberCnt: light.joinCnt,
         members: data2,
         organizer: organizer
     }))

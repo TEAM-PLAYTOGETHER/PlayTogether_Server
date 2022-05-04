@@ -96,7 +96,9 @@ const getOrganizerLight = async(organizerId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select id, title, date, time, people_cnt, place from light
+      select l.id, join_cnt, title, date, time, people_cnt, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) lu
+      on l.id = lu.light_id
       where organizer_id = $1;
       `,
       [organizerId],
@@ -117,9 +119,13 @@ const getEnterLight = async(memberId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, title, date, time, people_cnt, place from light l
-      inner join light_user lu on l.id = lu.light_id
-      where lu.member_id = $1;
+      select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      from light ll
+         right join (select lu.light_id, join_cnt
+                    from light_user lu
+                             left join (select light_id, count(id) join_cnt from light_user group by light_id) l_cnt
+                                       on lu.light_id = l_cnt.light_id
+                    where member_id = $1) ls on ll.id = ls.light_id;
       `,
       [memberId],
     );
@@ -139,9 +145,13 @@ const getScrapLight = async(memberId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, title, date, time, people_cnt, place from light l
-      inner join scrap s on l.id = s.light_id
-      where s.member_id = $1;
+      select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      from light ll
+         right join (select lu.light_id, join_cnt
+                    from scrap lu
+                             left join (select light_id, count(id) join_cnt from light_user group by light_id) l_cnt
+                                       on lu.light_id = l_cnt.light_id
+                    where member_id = $1) ls on ll.id = ls.light_id;
       `,
       [memberId],
     );
@@ -156,12 +166,13 @@ const getScrapLight = async(memberId) => {
 const getCategoryLight = async(category, sort) => {
   let client;
 
-  const log = `lightDao.getCategoryLight | category = ${category}, sort = ${category}`;
+  const log = `lightDao.getCategoryLight | category = ${category}, sort = ${sort}`;
   try {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, category, title, date, time, people_cnt, place from light l
+      select l.id, l.category, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       where category = $1
       order by $2 DESC;
       `,
@@ -183,8 +194,8 @@ const getLightDetail = async(lightId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, category, title, date, time, people_cnt, description, image, place from light l
-      inner join light_user lu on l.id = lu.light_id
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       where l.id = $1;
       `,
       [lightId],
@@ -297,5 +308,5 @@ module.exports = {
     getLightDetailMember,
     getLightDetailOrganizer,
     getLightOrganizerById,
-    getExistLight
+    getExistLight,
 };
