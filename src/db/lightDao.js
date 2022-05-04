@@ -28,6 +28,29 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     client.release();
   }
 };
+const addLightOrganizer = async(organizerId) => {
+  let client;
+
+  const log = `lightDao.addLightOrganizer | organizerId = ${organizerId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      INSERT into light_user (light_id, member_id)
+      select id, organizer_id from light
+      where organizer_id = $1;
+      `,
+      [organizerId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + "에서 에러 발생" + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
 const putLight = async (lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
   let client;
 
@@ -309,4 +332,5 @@ module.exports = {
     getLightDetailOrganizer,
     getLightOrganizerById,
     getExistLight,
+    addLightOrganizer
 };

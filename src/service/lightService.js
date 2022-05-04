@@ -21,7 +21,10 @@ const addLight = async (category, title, date, place, people_cnt, description, i
 
     const data = await lightDao.addLight(category, title, date, place
         , people_cnt, description,image, organizerId, crewId, time);
-
+    
+    // 번개 생성 후 번개 소유자도 번개에 참여시키기
+    await lightDao.addLightOrganizer(organizerId);
+    
     return util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS, data);
   } catch (error) {
     console.log('addLight에서 error 발생'+ error);
