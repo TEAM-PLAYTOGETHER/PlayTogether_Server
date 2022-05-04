@@ -34,6 +34,7 @@ module.exports = {
   MESSAGE_SEND_SUCCESS: '메시지 전송에 성공했습니다.',
   MESSAGE_SEND_FAIL: '메시지 전송에 실패했습니다.',
   NO_MESSAGE: '메시지 내용이 없습니다.',
+  NO_ROOM: '채팅방이 없습니다.',
   MESSAGE_READ_SUCCESS: '메시지 불러오기 성공',
   MESSAGE_READ_FAIL: '메시지 불러오기 실패',
 
@@ -65,5 +66,5 @@ module.exports = {
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
   SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.',
-  NO_SCRAP: "스크랩 한적이 없습니다.",
+  NO_SCRAP: '스크랩 한적이 없습니다.',
 };
