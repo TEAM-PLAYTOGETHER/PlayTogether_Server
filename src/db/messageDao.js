@@ -26,6 +26,29 @@ const getRoom = async (sendId, recvId) => {
   }
 };
 
+const getRoomByRoomId = async (roomId) => {
+  let client;
+  const log = `messageDao.getRoomByRoomId | roomId = ${roomId}`;
+  try {
+    client = await db.connect(log);
+
+    const { rows } = await client.query(
+      `
+      select member_one_id, member_two_id
+      from room
+      where id = $1
+      `,
+      [roomId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + '에서 에러 발생');
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
 const createRoom = async (sendId, recvId) => {
   let client;
   const log = `messageDao.createRoom | sendId = ${sendId}, recvId = ${recvId}`;
@@ -167,6 +190,7 @@ const readAllMessage = async (roomId, userId) => {
 
 module.exports = {
   getRoom,
+  getRoomByRoomId,
   createRoom,
   sendMessage,
   getAllMessageById,
