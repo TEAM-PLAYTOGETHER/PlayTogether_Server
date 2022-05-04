@@ -68,7 +68,7 @@ const deleteLight = async (req, res) => {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
-const getOranizerLight = async (req, res) => {
+const getOrganizerLight = async (req, res) => {
   const { organizerId } = req.params;
   if (!organizerId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
@@ -143,7 +143,7 @@ module.exports = {
     putLight,
     postEnterLight,
     deleteLight,
-    getOranizerLight,
+    getOrganizerLight,
     getEnterLight,
     getScrapLight,
     getCategoryLight,

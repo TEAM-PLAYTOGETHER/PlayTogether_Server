@@ -81,7 +81,7 @@ const deleteLight = async(lightId, organizerId) => {
       [lightId, organizerId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생", error);
     return null;
   } finally {
     client.release();

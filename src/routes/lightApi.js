@@ -8,7 +8,7 @@ router.post('/add/:crewId/:organizerId', upload.single('image'), lightController
 router.put('/:lightId', lightController.putLight);
 router.post('/enter/:lightId/:memberId', lightController.postEnterLight);
 router.post('/remove/:lightId/:organizerId', lightController.deleteLight);
-router.get('/open/:organizerId', lightController.getOranizerLight);
+router.get('/open/:organizerId', lightController.getOrganizerLight);
 router.get('/enter/:memberId', lightController.getEnterLight);
 router.get('/scrap/:memberId', lightController.getScrapLight);
 router.get('/', lightController.getCategoryLight);
