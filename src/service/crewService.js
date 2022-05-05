@@ -10,11 +10,14 @@ const createCrew = async (name, masterId) => {
     let code = '';
     let ok = false;
 
+    // db에 존재하는 모든 코드들을 가져옴
+    const existCodes = await crewDao.getAllCrewCode();
+    if (existCodes === null) throw new Error();
+
     // 유일한 코드가 될 때까지 대문자 6자 랜덤 코드 생성
     while (!ok) {
       code = createCrewCode();
-      const exist = await crewDao.getCrewByCode(code);
-      if (exist === null) throw new Error();
+      const exist = existCodes.find((data) => data.code === code);
       if (!exist) {
         ok = true;
       }
