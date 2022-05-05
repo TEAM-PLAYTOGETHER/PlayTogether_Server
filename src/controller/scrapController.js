@@ -5,7 +5,8 @@ const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 
 const postLightScrap = async (req, res) => {
-    const { lightId, memberId } = req.params;
+    const memberId = req.user.id;
+    const { lightId } = req.params;
     if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     try {
       const existedScrap = await scrapService.getLightScrap(lightId, memberId);
