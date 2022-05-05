@@ -185,7 +185,7 @@ const getCategoryLight = async (category, sort) => {
   if(!category){
     return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
   }
-// TODO: 번개 현재 인원 보내주기
+
   try {
     const result = await lightDao.getCategoryLight(category,sort);
     const data = result.map(light => ({
@@ -210,7 +210,7 @@ const getLightDetail = async (lightId) => {
    if(!existLight) {
      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
    }
-// TODO: 번개 현재 인원 보내주기
+   
   try {
     const result = await lightDao.getLightDetail(lightId);
     const members = await lightDao.getLightDetailMember(lightId);

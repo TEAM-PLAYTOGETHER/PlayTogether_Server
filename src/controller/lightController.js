@@ -36,7 +36,7 @@ const putLight = async (req, res) => {
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
-  if(category == '먹을래' || category == '갈래' || category == '할래'){
+  if(!(category == '먹을래' || category == '갈래' || category == '할래')){
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
   }
   try {
@@ -128,16 +128,19 @@ const getCategoryLight = async (req, res) => {
   const category = req.query.category;
   const sort = req.query.sort;
   // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
-  if(category == '먹을래' || category == '갈래' || category == '할래'){
-    try {
-      const lights = await lightService.getCategoryLight(category, sort);
-      return res.status(lights.status).json(lights);    
-    } catch (error) {
-      console.log(error);
-      return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
-    }
+  if(!(category == '먹을래' || category == '갈래' || category == '할래')){
+    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
   }
-  return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
+  if(!(sort == 'createdAt' || sort == 'peopleCnt')){
+    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_LIGHT));
+  }
+  try {
+    const lights = await lightService.getCategoryLight(category, sort);
+    return res.status(lights.status).json(lights);    
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
 };
 const getLightDetail = async (req, res) => {
   const { lightId } = req.params;
