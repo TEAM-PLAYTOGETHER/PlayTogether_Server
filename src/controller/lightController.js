@@ -132,7 +132,7 @@ const getCategoryLight = async (req, res) => {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
   }
   if(!(sort == 'createdAt' || sort == 'peopleCnt')){
-    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_LIGHT));
+    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.OUT_OF_VALUE));
   }
   try {
     const lights = await lightService.getCategoryLight(category, sort);
