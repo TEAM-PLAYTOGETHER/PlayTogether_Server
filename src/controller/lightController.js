@@ -6,7 +6,8 @@ const responseMessage = require('../constants/responseMessage');
 
 const addLight = async (req, res) => {
 
-  const { organizerId, crewId } = req.params;
+  const organizerId = req.user.id;
+  const { crewId } = req.params;
   const image = req.file.location;
   const { category, title, date, time, description, place, people_cnt } = req.body;
   
@@ -28,7 +29,8 @@ const addLight = async (req, res) => {
   }
 };
 const putLight = async (req, res) => {
-  const { lightId, organizerId} = req.params;
+  const organizerId = req.user.id;
+  const { lightId } = req.params;
   const { category, title, date, place, people_cnt, description, time  } = req.body;
   
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -52,7 +54,8 @@ const putLight = async (req, res) => {
   
 };
 const postEnterLight = async (req, res) => {
-  const { lightId, memberId } = req.params;
+  const memberId = req.user.id;
+  const { lightId } = req.params;
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
@@ -70,7 +73,8 @@ const postEnterLight = async (req, res) => {
   }
 };
 const deleteLight = async (req, res) => {
-  const { lightId, organizerId } = req.params;
+  const organizerId = req.user.id;
+  const { lightId } = req.params;
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
@@ -82,7 +86,7 @@ const deleteLight = async (req, res) => {
   }
 };
 const getOrganizerLight = async (req, res) => {
-  const { organizerId } = req.params;
+  const organizerId = req.user.id;
   if (!organizerId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
@@ -95,7 +99,7 @@ const getOrganizerLight = async (req, res) => {
   }
 };
 const getEnterLight = async (req, res) => {
-  const { memberId } = req.params;
+  const memberId = req.user.id;
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
@@ -108,7 +112,7 @@ const getEnterLight = async (req, res) => {
   }
 };
 const getScrapLight = async (req, res) => {
-  const { memberId } = req.params;
+  const memberId = req.user.id;
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
