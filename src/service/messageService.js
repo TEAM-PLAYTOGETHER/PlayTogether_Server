@@ -68,6 +68,17 @@ const getAllMessageById = async (userId) => {
 
 const getAllMessageByRoomId = async (roomId, userId) => {
   try {
+    // TODO: roomId, userId 처리
+    const existRoom = await messageDao.getRoomByRoomId(roomId);
+    if (existRoom === null) throw new Error();
+    if (!existRoom) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_ROOM);
+    }
+
+    if (Number(existRoom.memberOneId) !== userId && Number(existRoom.memberTwoId) !== userId) {
+      return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
+    }
+
     const cnt = await messageDao.readAllMessage(roomId, userId);
     if (cnt === null) throw new Error();
 
@@ -78,7 +89,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
       let message = {
         messageId: rowMessage.id,
         send: Number(rowMessage.sendId) === Number(userId),
-        read: Number(rowMessage.sendId) === Number(userId) ? rowMessage.read && true : false,
+        read: rowMessage.read,
         createdAt: rowMessage.createdAt,
         content: rowMessage.content,
       };

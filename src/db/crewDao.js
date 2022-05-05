@@ -47,6 +47,33 @@ const getCrewByCode = async (code) => {
   }
 };
 
+/**
+ * getAllCrewCode
+ * DB에 존재하는 모든 크루의 코드를 가져오는 메서드
+ * @return 모든 코드들
+ */
+const getAllCrewCode = async () => {
+  let client;
+  const log = `crewDao.getAllCrewCode`;
+  try {
+    client = await db.connect(log);
+
+    const { rows } = await client.query(
+      `
+        select code
+        from crew
+      `,
+    );
+
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    console.log(log + '에서 오류 발생' + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
 const deleteCrewByCrewId = async (crewId) => {
   let client;
   const log = `crewDao.deleteCrewByCrewId | crewId = ${crewId}`;
@@ -68,9 +95,32 @@ const deleteCrewByCrewId = async (crewId) => {
     client.release();
   }
 };
+const getExistCrew = async (crewId) => {
+  let client;
+  const log = `crewDao.getExistCrew | crewId = ${crewId}`;
+  try {
+    client = await db.connect(log);
+
+    const { rows } = await client.query(
+      `
+        select * from crew
+        where id = $1
+            `,
+      [crewId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + '에서 오류 발생' + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   createCrew,
   getCrewByCode,
   deleteCrewByCrewId,
+  getExistCrew,
+  getAllCrewCode,
 };

@@ -34,6 +34,7 @@ module.exports = {
   MESSAGE_SEND_SUCCESS: '메시지 전송에 성공했습니다.',
   MESSAGE_SEND_FAIL: '메시지 전송에 실패했습니다.',
   NO_MESSAGE: '메시지 내용이 없습니다.',
+  NO_ROOM: '채팅방이 없습니다.',
   MESSAGE_READ_SUCCESS: '메시지 불러오기 성공',
   MESSAGE_READ_FAIL: '메시지 불러오기 실패',
 
@@ -53,12 +54,17 @@ module.exports = {
   LIGHT_CANCEL_SUCCESS: '번개 참여 취소가 완료되었습니다.',
   LIGHT_DELETE_SUCCESS: '번개 삭제가 완료되었습니다.',
   LIGHT_GET_ORGANIZER_SUCCESS: '내가 만든 번개 리스트 조회 성공',
-  LIGHT_GET_ENTER_SUCCECSS: '내가 참여한 번개 리스트 조회 성공',
-  LIGHT_GET_SCRAP_SUCCECSS: '내가 찜한 번개 리스트 조회 성공',
+  LIGHT_GET_ENTER_SUCCESS: '내가 참여한 번개 리스트 조회 성공',
+  LIGHT_GET_SCRAP_SUCCESS: '내가 찜한 번개 리스트 조회 성공',
   LIGHT_GET_CATEGORY_SUCCESS: '카테고리별 번개 리스트 조회 성공',
   LIGHT_GET_DETAIL_SUCCESS: '번개 상세 조회 성공',
+  NOT_LIGHT_ORGANIZER: '번개 소유자가 아닙니다.',
+  NO_CATEGORY: '카테고리를 확인해주세요',
+  NO_LIGHT: '없는 번개입니다.',
+  NO_LIGHT_MEMBER: '번개에 참여한 사람이 아닙니다.',
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
   SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.',
+  NO_SCRAP: '스크랩 한적이 없습니다.',
 };

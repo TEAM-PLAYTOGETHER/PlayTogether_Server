@@ -22,26 +22,49 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
   }
 };
-const putLight = async (lightId, category, title, date, place, people_cnt, description, time) => {
+const addLightOrganizer = async(organizerId) => {
   let client;
 
-  const log = `lightDao.putLight | category = ${category}, title = ${title}, date = ${date}, place = ${place}
+  const log = `lightDao.addLightOrganizer | organizerId = ${organizerId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      INSERT into light_user (light_id, member_id)
+      select id, organizer_id from light
+      where organizer_id = $1;
+      `,
+      [organizerId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + "에서 에러 발생" + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+
+const putLight = async (lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
+  let client;
+
+  const log = `lightDao.putLight | lightId = ${lightId}, organizerId = ${organizerId}, 
+  category = ${category}, title = ${title}, date = ${date}, place = ${place}
   , people_cnt = ${people_cnt}, description = ${description}`;
   try {
     client = await db.connect(log);
     const { rows: existingRows } = await client.query(
       `
       SELECT * FROM light l
-      WHERE id = $1
-         AND is_deleted = FALSE
+      WHERE id = $1 and organizer_id = $2
       `,
-      [lightId],
+      [lightId, organizerId],
     );
   
     if (existingRows.length === 0) return false;
@@ -53,14 +76,14 @@ const putLight = async (lightId, category, title, date, place, people_cnt, descr
       `
       UPDATE light l
       SET category = $1, title = $2, date = $3, place = $4, people_cnt = $5, description = $6, time = $7, updated_at = now()
-      WHERE id = $8
+      WHERE id = $8 and organizer_id = $9
       RETURNING * 
       `,
-      [data.category, data.title, data.date, data.place, data.people_cnt, data.description, data.time, lightId],
+      [data.category, data.title, data.date, data.place, data.people_cnt, data.description, data.time, lightId, organizerId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -81,29 +104,31 @@ const deleteLight = async(lightId, organizerId) => {
       [lightId, organizerId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생", error);
     return null;
   } finally {
     client.release();
   }
 };
 
-const getOranizerLight = async(organizerId) => {
+const getOrganizerLight = async(organizerId) => {
   let client;
 
-  const log = `lightDao.getOranizerLight | organizerId = ${organizerId}`;
+  const log = `lightDao.getOrganizerLight | organizerId = ${organizerId}`;
   try {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select id, title, date, time, people_cnt, place from light
+      select l.id, join_cnt, title, date, time, people_cnt, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) lu
+      on l.id = lu.light_id
       where organizer_id = $1;
       `,
       [organizerId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -112,20 +137,24 @@ const getOranizerLight = async(organizerId) => {
 const getEnterLight = async(memberId) => {
   let client;
 
-  const log = `lightDao.getOranizerLight | memberId = ${memberId}`;
+  const log = `lightDao.getEnterLight | memberId = ${memberId}`;
   try {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, title, date, time, people_cnt, place from light l
-      inner join light_user lu on l.id = lu.light_id
-      where lu.member_id = $1;
+      select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      from light ll
+         right join (select lu.light_id, join_cnt
+                    from light_user lu
+                             left join (select light_id, count(id) join_cnt from light_user group by light_id) l_cnt
+                                       on lu.light_id = l_cnt.light_id
+                    where member_id = $1) ls on ll.id = ls.light_id;
       `,
       [memberId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -139,15 +168,19 @@ const getScrapLight = async(memberId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, title, date, time, people_cnt, place from light l
-      inner join scrap s on l.id = s.light_id
-      where s.member_id = $1;
+      select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      from light ll
+         right join (select lu.light_id, join_cnt
+                    from scrap lu
+                             left join (select light_id, count(id) join_cnt from light_user group by light_id) l_cnt
+                                       on lu.light_id = l_cnt.light_id
+                    where member_id = $1) ls on ll.id = ls.light_id;
       `,
       [memberId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -156,12 +189,13 @@ const getScrapLight = async(memberId) => {
 const getCategoryLight = async(category, sort) => {
   let client;
 
-  const log = `lightDao.getCategoryLight | category = ${category}, sort = ${category}`;
+  const log = `lightDao.getCategoryLight | category = ${category}, sort = ${sort}`;
   try {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, category, title, date, time, people_cnt, place from light l
+      select l.id, l.category, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       where category = $1
       order by $2 DESC;
       `,
@@ -169,7 +203,7 @@ const getCategoryLight = async(category, sort) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -183,15 +217,15 @@ const getLightDetail = async(lightId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select l.id, category, title, date, time, people_cnt, description, image, place from light l
-      inner join light_user lu on l.id = lu.light_id
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       where l.id = $1;
       `,
       [lightId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -205,8 +239,8 @@ const getLightDetailMember = async(lightId) => {
     client = await db.connect(log);
     const { rows } =  await client.query(
       `
-      select mbti, gender, name, birth_day from "user"
-      inner join light_user lu on "user".id = lu.member_id
+      select u.id, mbti, gender, name, birth_day from "user" u
+      inner join light_user lu on u.id = lu.member_id
       inner join light l on l.id = lu.light_id
       where l.id = $1;
       `,
@@ -214,7 +248,7 @@ const getLightDetailMember = async(lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -236,7 +270,49 @@ const getLightDetailOrganizer = async(lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
+    console.log(log + "에서 에러 발생" + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+const getLightOrganizerById = async(organizerId) => {
+  let client;
+
+  const log = `lightDao.getLightOrganizer | organizerId = ${organizerId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select * from light
+      where organizer_id = $1;
+      `,
+      [organizerId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + "에서 에러 발생" + error);
+    return null;
+  } finally {
+    client.release();
+  }
+};
+const getExistLight = async(lightId) => {
+  let client;
+
+  const log = `lightDao.getExistLight | lightId = ${lightId}`;
+  try {
+    client = await db.connect(log);
+    const { rows } =  await client.query(
+      `
+      select * from light
+      where id = $1;
+      `,
+      [lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    console.log(log + "에서 에러 발생" + error);
     return null;
   } finally {
     client.release();
@@ -247,11 +323,14 @@ module.exports = {
     addLight,
     putLight,
     deleteLight,
-    getOranizerLight,
+    getOrganizerLight,
     getEnterLight,
     getScrapLight,
     getCategoryLight,
     getLightDetail,
     getLightDetailMember,
-    getLightDetailOrganizer
+    getLightDetailOrganizer,
+    getLightOrganizerById,
+    getExistLight,
+    addLightOrganizer
 };
