@@ -37,20 +37,20 @@ const putLight = async (req, res) => {
 
   // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
   if(category == '먹을래' || category == '갈래' || category == '할래'){
-    try {
-      const updatedPost = await lightService.putLight(lightId,organizerId, category, title, date, place,
-        people_cnt, description, time);
-  
-      if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
+  }
+  try {
+    const updatedPost = await lightService.putLight(lightId,organizerId, category, title, date, place,
+      people_cnt, description, time);
 
-      return res.status(updatedPost.status).json(updatedPost);
-    } catch (error) {
-      console.log('putLight Controller 에러: '+ error);
-      return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
-    }
+    if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
+
+    return res.status(updatedPost.status).json(updatedPost);
+  } catch (error) {
+    console.log('putLight Controller 에러: '+ error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 
-  return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
   
 };
 const postEnterLight = async (req, res) => {
