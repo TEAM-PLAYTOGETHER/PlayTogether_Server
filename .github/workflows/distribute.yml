@@ -17,6 +17,9 @@ jobs:
           key: ${{ secrets.REMOTE_SSH_KEY }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
+            sudo git config --global --add safe.directory /home/***/PlayTogether_Server
+            sudo git config --global --add safe.directory ~/PlayTogether_Server
+            sudo git config --global --add safe.directory ~/PlayTogether_Server/src
             cd PlayTogether_Server/src
             sudo git checkout .
             sudo git pull origin main
