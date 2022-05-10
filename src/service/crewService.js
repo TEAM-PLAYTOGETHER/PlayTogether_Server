@@ -6,6 +6,13 @@ const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const { createCrewCode } = require('../lib/createCrewCode');
 
+/**
+ * createCrew
+ * 동아리 생성 서비스
+ * @param name - 생성할 동아리 이름
+ * @param masterId - 동아리장 유저 id값
+ * @returns
+ */
 const createCrew = async (name, masterId) => {
   let client;
   const log = `crewDao.createCrew | name = ${name}, masterId=${masterId}`;
