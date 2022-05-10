@@ -26,12 +26,14 @@ const createCrew = async (client, name, code, masterId) => {
   }
 };
 
-const getCrewByCode = async (code) => {
-  let client;
-  const log = `crewDao.getCrewByCode | code = ${code}`;
+/**
+ * getCrewByCode
+ * 가입코드가 인자로 받은 코드와 같은 동아리를 찾아주는 메서드
+ * @param code - 가입코드
+ * @returns 일치하는 동아리
+ */
+const getCrewByCode = async (client, code) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
         select * from crew
@@ -41,10 +43,7 @@ const getCrewByCode = async (code) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.getCrewByCode에서 오류 발생: ' + error);
   }
 };
 

@@ -24,12 +24,15 @@ const registerCrewMember = async (client, crewId, memberId) => {
   }
 };
 
-const getRegisteredMember = async (crewId, memberId) => {
-  let client;
-  const log = `crewUserDao.getRegisteredMember | crewId = ${crewId}, memberId=${memberId}; `;
+/**
+ * getRegisteredMember
+ * 해당 회원이 이미 해당 동아리에 가입했는지 확인해주는 메서드
+ * @param crewId - 검사할 동아리의 id값
+ * @param memberId - 검사할 회원의 id값
+ * @returns 회원의 가입 정보
+ */
+const getRegisteredMember = async (client, crewId, memberId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
         select * from crew_user
@@ -39,10 +42,7 @@ const getRegisteredMember = async (crewId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.getRegisteredMember에서 오류 발생: ' + error);
   }
 };
 
