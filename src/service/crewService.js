@@ -114,39 +114,53 @@ const getAllCrewByUserId = async (userId) => {
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
     return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: crews });
   } catch (error) {
-    console.log('getAllCrewByUserId에서 오류 발생: ' + error);
+    console.log('getAllCrewByUserId에서 오류 발생: ' + error.message);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   } finally {
     client.release();
   }
 };
 
-// 삭제 로직
-// 1. 내가 대빵인지 확인
-// 2. 멤버 모두 탈퇴시키기
-// 3. 동아리 삭제하기
+/**
+ * deleteCrewByCrewId
+ * @param userId - 삭제를 요청한 회원의 id값
+ * @param crewCode - 삭제할 동아리의 가입 코드
+ */
 const deleteCrewByCrewId = async (userId, crewCode) => {
+  let client;
+  const log = `crewDao.deleteCrewByCrewId | userId = ${userId}, crewCode = ${crewCode}`;
+
   try {
-    const crew = await crewDao.getCrewByCode(crewCode);
-    if (crew === null) throw new Error();
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 삭제할 동아리가 존재하는 동아리인지 확인
+    const crew = await crewDao.getCrewByCode(client, crewCode);
     if (!crew) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
+    // 삭제를 요청한 유저가 동아리장인지 확인
     if (userId !== crew.masterId) {
       return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_MASTER_USER);
     }
 
-    let cnt = await crewUserDao.withdrawAllMemberByCrewId(crew.id);
-    if (cnt === null) throw new Error();
+    // 동아리에 가입한 모든 유저들 탈퇴
+    await crewUserDao.withdrawAllMemberByCrewId(client, crew.id);
 
-    cnt = await crewDao.deleteCrewByCrewId(crew.id);
-    if (cnt !== 1) throw new Error();
+    // 동아리 삭제
+    const cnt = await crewDao.deleteCrewByCrewId(client, crew.id);
+    if (cnt !== 1) throw new Error('deleteCrewByCrewId 동아리 삭제과정에서 오류 발생');
 
+    await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_DELETE_SUCCESS);
   } catch (error) {
-    console.log('deleteCrewByCrewId에서 오류 발생: ' + error);
+    console.log('deleteCrewByCrewId에서 오류 발생: ' + error.message);
+    await client.query('ROLLBACK');
+
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
   }
 };
 
