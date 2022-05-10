@@ -1,16 +1,9 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
-const db = require('../loaders/db');
 
 
-const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
-  let client;
-
-  const log = `lightDao.addLight | category = ${category}, title = ${title}, date = ${date}, place = ${place}
-  , people_cnt = ${people_cnt}, description = ${description}, image = ${image}, organizerId = ${organizerId},
-  , crewId = ${crewId}, time = ${time}`;
+const addLight = async (client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   try {
-    client = await db.connect(log);
     const { rows } = await client.query(
       `
       INSERT INTO light (category, title, date, place, people_cnt, description, image, is_deleted, created_at, updated_at, organizer_id, crew_id, time) 
@@ -22,18 +15,11 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.addLight에서 에러 발생했습니다' + error);
   }
 };
-const addLightOrganizer = async(organizerId) => {
-  let client;
-
-  const log = `lightDao.addLightOrganizer | organizerId = ${organizerId}`;
+const addLightOrganizer = async(client, organizerId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       INSERT into light_user (light_id, member_id)
@@ -44,21 +30,12 @@ const addLightOrganizer = async(organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.addLight에서 에러 발생했습니다' + error);
   }
 };
 
-const putLight = async (lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
-  let client;
-
-  const log = `lightDao.putLight | lightId = ${lightId}, organizerId = ${organizerId}, 
-  category = ${category}, title = ${title}, date = ${date}, place = ${place}
-  , people_cnt = ${people_cnt}, description = ${description}`;
+const putLight = async (client, lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
   try {
-    client = await db.connect(log);
     const { rows: existingRows } = await client.query(
       `
       SELECT * FROM light l
@@ -83,19 +60,12 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
 
-const deleteLight = async(lightId, organizerId) => {
-  let client;
-
-  const log = `lightDao.deleteLight | lightId = ${lightId}, organizerId = ${organizerId}`;
+const deleteLight = async(client, lightId, organizerId) => {
   try {
-    client = await db.connect(log);
     await client.query(
       `
       DELETE FROM light 
@@ -104,19 +74,12 @@ const deleteLight = async(lightId, organizerId) => {
       [lightId, organizerId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생", error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
 
-const getOrganizerLight = async(organizerId) => {
-  let client;
-
-  const log = `lightDao.getOrganizerLight | organizerId = ${organizerId}`;
+const getOrganizerLight = async(client, organizerId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select l.id, join_cnt, title, date, time, people_cnt, place from light l
@@ -128,18 +91,11 @@ const getOrganizerLight = async(organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getEnterLight = async(memberId) => {
-  let client;
-
-  const log = `lightDao.getEnterLight | memberId = ${memberId}`;
+const getEnterLight = async(client, memberId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
@@ -154,18 +110,11 @@ const getEnterLight = async(memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getScrapLight = async(memberId) => {
-  let client;
-
-  const log = `lightDao.getScrapLight | memberId = ${memberId}`;
+const getScrapLight = async(client, memberId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
@@ -180,18 +129,11 @@ const getScrapLight = async(memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getCategoryLight = async(category, sort) => {
-  let client;
-
-  const log = `lightDao.getCategoryLight | category = ${category}, sort = ${sort}`;
+const getCategoryLight = async(client, category, sort) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select l.id, l.category, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
@@ -203,18 +145,11 @@ const getCategoryLight = async(category, sort) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetail = async(lightId) => {
-  let client;
-
-  const log = `lightDao.getLightDetail | lightId = ${lightId}`;
+const getLightDetail = async(client, lightId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
@@ -225,18 +160,11 @@ const getLightDetail = async(lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetailMember = async(lightId) => {
-  let client;
-
-  const log = `lightDao.getLightDetailMember | lightId = ${lightId}`;
+const getLightDetailMember = async(client, lightId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select u.id, mbti, gender, name, birth_day from "user" u
@@ -248,18 +176,11 @@ const getLightDetailMember = async(lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetailOrganizer = async(lightId) => {
-  let client;
-
-  const log = `lightDao.getLightDetailOrganizer | lightId = ${lightId}`;
+const getLightDetailOrganizer = async(client, lightId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select name from "user"
@@ -270,18 +191,11 @@ const getLightDetailOrganizer = async(lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
   }
 };
-const getLightOrganizerById = async(organizerId) => {
-  let client;
-
-  const log = `lightDao.getLightOrganizer | organizerId = ${organizerId}`;
+const getLightOrganizerById = async(client, organizerId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select * from light
@@ -291,18 +205,11 @@ const getLightOrganizerById = async(organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.getLightOrganizerById에서 에러 발생했습니다' + error);
   }
 };
-const getExistLight = async(lightId) => {
-  let client;
-
-  const log = `lightDao.getExistLight | lightId = ${lightId}`;
+const getExistLight = async(client, lightId) => {
   try {
-    client = await db.connect(log);
     const { rows } =  await client.query(
       `
       select * from light
@@ -312,10 +219,7 @@ const getExistLight = async(lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightdao.getExistLight에서 에러 발생했습니다' + error);
   }
 };
 

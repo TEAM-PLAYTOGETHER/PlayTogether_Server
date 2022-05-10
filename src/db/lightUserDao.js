@@ -1,13 +1,8 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
-const db = require('../loaders/db');
 
-const postEnterLight = async (lightId, memberId) => {
-  let client;
-
-  const log = `lightDao.postEnterLight | lightId = ${lightId}, memberId = ${memberId}`;
+const postEnterLight = async (client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     await client.query(
       `
       INSERT INTO light_user
@@ -18,18 +13,11 @@ const postEnterLight = async (lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생");
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightUserdao.postEnterLight에서 에러 발생했습니다' + error);
   }
 };
-const getEnterLightMember = async(lightId, memberId) => {
-  let client;
-
-  const log = `lightDao.getEnterLightMember | lightId = ${lightId}, memberId = ${memberId}`;
+const getEnterLightMember = async(client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     const { rows } = await client.query(
       `
       SELECT * FROM light_user 
@@ -39,18 +27,11 @@ const getEnterLightMember = async(lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생");
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightUserdao.getEnterLightMember에서 에러 발생했습니다' + error);
   }
 };
-const deleteCancelLight = async(lightId, memberId) => {
-  let client;
-
-  const log = `lightDao.deleteCancelLight | lightId = ${lightId}, memberId = ${memberId}`;
+const deleteCancelLight = async(client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     await client.query(
       `
       DELETE FROM light_user 
@@ -59,10 +40,7 @@ const deleteCancelLight = async(lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생");
-    return null;
-  } finally {
-    client.release();
+    throw new Error('lightUserdao.deleteCancelLight에서 에러 발생했습니다' + error);
   }
 };
 
