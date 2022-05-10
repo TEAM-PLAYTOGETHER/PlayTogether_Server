@@ -47,7 +47,7 @@ const createCrew = async (name, masterId) => {
 
     return util.success(statusCode.OK, responseMessage.CREW_CREATE_SUCCESS, createdCrew);
   } catch (error) {
-    console.log('createCrew error 발생: ' + error.message);
+    console.log('createCrew error 발생: ' + error);
     await client.query('ROLLBACK');
 
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
@@ -89,7 +89,7 @@ const registerMember = async (userId, crewCode) => {
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
   } catch (error) {
-    console.log('registerMember에서 오류 발생: ' + error.message);
+    console.log('registerMember에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
 
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
@@ -114,7 +114,7 @@ const getAllCrewByUserId = async (userId) => {
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
     return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: crews });
   } catch (error) {
-    console.log('getAllCrewByUserId에서 오류 발생: ' + error.message);
+    console.log('getAllCrewByUserId에서 오류 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   } finally {
     client.release();
@@ -155,7 +155,7 @@ const deleteCrewByCrewId = async (userId, crewCode) => {
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_DELETE_SUCCESS);
   } catch (error) {
-    console.log('deleteCrewByCrewId에서 오류 발생: ' + error.message);
+    console.log('deleteCrewByCrewId에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
 
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
