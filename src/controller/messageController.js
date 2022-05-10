@@ -29,7 +29,7 @@ const sendMessage = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ', error);
+    console.log('sendMessage Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
@@ -39,7 +39,7 @@ const getAllMessageById = async (req, res) => {
     const result = await messageService.getAllMessageById(req.user.id);
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ', error);
+    console.log('sendMessage Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
@@ -57,7 +57,7 @@ const getAllMessageByRoomId = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ', error);
+    console.log('sendMessage Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
