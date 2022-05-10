@@ -67,12 +67,14 @@ const getAllCrewCode = async (client) => {
   }
 };
 
-const deleteCrewByCrewId = async (crewId) => {
-  let client;
-  const log = `crewDao.deleteCrewByCrewId | crewId = ${crewId}`;
+/**
+ * deleteCrewByCrewId
+ * 동아리 삭제하는 메서드
+ * @param {*} crewId - 삭제할 동아리의 id값
+ * @returns 삭제된 동아리 갯수
+ */
+const deleteCrewByCrewId = async (client, crewId) => {
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
         delete from crew
@@ -82,10 +84,7 @@ const deleteCrewByCrewId = async (crewId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.deleteCrewByCrewId에서 오류 발생: ' + error);
   }
 };
 const getExistCrew = async (crewId) => {

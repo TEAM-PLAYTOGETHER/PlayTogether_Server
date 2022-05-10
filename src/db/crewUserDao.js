@@ -69,13 +69,15 @@ const getAllCrewByUserId = async (client, userId) => {
   }
 };
 
-// TODO: 일단 soft delete 적용 안했습니다.
-const withdrawAllMemberByCrewId = async (crewId) => {
-  let client;
-  const log = `crewUserDao.withdrawAllMemberByCrewId | crewId = ${crewId}`;
+/**
+ * withdrawAllMemberByCrewId
+ * 동아리의 모든 멤버 탈퇴
+ * @param {*} crewId - 동아리의 id값
+ * @returns 탈퇴처리된 회원의 수
+ */
+const withdrawAllMemberByCrewId = async (client, crewId) => {
+  // TODO: 일단 soft delete 적용 안했습니다.
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
       delete from crew_user
@@ -85,10 +87,7 @@ const withdrawAllMemberByCrewId = async (crewId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.withdrawAllMemberByCrewId에서 오류 발생: ' + error);
   }
 };
 
