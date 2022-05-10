@@ -1,13 +1,14 @@
-const db = require('../loaders/db');
-
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
-const getRoom = async (sendId, recvId) => {
-  let client;
-  const log = `messageDao.getRoom | sendId = ${sendId}, recvId = ${recvId}`;
+/**
+ * getRoom
+ * sendId와 recvId가 주고 받은 채팅방 정보를 가져오는 메서드
+ * @param {*} sendId - 전송자 id값
+ * @param {*} recvId - 수신자 id값
+ * @returns 채팅방 정보
+ */
+const getRoom = async (client, sendId, recvId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
           select id
@@ -19,19 +20,18 @@ const getRoom = async (sendId, recvId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.getRoom에서 오류 발생: ' + error);
   }
 };
 
-const getRoomByRoomId = async (roomId) => {
-  let client;
-  const log = `messageDao.getRoomByRoomId | roomId = ${roomId}`;
+/**
+ * getRoomByRoomId
+ * roomId로 채팅창 정보를 가져오는 메서드
+ * @param {*} roomId - 채팅방 id값
+ * @returns 채팅방 정보
+ */
+const getRoomByRoomId = async (client, roomId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
       select member_one_id, member_two_id
@@ -42,19 +42,19 @@ const getRoomByRoomId = async (roomId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.getRoom에서 오류 발생: ' + error);
   }
 };
 
-const createRoom = async (sendId, recvId) => {
-  let client;
-  const log = `messageDao.createRoom | sendId = ${sendId}, recvId = ${recvId}`;
+/**
+ * createRoom
+ * 채팅방을 생성하는 메서드
+ * @param {*} sendId - 참여자1 id값
+ * @param {*} recvId - 참여자2 id값
+ * @returns 생성된 방의 id값
+ */
+const createRoom = async (client, sendId, recvId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
           insert into room (member_one_id, member_two_id)
@@ -65,18 +65,21 @@ const createRoom = async (sendId, recvId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.createRoom에서 오류 발생: ' + error);
   }
 };
 
-const sendMessage = async (roomId, sendId, recvId, content) => {
-  let client;
-  const log = `messageDao.sendMessage | roomId = ${roomId}, sendId = ${sendId}, recvId = ${recvId}, content = ${content}`;
+/**
+ * sendMessage
+ * 발신자가 수신자에게 메시지를 전송하는 메서드
+ * @param {*} roomId - 채팅방 id값
+ * @param {*} sendId - 발신자 id값
+ * @param {*} recvId - 수신자 id값
+ * @param {*} content - 메시지 내용
+ * @returns 전송에 성공한 메시지의 수
+ */
+const sendMessage = async (client, roomId, sendId, recvId, content) => {
   try {
-    client = await db.connect(log);
     const { rowCount } = await client.query(
       `
           insert into message (content, room_id, send_id, recv_id)
@@ -86,18 +89,18 @@ const sendMessage = async (roomId, sendId, recvId, content) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.sendMessage에서 오류 발생: ' + error);
   }
 };
 
-const getAllMessageById = async (userId) => {
-  let client;
-  const log = `messageDao.getAllMessageById | userId = ${userId}`;
+/**
+ * getAllMessageById
+ * 사용자가 받은 모든 메시지 중 채팅방 별로 최근에 받은 메시지 하나를 반환하는 메서드
+ * @param {*} userId - 사용자의 id값
+ * @returns - 메시지 모음
+ */
+const getAllMessageById = async (client, userId) => {
   try {
-    client = await db.connect(log);
     const { rows } = await client.query(
       `
           select room_id,
@@ -132,19 +135,18 @@ const getAllMessageById = async (userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.getAllMessageById에서 오류 발생: ' + error);
   }
 };
 
-const getAllMessageByRoomId = async (roomId) => {
-  let client;
-  const log = `messageDao.getAllMessageByRoomId | roomId = ${roomId}`;
+/**
+ * getAllMessageByRoomId
+ * roomId에 해당하는 채팅방의 모든 채팅을 가져오는 메서드
+ * @param {*} roomId - 채팅방 id값
+ * @returns - 해당 채팅방의 모든 메시지
+ */
+const getAllMessageByRoomId = async (client, roomId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
       select m.id, m.created_at, m.content, m.send_id, m.read
@@ -158,19 +160,19 @@ const getAllMessageByRoomId = async (roomId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: ' + error);
   }
 };
 
-const readAllMessage = async (roomId, userId) => {
-  let client;
-  const log = `messageDao.readAllMessage | roomId = ${roomId}, userId = ${userId}`;
+/**
+ * readAllMessage
+ * userId와 roomId를 받아 자신에게 온 모든 메시지를 읽음처리하는 메서드
+ * @param {*} roomId - 채팅방 id값
+ * @param {*} userId - 회원 id값
+ * @returns 읽음 처리한 메시지의 수
+ */
+const readAllMessage = async (client, roomId, userId) => {
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
       update message
@@ -181,10 +183,7 @@ const readAllMessage = async (roomId, userId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 에러 발생');
-    return null;
-  } finally {
-    client.release();
+    throw new Error('messageDao.readAllMessage에서 오류 발생: ' + error);
   }
 };
 
