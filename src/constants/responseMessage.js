@@ -11,7 +11,9 @@ module.exports = {
   ALREADY_NICKNAME: '이미 사용중인 닉네임입니다.',
   USEABLE_ID: '중복되는 아이디가 없습니다.',
   USEABLE_NICKNAME: '사용 가능한 닉네임입니다.',
-  ALREADY_USER_ID: '이미 사용중인 아이디입니다',
+  ALREADY_USER_ID: '이미 사용중인 아이디입니다.',
+  AVAILABLE_PASSWORD: '사용 가능한 비밀번호 입니다.',
+  NOT_AVAILABLE_PASSWORD: '사용 불가능한 비밀번호 형식입니다.',
 
   // 로그인
   LOGIN_SUCCESS: '로그인 성공',

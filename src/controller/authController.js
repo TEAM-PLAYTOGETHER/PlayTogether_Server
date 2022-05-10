@@ -30,6 +30,11 @@ const signup = async (req, res) => {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
+    // TODO: 길이 이외의 로직 추가 시 service단으로 분리
+    if (password.length < 8 || password.length > 15) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_AVAILABLE_PASSWORD));
+    }
+
     // 유저 생성
     const newUser = await authService.createUser(userLoginId, password, userName, gender, birth, mbti);
 
