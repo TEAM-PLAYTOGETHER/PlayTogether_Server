@@ -1,3 +1,4 @@
+const db = require('../loaders/db');
 const { crewDao, crewUserDao } = require('../db');
 
 const util = require('../lib/util');
@@ -6,13 +7,18 @@ const responseMessage = require('../constants/responseMessage');
 const { createCrewCode } = require('../lib/createCrewCode');
 
 const createCrew = async (name, masterId) => {
+  let client;
+  const log = `crewDao.createCrew | name = ${name}, masterId=${masterId}`;
+
   try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
     let code = '';
     let ok = false;
 
     // db에 존재하는 모든 코드들을 가져옴
-    const existCodes = await crewDao.getAllCrewCode();
-    if (existCodes === null) throw new Error();
+    const existCodes = await crewDao.getAllCrewCode(client);
 
     // 유일한 코드가 될 때까지 대문자 6자 랜덤 코드 생성
     while (!ok) {
@@ -23,16 +29,24 @@ const createCrew = async (name, masterId) => {
       }
     }
 
-    const createdCrew = await crewDao.createCrew(name, code, masterId);
-    if (!createdCrew) throw new Error();
+    // 동아리 생성
+    const createdCrew = await crewDao.createCrew(client, name, code, masterId);
+    if (!createCrew) throw new Error('createCrew 동아리 생성 중 오류 발생');
 
-    const cnt = await crewUserDao.registerCrewMember(createdCrew.id, masterId);
-    if (cnt !== 1) throw new Error();
+    // 동아리장을 생성된 동아리에 가입시킴
+    const cnt = await crewUserDao.registerCrewMember(client, createdCrew.id, masterId);
+    if (cnt !== 1) throw new Error('createCrew 회원 추가 중 오류 발생');
+
+    await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.CREW_CREATE_SUCCESS, createdCrew);
   } catch (error) {
-    console.log('createCrew error 발생: ' + error);
+    console.log('createCrew error 발생: ' + error.message);
+    await client.query('ROLLBACK');
+
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
   }
 };
 
