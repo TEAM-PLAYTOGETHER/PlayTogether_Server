@@ -1,5 +1,3 @@
-const db = require('../loaders/db');
-
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
 /**

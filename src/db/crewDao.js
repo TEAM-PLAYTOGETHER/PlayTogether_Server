@@ -1,5 +1,3 @@
-const db = require('../loaders/db');
-
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
 /**
@@ -87,12 +85,15 @@ const deleteCrewByCrewId = async (client, crewId) => {
     throw new Error('crewDao.deleteCrewByCrewId에서 오류 발생: ' + error);
   }
 };
-const getExistCrew = async (crewId) => {
-  let client;
-  const log = `crewDao.getExistCrew | crewId = ${crewId}`;
-  try {
-    client = await db.connect(log);
 
+/**
+ * getExistCrew
+ * crewId로 동아리 정보 가져오기
+ * @param {*} crewId - 동아리 id값
+ * @returns - 검색된 동아리의 정보
+ */
+const getExistCrew = async (client, crewId) => {
+  try {
     const { rows } = await client.query(
       `
         select * from crew
@@ -102,10 +103,7 @@ const getExistCrew = async (crewId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.getExistCrew에서 오류 발생: ' + error);
   }
 };
 
