@@ -22,7 +22,7 @@ const createCrew = async (client, name, code, masterId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewDao.createCrew에서 오류 발생: ', error);
+    throw new Error('crewDao.createCrew에서 오류 발생: ' + error);
   }
 };
 
@@ -64,7 +64,7 @@ const getAllCrewCode = async (client) => {
 
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('crewDao.getAllCrewCode에서 오류 발생: ', error);
+    throw new Error('crewDao.getAllCrewCode에서 오류 발생: ' + error);
   }
 };
 

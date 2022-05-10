@@ -20,7 +20,7 @@ const registerCrewMember = async (client, crewId, memberId) => {
     );
     return rowCount;
   } catch (error) {
-    throw new Error('crewUserDao.registerCrewMember에서 오류 발생: ', error);
+    throw new Error('crewUserDao.registerCrewMember에서 오류 발생: ' + error);
   }
 };
 
