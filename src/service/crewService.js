@@ -11,11 +11,10 @@ const { createCrewCode } = require('../lib/createCrewCode');
  * 동아리 생성 서비스
  * @param name - 생성할 동아리 이름
  * @param masterId - 동아리장 유저 id값
- * @returns
  */
 const createCrew = async (name, masterId) => {
   let client;
-  const log = `crewDao.createCrew | name = ${name}, masterId=${masterId}`;
+  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}`;
 
   try {
     client = await db.connect(log);
@@ -57,27 +56,45 @@ const createCrew = async (name, masterId) => {
   }
 };
 
+/**
+ * registerMember
+ * 동아리에 회원 등록시키는 서비스
+ * @param userId - 가입할 회원의 id값
+ * @param crewCode - 가입할 동아리의 코드
+ */
 const registerMember = async (userId, crewCode) => {
+  let client;
+  const log = `crewDao.registerMember | userId = ${userId}, crewCode = ${crewCode}`;
+
   try {
-    const crew = await crewDao.getCrewByCode(crewCode);
-    if (crew === null) throw new Error();
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 인자로 받은 가입코드와 일치하는 동아리 찾기
+    const crew = await crewDao.getCrewByCode(client, crewCode);
     if (!crew) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const alreadyRegistered = await crewUserDao.getRegisteredMember(crew.id, userId);
-    if (alreadyRegistered === null) throw new Error();
+    // 해당 회원이 이미 그 동아리에 가입했는지 확인
+    const alreadyRegistered = await crewUserDao.getRegisteredMember(client, crew.id, userId);
     if (alreadyRegistered) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_REGISTERED);
     }
 
-    const cnt = await crewUserDao.registerCrewMember(crew.id, userId);
-    if (cnt !== 1) throw new Error();
+    // 해당 회원을 동아리에 가입시킴
+    const cnt = await crewUserDao.registerCrewMember(client, crew.id, userId);
+    if (cnt !== 1) throw new Error('registerMember 회원 등록과정에서 오류 발생');
 
+    await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
   } catch (error) {
-    console.log('registerMember에서 오류 발생: ' + error);
+    console.log('registerMember에서 오류 발생: ' + error.message);
+    await client.query('ROLLBACK');
+
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
   }
 };
 
