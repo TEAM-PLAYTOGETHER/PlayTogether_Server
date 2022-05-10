@@ -98,13 +98,26 @@ const registerMember = async (userId, crewCode) => {
   }
 };
 
+/**
+ * getAllCrewByUserId
+ * 회원이 가입한 모든 동아리의 정보 반환해주는 서비스
+ * @param userId - 회원의 id값
+ */
 const getAllCrewByUserId = async (userId) => {
+  let client;
+  const log = `crewDao.registerMember | userId = ${userId}`;
+
   try {
-    const crews = await crewUserDao.getAllCrewByUserId(userId);
+    client = await db.connect(log);
+
+    // 가입된 crew 정보들을 가져옴
+    const crews = await crewUserDao.getAllCrewByUserId(client, userId);
     return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: crews });
   } catch (error) {
-    console.log('registerMember에서 오류 발생: ' + error);
+    console.log('getAllCrewByUserId에서 오류 발생: ' + error);
     return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
   }
 };
 
