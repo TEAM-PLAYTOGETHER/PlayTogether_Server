@@ -16,7 +16,7 @@ const createCrew = async (req, res) => {
     const result = await crewService.createCrew(name, userId);
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('createCrew Controller 에러: ', error);
+    console.log('createCrew Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
@@ -33,7 +33,7 @@ const registerMember = async (req, res) => {
     const result = await crewService.registerMember(userId, crewCode);
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('registerMember Controller 에러: ', error);
+    console.log('registerMember Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
@@ -46,7 +46,7 @@ const getAllCrewByUserId = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('registerMember Controller 에러: ', error);
+    console.log('registerMember Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };
@@ -63,7 +63,7 @@ const deleteCrewByCrewId = async (req, res) => {
     const result = await crewService.deleteCrewByCrewId(userId, crewCode);
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('deleteCrewByCrewId Controller 에러: ', error);
+    console.log('deleteCrewByCrewId Controller 에러: ' + error);
     return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   }
 };

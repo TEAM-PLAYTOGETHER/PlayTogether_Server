@@ -49,8 +49,6 @@ const createCrew = async (name, masterId) => {
   } catch (error) {
     console.log('createCrew error 발생: ' + error);
     await client.query('ROLLBACK');
-
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   } finally {
     client.release();
   }
@@ -91,8 +89,6 @@ const registerMember = async (userId, crewCode) => {
   } catch (error) {
     console.log('registerMember에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
-
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   } finally {
     client.release();
   }
@@ -115,7 +111,6 @@ const getAllCrewByUserId = async (userId) => {
     return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: crews });
   } catch (error) {
     console.log('getAllCrewByUserId에서 오류 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   } finally {
     client.release();
   }
@@ -157,8 +152,6 @@ const deleteCrewByCrewId = async (userId, crewCode) => {
   } catch (error) {
     console.log('deleteCrewByCrewId에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
-
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
   } finally {
     client.release();
   }
