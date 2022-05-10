@@ -2,12 +2,15 @@ const db = require('../loaders/db');
 
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
-const registerCrewMember = async (crewId, memberId) => {
-  let client;
-  const log = `crewUserDao.registerCrewMember | crewId = ${crewId}, memberId=${memberId}; `;
+/**
+ * registerCrewMember
+ * 동아리에 회원을 가입시키는 메서드
+ * @param crewId - 가입할 동아리의 id값
+ * @param memberId - 가입할 회원의 id값
+ * @returns - 가입한 회원의 수 (1이 정상)
+ */
+const registerCrewMember = async (client, crewId, memberId) => {
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
         insert into crew_user (crew_id, member_id)
@@ -17,10 +20,7 @@ const registerCrewMember = async (crewId, memberId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.registerCrewMember에서 오류 발생: ', error);
   }
 };
 
