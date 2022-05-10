@@ -29,12 +29,29 @@ const addLight = async (category, title, date, place, people_cnt, description, i
 
     const data = await lightDao.addLight(client, category, title, date, place
         , people_cnt, description,image, organizerId, crewId, time);
-    
+    const result = [data];
+    const data_result = result.map(o => ({
+      id: Number(o.id),
+      category: o.category,
+      title: o.title,
+      date: o.date,
+      place: o.place,
+      peopleCnt: o.peopleCnt,
+      description: o.description,
+      image: o.image,
+      isDeleted: o.isDeleted,
+      createdAt: o.createdAt,
+      updatedAt: o.updatedAt,
+      organizerId: Number(o.organizerId),
+      crewId: Number(o.crewId),
+      time: o.time
+  }));
+
     // 번개 생성 후 번개 소유자도 번개에 참여시키기
     await lightDao.addLightOrganizer(client, organizerId);
     await client.query('COMMIT');
 
-    return util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS, data);
+    return util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS, data_result);
   } catch (error) {
     await client.query('ROLLBACK');
     console.log('addLight에서 error 발생'+ error);
@@ -68,9 +85,26 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
     }
     const data = await lightDao.putLight(client,lightId,organizerId,category,title, date, place
       , people_cnt, description, time);
+    const result = [data];
+    const data_result = result.map(o => ({
+        id: Number(o.id),
+        category: o.category,
+        title: o.title,
+        date: o.date,
+        place: o.place,
+        peopleCnt: o.peopleCnt,
+        description: o.description,
+        image: o.image,
+        isDeleted: o.isDeleted,
+        createdAt: o.createdAt,
+        updatedAt: o.updatedAt,
+        organizerId: Number(o.organizerId),
+        crewId: Number(o.crewId),
+        time: o.time
+    }));
     
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data);
+    return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
   } catch (error) {
     await client.query('ROLLBACK');
     console.log('putLight에서 error 발생'+ error);
@@ -181,13 +215,13 @@ const getOrganizerLight = async (organizerId) => {
 
     const result = await lightDao.getOrganizerLight(client, organizerId);
     const data = result.map(light => ({
-        light_id : light.id,
+        light_id : Number(light.id),
         title: light.title,
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
         place: light.place,
-        LightMemberCnt: light.joinCnt
+        LightMemberCnt: Number(light.joinCnt)
     }))
 
     await client.query('COMMIT');
@@ -215,13 +249,13 @@ const getEnterLight = async (memberId) => {
 
     const result = await lightDao.getEnterLight(client, memberId);
     const data = result.map(light => ({
-        light_id : light.id,
+        light_id : Number(light.id),
         title: light.title,
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
         place: light.place,
-        LightMemberCnt: light.joinCnt
+        LightMemberCnt: Number(light.joinCnt)
     }))
 
     await client.query('COMMIT');
@@ -249,13 +283,13 @@ const getScrapLight = async (memberId) => {
 
     const result = await lightDao.getScrapLight(client, memberId);
     const data = result.map(light => ({
-        light_id : light.id,
+        light_id : Number(light.id),
         title: light.title,
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
         place: light.place,
-        LightMemberCnt: light.joinCnt
+        LightMemberCnt: Number(light.joinCnt)
     }))
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_SCRAP_SUCCESS, data);
@@ -279,14 +313,14 @@ const getCategoryLight = async (category, sort) => {
     const result = await lightDao.getCategoryLight(client, category,sort);
 
     const data = result.map(light => ({
-      light_id : light.id,
+      light_id : Number(light.id),
       category: light.category,
       title: light.title,
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0,-3),
       people_cnt: light.peopleCnt,
       place: light.place,
-      LightMemberCnt: light.joinCnt
+      LightMemberCnt: Number(light.joinCnt)
     }))
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_CATEGORY_SUCCESS, data);
@@ -313,7 +347,7 @@ const getLightDetail = async (lightId) => {
     const organizer = await lightDao.getLightDetailOrganizer(client, lightId);
     
     const data2 = members.map(o => ({
-      user_id: o.id,
+      user_id: Number(o.id),
       mbti : o.mbti,
       gender: o.gender,
       name : o.name,
@@ -321,7 +355,7 @@ const getLightDetail = async (lightId) => {
   }))
 
     const data = result.map(light => ({
-        light_id : light.id,
+        light_id : Number(light.id),
         category : light.category,
         title: light.title,
         date: dayjs(light.date).format('YYYY-MM-DD'),
@@ -330,7 +364,7 @@ const getLightDetail = async (lightId) => {
         image: light.image,
         people_cnt: light.peopleCnt,
         place: light.place,
-        LightMemberCnt: light.joinCnt,
+        LightMemberCnt: Number(light.joinCnt),
         members: data2,
         organizer: organizer
     }))
