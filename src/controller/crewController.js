@@ -4,6 +4,11 @@ const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 
+/**
+ * POST ~/crew
+ * 동아리 만들기
+ * @private
+ */
 const createCrew = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -21,6 +26,11 @@ const createCrew = async (req, res) => {
   }
 };
 
+/**
+ * POST ~/crew/register
+ * 동아리 만들기
+ * @private
+ */
 const registerMember = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -38,6 +48,11 @@ const registerMember = async (req, res) => {
   }
 };
 
+/**
+ * GET ~/crew/list
+ * 회원이 가입한 동아리 리스트 조회
+ * @private
+ */
 const getAllCrewByUserId = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -51,6 +66,11 @@ const getAllCrewByUserId = async (req, res) => {
   }
 };
 
+/**
+ * DELETE ~/crew
+ * 동아리 삭제 (미사용 API)
+ * @private
+ */
 const deleteCrewByCrewId = async (req, res) => {
   try {
     const userId = req.user.id;
