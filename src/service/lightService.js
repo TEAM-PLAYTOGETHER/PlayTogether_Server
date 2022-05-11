@@ -217,6 +217,7 @@ const getOrganizerLight = async (organizerId) => {
     const data = result.map(light => ({
         light_id : Number(light.id),
         title: light.title,
+        category: light.category,
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
@@ -251,6 +252,7 @@ const getEnterLight = async (memberId) => {
     const data = result.map(light => ({
         light_id : Number(light.id),
         title: light.title,
+        category: light.category,
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,
@@ -285,6 +287,7 @@ const getScrapLight = async (memberId) => {
     const data = result.map(light => ({
         light_id : Number(light.id),
         title: light.title,
+        category: light.category,
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         people_cnt: light.peopleCnt,

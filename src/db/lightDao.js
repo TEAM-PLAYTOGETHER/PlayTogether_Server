@@ -82,7 +82,7 @@ const getOrganizerLight = async(client, organizerId) => {
   try {
     const { rows } =  await client.query(
       `
-      select l.id, join_cnt, title, date, time, people_cnt, place from light l
+      select l.id, join_cnt, category, title, date, time, people_cnt, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) lu
       on l.id = lu.light_id
       where organizer_id = $1;
@@ -98,7 +98,7 @@ const getEnterLight = async(client, memberId) => {
   try {
     const { rows } =  await client.query(
       `
-      select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      select ll.id, ll.title, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
       from light ll
          right join (select lu.light_id, join_cnt
                     from light_user lu
@@ -117,7 +117,7 @@ const getScrapLight = async(client, memberId) => {
   try {
     const { rows } =  await client.query(
       `
-      select ll.id, ll.title, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      select ll.id, ll.title, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
       from light ll
          right join (select lu.light_id, join_cnt
                     from scrap lu
