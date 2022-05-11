@@ -28,7 +28,7 @@ const addLightScrap = async (lightId, memberId) => {
     return util.success(statusCode.OK, responseMessage.SCRAP_SUCCESS);
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('postEnterLight error 발생'+ error);
+    console.log('addLightScrap error 발생'+ error);
   } finally {
     client.release();
   }
@@ -42,7 +42,7 @@ const getLightScrap = async (lightId, memberId) => {
     const data = await scrapDao.getLightScrap(client, lightId, memberId);
     return data
   } catch (error) {
-    console.log('getEnterLightMember error 발생'+ error);
+    console.log('getLightScrap error 발생'+ error);
   } finally {
     client.release();
   }
@@ -65,7 +65,7 @@ const deleteLightScrap = async (lightId, memberId) => {
     return util.success(statusCode.OK, responseMessage.SCRAP_DELETE_SUCCESS);
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('deleteCancelLight error 발생'+ error);
+    console.log('deleteLightScrap error 발생'+ error);
   } finally {
     client.release();
   }

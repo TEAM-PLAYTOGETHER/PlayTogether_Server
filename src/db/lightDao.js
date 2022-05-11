@@ -30,7 +30,7 @@ const addLightOrganizer = async(client, organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightdao.addLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.addLightOrganizer에서 에러 발생했습니다' + error);
   }
 };
 
@@ -74,7 +74,7 @@ const deleteLight = async(client, lightId, organizerId) => {
       [lightId, organizerId],
     );
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.deleteLight에서 에러 발생했습니다' + error);
   }
 };
 
@@ -91,7 +91,7 @@ const getOrganizerLight = async(client, organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getOrganizerLight에서 에러 발생했습니다' + error);
   }
 };
 const getEnterLight = async(client, memberId) => {
@@ -110,7 +110,7 @@ const getEnterLight = async(client, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getEnterLight에서 에러 발생했습니다' + error);
   }
 };
 const getScrapLight = async(client, memberId) => {
@@ -129,7 +129,7 @@ const getScrapLight = async(client, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getScrapLight에서 에러 발생했습니다' + error);
   }
 };
 const getCategoryLight = async(client, category, sort) => {
@@ -145,7 +145,7 @@ const getCategoryLight = async(client, category, sort) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다' + error);
   }
 };
 const getLightDetail = async(client, lightId) => {
@@ -160,7 +160,7 @@ const getLightDetail = async(client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightDetail에서 에러 발생했습니다' + error);
   }
 };
 const getLightDetailMember = async(client, lightId) => {
@@ -176,7 +176,7 @@ const getLightDetailMember = async(client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightDetailMember에서 에러 발생했습니다' + error);
   }
 };
 const getLightDetailOrganizer = async(client, lightId) => {
@@ -191,7 +191,7 @@ const getLightDetailOrganizer = async(client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightDetailOrganizer에서 에러 발생했습니다' + error);
   }
 };
 const getLightOrganizerById = async(client, organizerId) => {

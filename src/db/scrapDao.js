@@ -42,7 +42,7 @@ const getLightScrap = async(client, lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('ScrapDao.deleteLightScrap 에러 발생했습니다' + error);
+    throw new Error('ScrapDao.getLightScrap 에러 발생했습니다' + error);
   } 
 };
 const getLightScrapMember = async(client, lightId, memberId) => {
@@ -56,7 +56,7 @@ const getLightScrapMember = async(client, lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('ScrapDao.deleteLightScrap 에러 발생했습니다' + error);
+    throw new Error('ScrapDao.getLightScrapMember 에러 발생했습니다' + error);
   }
 };
 module.exports = {
