@@ -37,7 +37,7 @@ const createCrew = async (name, masterId) => {
 
     // 동아리 생성
     const createdCrew = await crewDao.createCrew(client, name, code, masterId);
-    if (!createCrew) throw new Error('createCrew 동아리 생성 중 오류 발생');
+    if (!createdCrew) throw new Error('createCrew 동아리 생성 중 오류 발생');
 
     // 동아리장을 생성된 동아리에 가입시킴
     const cnt = await crewUserDao.registerCrewMember(client, createdCrew.id, masterId);
@@ -45,7 +45,12 @@ const createCrew = async (name, masterId) => {
 
     await client.query('COMMIT');
 
-    return util.success(statusCode.OK, responseMessage.CREW_CREATE_SUCCESS, createdCrew);
+    const castedCreatedCrew = {
+      ...createdCrew,
+      id: Number(createdCrew.id),
+    };
+
+    return util.success(statusCode.OK, responseMessage.CREW_CREATE_SUCCESS, castedCreatedCrew);
   } catch (error) {
     console.log('createCrew error 발생: ' + error);
     await client.query('ROLLBACK');
@@ -108,7 +113,14 @@ const getAllCrewByUserId = async (userId) => {
 
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
-    return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: crews });
+    const castedCrews = crews.map((crew) => {
+      return {
+        ...crew,
+        id: Number(crew.id),
+      };
+    });
+
+    return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: castedCrews });
   } catch (error) {
     console.log('getAllCrewByUserId에서 오류 발생: ' + error);
   } finally {

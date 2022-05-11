@@ -4,6 +4,11 @@ const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 
+/**
+ * POST ~/message
+ * 메시지 전송
+ * @private
+ */
 const sendMessage = async (req, res) => {
   try {
     const sendId = req.user.id;
@@ -34,6 +39,11 @@ const sendMessage = async (req, res) => {
   }
 };
 
+/**
+ * GET ~/message
+ * 유저가 최근에 받은 모든 쪽지 리스트 조회
+ * @private
+ */
 const getAllMessageById = async (req, res) => {
   try {
     const result = await messageService.getAllMessageById(req.user.id);
@@ -44,6 +54,11 @@ const getAllMessageById = async (req, res) => {
   }
 };
 
+/**
+ * GET ~/message/:roomId
+ * 톡방 메시지 읽어오기
+ * @private
+ */
 const getAllMessageByRoomId = async (req, res) => {
   try {
     const { roomId } = req.params;

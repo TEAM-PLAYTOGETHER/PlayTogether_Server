@@ -75,9 +75,9 @@ const getAllMessageById = async (userId) => {
     // 가져온 메시지들을 용도에 맞게 매핑
     const messages = rowMessages.map((rowMessage) => {
       let message = {
-        roomId: rowMessage.roomId,
+        roomId: Number(rowMessage.roomId),
         audience: rowMessage.audience,
-        audienceId: rowMessage.audienceId,
+        audienceId: Number(rowMessage.audienceId),
         send: Number(rowMessage.sendId) === Number(userId),
         read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
         createdAt: rowMessage.createdAt,
@@ -129,7 +129,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
     // 가져온 메시지를 용도에 맞게 매핑
     const messages = rowMessages.map((rowMessage) => {
       let message = {
-        messageId: rowMessage.id,
+        messageId: Number(rowMessage.id),
         send: Number(rowMessage.sendId) === Number(userId),
         read: rowMessage.read,
         createdAt: rowMessage.createdAt,
