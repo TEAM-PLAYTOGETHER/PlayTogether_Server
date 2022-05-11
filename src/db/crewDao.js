@@ -1,13 +1,15 @@
-const db = require('../loaders/db');
-
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
-const createCrew = async (name, code, masterId) => {
-  let client;
-  const log = `crewDao.createCrew | name = ${name}, code=${code}, masterId=${masterId}`;
+/**
+ * createCrew
+ * 동아리 생성하는 메서드
+ * @param name - 동아리 이름
+ * @param code - 동아리 가입 코드
+ * @param masterId - 동아리장 id값
+ * @returns 생성된 crew의 name, code, masterId
+ */
+const createCrew = async (client, name, code, masterId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
         insert into crew (name, code, master_id)
@@ -18,19 +20,18 @@ const createCrew = async (name, code, masterId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.createCrew에서 오류 발생: ' + error);
   }
 };
 
-const getCrewByCode = async (code) => {
-  let client;
-  const log = `crewDao.getCrewByCode | code = ${code}`;
+/**
+ * getCrewByCode
+ * 가입코드가 인자로 받은 코드와 같은 동아리를 찾아주는 메서드
+ * @param code - 가입코드
+ * @returns 일치하는 동아리
+ */
+const getCrewByCode = async (client, code) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
         select * from crew
@@ -40,10 +41,7 @@ const getCrewByCode = async (code) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.getCrewByCode에서 오류 발생: ' + error);
   }
 };
 
@@ -52,12 +50,8 @@ const getCrewByCode = async (code) => {
  * DB에 존재하는 모든 크루의 코드를 가져오는 메서드
  * @return 모든 코드들
  */
-const getAllCrewCode = async () => {
-  let client;
-  const log = `crewDao.getAllCrewCode`;
+const getAllCrewCode = async (client) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
         select code
@@ -67,19 +61,18 @@ const getAllCrewCode = async () => {
 
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.getAllCrewCode에서 오류 발생: ' + error);
   }
 };
 
-const deleteCrewByCrewId = async (crewId) => {
-  let client;
-  const log = `crewDao.deleteCrewByCrewId | crewId = ${crewId}`;
+/**
+ * deleteCrewByCrewId
+ * 동아리 삭제하는 메서드
+ * @param {*} crewId - 삭제할 동아리의 id값
+ * @returns 삭제된 동아리 갯수
+ */
+const deleteCrewByCrewId = async (client, crewId) => {
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
         delete from crew
@@ -89,18 +82,18 @@ const deleteCrewByCrewId = async (crewId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.deleteCrewByCrewId에서 오류 발생: ' + error);
   }
 };
-const getExistCrew = async (crewId) => {
-  let client;
-  const log = `crewDao.getExistCrew | crewId = ${crewId}`;
-  try {
-    client = await db.connect(log);
 
+/**
+ * getExistCrew
+ * crewId로 동아리 정보 가져오기
+ * @param {*} crewId - 동아리 id값
+ * @returns - 검색된 동아리의 정보
+ */
+const getExistCrew = async (client, crewId) => {
+  try {
     const { rows } = await client.query(
       `
         select * from crew
@@ -110,10 +103,7 @@ const getExistCrew = async (crewId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewDao.getExistCrew에서 오류 발생: ' + error);
   }
 };
 

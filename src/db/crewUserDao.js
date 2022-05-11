@@ -1,13 +1,14 @@
-const db = require('../loaders/db');
-
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
-const registerCrewMember = async (crewId, memberId) => {
-  let client;
-  const log = `crewUserDao.registerCrewMember | crewId = ${crewId}, memberId=${memberId}; `;
+/**
+ * registerCrewMember
+ * 동아리에 회원을 가입시키는 메서드
+ * @param crewId - 가입할 동아리의 id값
+ * @param memberId - 가입할 회원의 id값
+ * @returns - 가입한 회원의 수 (1이 정상)
+ */
+const registerCrewMember = async (client, crewId, memberId) => {
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
         insert into crew_user (crew_id, member_id)
@@ -17,19 +18,19 @@ const registerCrewMember = async (crewId, memberId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.registerCrewMember에서 오류 발생: ' + error);
   }
 };
 
-const getRegisteredMember = async (crewId, memberId) => {
-  let client;
-  const log = `crewUserDao.getRegisteredMember | crewId = ${crewId}, memberId=${memberId}; `;
+/**
+ * getRegisteredMember
+ * 해당 회원이 이미 해당 동아리에 가입했는지 확인해주는 메서드
+ * @param crewId - 검사할 동아리의 id값
+ * @param memberId - 검사할 회원의 id값
+ * @returns 회원의 가입 정보
+ */
+const getRegisteredMember = async (client, crewId, memberId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
         select * from crew_user
@@ -39,19 +40,18 @@ const getRegisteredMember = async (crewId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.getRegisteredMember에서 오류 발생: ' + error);
   }
 };
 
-const getAllCrewByUserId = async (userId) => {
-  let client;
-  const log = `crewUserDao.getAllCrewByUserId | userId = ${userId}`;
+/**
+ * getAllCrewByUserId
+ * 회원이 가입한 모든 동아리 정보 return
+ * @param {*} userId - 회원의 id값
+ * @returns - 회원이 가입한 모든 동아리 정보
+ */
+const getAllCrewByUserId = async (client, userId) => {
   try {
-    client = await db.connect(log);
-
     const { rows } = await client.query(
       `
       select c.id, c.name
@@ -63,20 +63,19 @@ const getAllCrewByUserId = async (userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.getAllCrewByUserId에서 오류 발생: ' + error);
   }
 };
 
-// TODO: 일단 soft delete 적용 안했습니다.
-const withdrawAllMemberByCrewId = async (crewId) => {
-  let client;
-  const log = `crewUserDao.withdrawAllMemberByCrewId | crewId = ${crewId}`;
+/**
+ * withdrawAllMemberByCrewId
+ * 동아리의 모든 멤버 탈퇴
+ * @param {*} crewId - 동아리의 id값
+ * @returns 탈퇴처리된 회원의 수
+ */
+const withdrawAllMemberByCrewId = async (client, crewId) => {
+  // TODO: 일단 soft delete 적용 안했습니다.
   try {
-    client = await db.connect(log);
-
     const { rowCount } = await client.query(
       `
       delete from crew_user
@@ -86,10 +85,7 @@ const withdrawAllMemberByCrewId = async (crewId) => {
     );
     return rowCount;
   } catch (error) {
-    console.log(log + '에서 오류 발생' + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('crewUserDao.withdrawAllMemberByCrewId에서 오류 발생: ' + error);
   }
 };
 
