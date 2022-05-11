@@ -195,7 +195,7 @@ const deleteLight = async (lightId, organizerId) => {
     return util.success(statusCode.OK, responseMessage.LIGHT_DELETE_SUCCESS);
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('deleteCancelLight error 발생'+ error);
+    console.log('deleteLight error 발생'+ error);
   } finally {
     client.release();
   }
@@ -333,7 +333,7 @@ const getCategoryLight = async (category, sort) => {
 const getLightDetail = async (lightId) => {
   let client;
 
-  const log = `lightService.getCategoryLight | lightId = ${lightId}`;
+  const log = `lightService.getLightDetail | lightId = ${lightId}`;
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
@@ -373,7 +373,7 @@ const getLightDetail = async (lightId) => {
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_DETAIL_SUCCESS, data);
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('getCategoryLight error 발생'+ error);
+    console.log('getLightDetail error 발생'+ error);
   } finally {
     client.release();
   }
