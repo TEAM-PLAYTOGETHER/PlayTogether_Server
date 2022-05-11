@@ -1,14 +1,9 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
-const db = require('../loaders/db');
 
 
-const addLightScrap = async (lightId, memberId) => {
-  let client;
-
-  const log = `scrapDao.addLightScrap | lightId = ${lightId}, memberId = ${memberId}`;
+const addLightScrap = async (client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     await client.query(
       `
       INSERT INTO scrap
@@ -19,19 +14,12 @@ const addLightScrap = async (lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('ScrapDao.addLightScrap에서 에러 발생했습니다' + error);
   }
 };
 
-const deleteLightScrap = async(lightId, memberId) => {
-  let client;
-
-  const log = `scrapDao.deleteLightScrap | lightId = ${lightId}, memberId = ${memberId}`;
+const deleteLightScrap = async(client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     await client.query(
       `
       DELETE FROM scrap 
@@ -40,18 +28,11 @@ const deleteLightScrap = async(lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('ScrapDao.deleteLightScrap 에러 발생했습니다' + error);
   }
 };
-const getLightScrap = async(lightId, memberId) => {
-  let client;
-
-  const log = `scrapDao.getLightScrap | lightId = ${lightId}, memberId = ${memberId}`;
+const getLightScrap = async(client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     const { rows } = await client.query(
       `
       SELECT * FROM scrap 
@@ -61,18 +42,11 @@ const getLightScrap = async(lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
-  }
+    throw new Error('ScrapDao.getLightScrap 에러 발생했습니다' + error);
+  } 
 };
-const getLightScrapMember = async(lightId, memberId) => {
-  let client;
-
-  const log = `scrapDao.getLightScrapMember | lightId = ${lightId}, memberId = ${memberId}`;
+const getLightScrapMember = async(client, lightId, memberId) => {
   try {
-    client = await db.connect(log);
     const { rows } = await client.query(
       `
       select * from scrap
@@ -82,10 +56,7 @@ const getLightScrapMember = async(lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    console.log(log + "에서 에러 발생" + error);
-    return null;
-  } finally {
-    client.release();
+    throw new Error('ScrapDao.getLightScrapMember 에러 발생했습니다' + error);
   }
 };
 module.exports = {

@@ -23,15 +23,20 @@ const login = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { userLoginId, password, userName, gender, birth, mbti } = req.body;
+    const { userLoginId, password, userName, gender, birth } = req.body;
 
     // 유저 정보 미 입력시 에러 처리
-    if (!userLoginId || !password || !userName || !gender || !birth || !mbti) {
+    if (!userLoginId || !password || !userName || !gender || !birth) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
+    // TODO: 길이 이외의 로직 추가 시 service단으로 분리
+    if (password.length < 8 || password.length > 15) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_AVAILABLE_PASSWORD));
+    }
+
     // 유저 생성
-    const newUser = await authService.createUser(userLoginId, password, userName, gender, birth, mbti);
+    const newUser = await authService.createUser(userLoginId, password, userName, gender, birth);
 
     return res.status(newUser.status).json(newUser);
   } catch (error) {
