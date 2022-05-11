@@ -357,6 +357,11 @@ const getLightDetail = async (lightId) => {
       age : Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))) + 1
   }))
 
+    const data3 = organizer.map(o => ({
+      organizer_id: Number(o.id),
+      name: o.name
+    })) 
+
     const data = result.map(light => ({
         light_id : Number(light.id),
         category : light.category,
@@ -369,7 +374,7 @@ const getLightDetail = async (lightId) => {
         place: light.place,
         LightMemberCnt: Number(light.joinCnt),
         members: data2,
-        organizer: organizer
+        organizer: data3
     }))
 
     await client.query('COMMIT');
