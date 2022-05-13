@@ -2,16 +2,17 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
 
 
-const addLight = async (client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
+const addLight = async (client, category, title, date, place, people_cnt, description, organizerId, crewId, time) => {
   try {
     const { rows } = await client.query(
+      // TODO: 데모데이 후 이미지 추가
       `
-      INSERT INTO light (category, title, date, place, people_cnt, description, image, is_deleted, created_at, updated_at, organizer_id, crew_id, time) 
+      INSERT INTO light (category, title, date, place, people_cnt, description, is_deleted, organizer_id, crew_id, time) 
       VALUES 
-      ($1, $2, $3, $4, $5, $6, $7, FALSE, now(), now(), $8, $9, $10)
+      ($1, $2, $3, $4, $5, $6, FALSE, $7, $8, $9)
       RETURNING *
       `,
-      [category, title, date, place, people_cnt, description, image,  organizerId, crewId, time],
+      [category, title, date, place, people_cnt, description, organizerId, crewId, time],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
@@ -149,10 +150,11 @@ const getCategoryLight = async(client, category, sort) => {
   }
 };
 const getLightDetail = async(client, lightId) => {
+// TODO: 데모데이 후 image 추가
   try {
     const { rows } =  await client.query(
       `
-      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       where l.id = $1;
       `,
