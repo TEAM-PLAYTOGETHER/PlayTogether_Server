@@ -4,6 +4,7 @@ const { messageDao, testDao, userDao } = require('../db');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const util = require('../lib/util');
+const { applyKoreanTime } = require('../lib/calculateAge');
 
 /**
  * sendMessage
@@ -80,7 +81,7 @@ const getAllMessageById = async (userId) => {
         audienceId: Number(rowMessage.audienceId),
         send: Number(rowMessage.sendId) === Number(userId),
         read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
-        createdAt: rowMessage.createdAt,
+        createdAt: applyKoreanTime(rowMessage.createdAt),
         content: rowMessage.content,
       };
       return message;
@@ -132,7 +133,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
         messageId: Number(rowMessage.id),
         send: Number(rowMessage.sendId) === Number(userId),
         read: rowMessage.read,
-        createdAt: rowMessage.createdAt,
+        createdAt: applyKoreanTime(rowMessage.createdAt),
         content: rowMessage.content,
       };
       return message;
