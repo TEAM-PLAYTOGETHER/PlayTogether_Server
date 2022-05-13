@@ -154,7 +154,7 @@ const getAllMessageByRoomId = async (client, roomId) => {
                left join message m
                          on r.id = m.room_id
       where r.id = $1
-      order by created_at desc;
+      order by created_at;
       `,
       [roomId],
     );
