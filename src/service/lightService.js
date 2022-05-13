@@ -357,6 +357,7 @@ const getLightDetail = async (lightId) => {
     }));
 
     const data3 = organizer.map((o) => ({
+      userLoginId: o.userLoginId,
       organizer_id: Number(o.id),
       name: o.name,
     }));
