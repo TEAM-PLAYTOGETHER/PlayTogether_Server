@@ -6,11 +6,11 @@ const db = require('../loaders/db');
 const dayjs = require('dayjs');
 const { calculateAge } = require('../lib/calculateAge');
 
-const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
+const addLight = async (category, title, date, place, people_cnt, description,  organizerId, crewId, time) => {
   let client;
 
   const log = `lightService.addLight | category = ${category}, title = ${title}, date = ${date}, place = ${place}
-  , people_cnt = ${people_cnt}, description = ${description}, image = ${image}, organizerId = ${organizerId},
+  , people_cnt = ${people_cnt}, description = ${description}, organizerId = ${organizerId},
   , crewId = ${crewId}, time = ${time}`;
   try {
     client = await db.connect(log);
@@ -28,7 +28,7 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     }
 
     const data = await lightDao.addLight(client, category, title, date, place
-        , people_cnt, description,image, organizerId, crewId, time);
+        , people_cnt, description,organizerId, crewId, time);
     const result = [data];
     const data_result = result.map(o => ({
       id: Number(o.id),
@@ -38,7 +38,7 @@ const addLight = async (category, title, date, place, people_cnt, description, i
       place: o.place,
       peopleCnt: o.peopleCnt,
       description: o.description,
-      image: o.image,
+      // image: o.image,
       isDeleted: o.isDeleted,
       createdAt: o.createdAt,
       updatedAt: o.updatedAt,
@@ -94,7 +94,7 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
         place: o.place,
         peopleCnt: o.peopleCnt,
         description: o.description,
-        image: o.image,
+        // image: o.image,
         isDeleted: o.isDeleted,
         createdAt: o.createdAt,
         updatedAt: o.updatedAt,
@@ -369,7 +369,7 @@ const getLightDetail = async (lightId) => {
         date: dayjs(light.date).format('YYYY-MM-DD'),
         time: light.time.slice(0,-3),
         description: light.description,
-        image: light.image,
+        // image: light.image,
         people_cnt: light.peopleCnt,
         place: light.place,
         LightMemberCnt: Number(light.joinCnt),

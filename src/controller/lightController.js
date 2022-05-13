@@ -8,7 +8,8 @@ const addLight = async (req, res) => {
 
   const organizerId = req.user.id;
   const { crewId } = req.params;
-  const image = req.file.location;
+// TODO: 데모데이 이후에 이미지 처리.
+  // const image = req.file.location;
   const { category, title, date, time, description, place, people_cnt } = req.body;
   
   // 번개 내용 미입력 시 에러
@@ -20,7 +21,7 @@ const addLight = async (req, res) => {
   }
   try {
     const result = await lightService.addLight(category, title, date, place,
-       people_cnt, description, image,organizerId, crewId, time);
+       people_cnt, description,organizerId, crewId, time);
 
     return res.status(result.status).json(result);
   } catch (error) {

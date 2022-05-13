@@ -1,11 +1,12 @@
 const express = require('express');
 const { lightController } = require('../controller');
-const upload = require('../middlewares/multer');
+// TODO: 데모데이 후 이미지 추가
+// const upload = require('../middlewares/multer'); 
 const { authMiddleware } = require('../middlewares/jwtAuthorization');
 
 const router = express.Router();
 
-router.post('/add/:crewId', authMiddleware, upload.single('image'), lightController.addLight);
+router.post('/add/:crewId', authMiddleware, lightController.addLight);
 router.put('/:lightId', authMiddleware, lightController.putLight);
 router.post('/enter/:lightId', authMiddleware, lightController.postEnterLight);
 router.post('/remove/:lightId', authMiddleware, lightController.deleteLight);
