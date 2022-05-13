@@ -7,8 +7,11 @@ const responseMessage = require('../constants/responseMessage');
 const addLight = async (req, res) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
-  // TODO: 데모데이 이후에 이미지 처리.
-  // const image = req.file.location;
+  let image = null;
+  if (req.file) {
+    image = req.file.location;
+  }
+
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러
@@ -19,7 +22,7 @@ const addLight = async (req, res) => {
     return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW));
   }
   try {
-    const result = await lightService.addLight(category, title, date, place, people_cnt, description, organizerId, crewId, time);
+    const result = await lightService.addLight(category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
     return res.status(result.status).json(result);
   } catch (error) {
     console.log('addLight Controller 에러: ' + error);
