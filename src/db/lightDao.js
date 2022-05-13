@@ -1,27 +1,25 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
 
-
-const addLight = async (client, category, title, date, place, people_cnt, description, organizerId, crewId, time) => {
+const addLight = async (client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   try {
     const { rows } = await client.query(
-      // TODO: 데모데이 후 이미지 추가
       `
-      INSERT INTO light (category, title, date, place, people_cnt, description, is_deleted, organizer_id, crew_id, time) 
+      INSERT INTO light (category, title, date, place, people_cnt, description, image, is_deleted, created_at, updated_at, organizer_id, crew_id, time) 
       VALUES 
-      ($1, $2, $3, $4, $5, $6, FALSE, $7, $8, $9)
+      ($1, $2, $3, $4, $5, $6, $7, FALSE, now(), now(), $8, $9, $10)
       RETURNING *
       `,
-      [category, title, date, place, people_cnt, description, organizerId, crewId, time],
+      [category, title, date, place, people_cnt, description, image, organizerId, crewId, time],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
     throw new Error('lightdao.addLight에서 에러 발생했습니다' + error);
   }
 };
-const addLightOrganizer = async(client, organizerId) => {
+const addLightOrganizer = async (client, organizerId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       INSERT into light_user (light_id, member_id)
       select id, organizer_id from light
@@ -44,12 +42,11 @@ const putLight = async (client, lightId, organizerId, category, title, date, pla
       `,
       [lightId, organizerId],
     );
-  
+
     if (existingRows.length === 0) return false;
-  
-    const data = _.merge({}, convertSnakeToCamel.keysToCamel(existingRows[0]),
-     { category, title, date, place, people_cnt, description, time});
-  
+
+    const data = _.merge({}, convertSnakeToCamel.keysToCamel(existingRows[0]), { category, title, date, place, people_cnt, description, time });
+
     const { rows } = await client.query(
       `
       UPDATE light l
@@ -65,7 +62,7 @@ const putLight = async (client, lightId, organizerId, category, title, date, pla
   }
 };
 
-const deleteLight = async(client, lightId, organizerId) => {
+const deleteLight = async (client, lightId, organizerId) => {
   try {
     await client.query(
       `
@@ -79,9 +76,9 @@ const deleteLight = async(client, lightId, organizerId) => {
   }
 };
 
-const getOrganizerLight = async(client, organizerId) => {
+const getOrganizerLight = async (client, organizerId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select l.id, join_cnt, category, title, date, time, people_cnt, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) lu
@@ -95,9 +92,9 @@ const getOrganizerLight = async(client, organizerId) => {
     throw new Error('lightdao.getOrganizerLight에서 에러 발생했습니다' + error);
   }
 };
-const getEnterLight = async(client, memberId) => {
+const getEnterLight = async (client, memberId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select ll.id, ll.title, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
       from light ll
@@ -114,9 +111,9 @@ const getEnterLight = async(client, memberId) => {
     throw new Error('lightdao.getEnterLight에서 에러 발생했습니다' + error);
   }
 };
-const getScrapLight = async(client, memberId) => {
+const getScrapLight = async (client, memberId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select ll.id, ll.title, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
       from light ll
@@ -133,9 +130,9 @@ const getScrapLight = async(client, memberId) => {
     throw new Error('lightdao.getScrapLight에서 에러 발생했습니다' + error);
   }
 };
-const getCategoryLight = async(client, category, sort) => {
+const getCategoryLight = async (client, category, sort) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select l.id, l.category, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
@@ -149,12 +146,11 @@ const getCategoryLight = async(client, category, sort) => {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetail = async(client, lightId) => {
-// TODO: 데모데이 후 image 추가
+const getLightDetail = async (client, lightId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
-      select l.id, category, join_cnt, title, date, time, people_cnt, description, place from light l
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       where l.id = $1;
       `,
@@ -165,9 +161,9 @@ const getLightDetail = async(client, lightId) => {
     throw new Error('lightdao.getLightDetail에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetailMember = async(client, lightId) => {
+const getLightDetailMember = async (client, lightId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select u.id, mbti, gender, name, birth_day from "user" u
       inner join light_user lu on u.id = lu.member_id
@@ -181,9 +177,9 @@ const getLightDetailMember = async(client, lightId) => {
     throw new Error('lightdao.getLightDetailMember에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetailOrganizer = async(client, lightId) => {
+const getLightDetailOrganizer = async (client, lightId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select u.id, name from "user" u
       inner join light l on u.id = l.organizer_id
@@ -196,9 +192,9 @@ const getLightDetailOrganizer = async(client, lightId) => {
     throw new Error('lightdao.getLightDetailOrganizer에서 에러 발생했습니다' + error);
   }
 };
-const getLightOrganizerById = async(client, organizerId) => {
+const getLightOrganizerById = async (client, organizerId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select * from light
       where organizer_id = $1;
@@ -210,9 +206,9 @@ const getLightOrganizerById = async(client, organizerId) => {
     throw new Error('lightdao.getLightOrganizerById에서 에러 발생했습니다' + error);
   }
 };
-const getExistLight = async(client, lightId) => {
+const getExistLight = async (client, lightId) => {
   try {
-    const { rows } =  await client.query(
+    const { rows } = await client.query(
       `
       select * from light
       where id = $1;
@@ -226,17 +222,17 @@ const getExistLight = async(client, lightId) => {
 };
 
 module.exports = {
-    addLight,
-    putLight,
-    deleteLight,
-    getOrganizerLight,
-    getEnterLight,
-    getScrapLight,
-    getCategoryLight,
-    getLightDetail,
-    getLightDetailMember,
-    getLightDetailOrganizer,
-    getLightOrganizerById,
-    getExistLight,
-    addLightOrganizer
+  addLight,
+  putLight,
+  deleteLight,
+  getOrganizerLight,
+  getEnterLight,
+  getScrapLight,
+  getCategoryLight,
+  getLightDetail,
+  getLightDetailMember,
+  getLightDetailOrganizer,
+  getLightOrganizerById,
+  getExistLight,
+  addLightOrganizer,
 };
