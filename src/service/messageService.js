@@ -4,7 +4,7 @@ const { messageDao, testDao, userDao } = require('../db');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const util = require('../lib/util');
-const { applyKoreanTime } = require('../lib/calculateAge');
+const { applyKoreanTime } = require('../lib/applyKoreanTime');
 
 /**
  * sendMessage

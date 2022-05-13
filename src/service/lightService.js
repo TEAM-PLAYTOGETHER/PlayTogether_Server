@@ -4,13 +4,14 @@ const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const db = require('../loaders/db');
 const dayjs = require('dayjs');
-const { calculateAge, applyKoreanTime } = require('../lib/calculateAge');
+const { calculateAge } = require('../lib/calculateAge');
+const { applyKoreanTime } = require('../lib/applyKoreanTime');
 
-const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
+const addLight = async (category, title, date, place, people_cnt, description, organizerId, crewId, time) => {
   let client;
 
   const log = `lightService.addLight | category = ${category}, title = ${title}, date = ${date}, place = ${place}
-  , people_cnt = ${people_cnt}, description = ${description}, image = ${image}, organizerId = ${organizerId},
+  , people_cnt = ${people_cnt}, description = ${description}, organizerId = ${organizerId},
   , crewId = ${crewId}, time = ${time}`;
   try {
     client = await db.connect(log);
@@ -27,7 +28,7 @@ const addLight = async (category, title, date, place, people_cnt, description, i
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const data = await lightDao.addLight(client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
+    const data = await lightDao.addLight(client, category, title, date, place, people_cnt, description, organizerId, crewId, time);
     const result = [data];
     const data_result = result.map((o) => ({
       id: Number(o.id),
@@ -37,13 +38,13 @@ const addLight = async (category, title, date, place, people_cnt, description, i
       place: o.place,
       peopleCnt: o.peopleCnt,
       description: o.description,
-      image: o.image,
+      // image: o.image,
       isDeleted: o.isDeleted,
-      createdAt: o.createdAt,
-      updatedAt: o.updatedAt,
+      createdAt: applyKoreanTime(o.createdAt),
+      updatedAt: applyKoreanTime(o.updatedAt),
       organizerId: Number(o.organizerId),
       crewId: Number(o.crewId),
-      time: applyKoreanTime(o.time),
+      time: o.time,
     }));
 
     // 번개 생성 후 번개 소유자도 번개에 참여시키기
@@ -94,11 +95,11 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
       description: o.description,
       image: o.image,
       isDeleted: o.isDeleted,
-      createdAt: o.createdAt,
-      updatedAt: o.updatedAt,
+      createdAt: applyKoreanTime(o.createdAt),
+      updatedAt: applyKoreanTime(o.updatedAt),
       organizerId: Number(o.organizerId),
       crewId: Number(o.crewId),
-      time: applyKoreanTime(o.time),
+      time: o.time,
     }));
 
     await client.query('COMMIT');
@@ -367,7 +368,7 @@ const getLightDetail = async (lightId) => {
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0, -3),
       description: light.description,
-      image: light.image,
+      // image: light.image,
       people_cnt: light.peopleCnt,
       place: light.place,
       LightMemberCnt: Number(light.joinCnt),
