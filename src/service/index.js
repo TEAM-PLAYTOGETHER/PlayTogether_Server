@@ -1,5 +1,4 @@
-const testService = require('./testService');
-const lightService = require('./lightService');
+// 메시지 관련 서비스
 const messageService = require('./messageService');
 
 // 동아리 관련 서비스
@@ -9,11 +8,11 @@ const crewService = require('./crewService');
 const authService = require('./authService');
 const userService = require('./userService');
 
-// 번개 찜 관련 서비스
+// 번개 관련 서비스
+const lightService = require('./lightService');
 const scrapService = require('./scrapService');
 
 module.exports = {
-  testService,
   authService,
   userService,
   messageService,

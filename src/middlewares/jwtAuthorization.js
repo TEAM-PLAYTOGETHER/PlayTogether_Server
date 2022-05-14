@@ -5,7 +5,7 @@ const config = require('../config');
 const util = require('../lib/util');
 const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
-const { testDao, userDao } = require('../db');
+const { userDao } = require('../db');
 
 const authMiddleware = async (req, res, next) => {
   let client;

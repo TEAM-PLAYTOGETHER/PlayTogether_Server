@@ -1,5 +1,3 @@
-const testDao = require('./testDao');
-
 // 메시지 관련 dao
 const messageDao = require('./messageDao');
 
@@ -19,7 +17,6 @@ const lightUserDao = require('./lightUserDao');
 const scrapDao = require('./scrapDao');
 
 module.exports = {
-  testDao,
   authDao,
   userDao,
   lightDao,
@@ -27,5 +24,5 @@ module.exports = {
   crewDao,
   crewUserDao,
   lightUserDao,
-  scrapDao
+  scrapDao,
 };
