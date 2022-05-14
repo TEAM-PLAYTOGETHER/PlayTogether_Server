@@ -16,6 +16,8 @@ const addLight = async (category, title, date, place, people_cnt, description, i
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
+
+
     // 번개 생성하려고 하는 사람이 존재하는 사람인지를 검사.
     const exist = await userDao.getUserById(client, organizerId);
     if (!exist) {
@@ -147,6 +149,7 @@ const deleteCancelLight = async (lightId, memberId) => {
     client = await db.connect(log);
     await client.query('BEGIN');
     // 번개에 참여한 유저인지 검사
+    
     const enterLightMember = await lightUserDao.getEnterLightMember(client, lightId, memberId);
     if (!enterLightMember) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT_MEMBER);
