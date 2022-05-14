@@ -192,14 +192,14 @@ const getLightDetailOrganizer = async (client, lightId) => {
     throw new Error('lightdao.getLightDetailOrganizer에서 에러 발생했습니다' + error);
   }
 };
-const getLightOrganizerById = async (client, organizerId) => {
+const getLightOrganizerById = async (client, lightId, organizerId) => {
   try {
     const { rows } = await client.query(
       `
-      select * from light
-      where organizer_id = $1;
+      SELECT * FROM light l
+      WHERE id = $1 and organizer_id = $2
       `,
-      [organizerId],
+      [lightId, organizerId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
