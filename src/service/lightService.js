@@ -360,7 +360,7 @@ const getLightDetail = async (lightId) => {
       mbti: o.mbti,
       gender: o.gender,
       name: o.name,
-      age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))) + 1,
+      age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))),
     }));
 
     const data3 = organizer.map((o) => ({
