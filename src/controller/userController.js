@@ -26,8 +26,6 @@ const updateUserMbti = async (req, res) => {
     const userId = req.user.id;
     const { mbti } = req.body;
 
-    console.log(userId);
-
     // 헤더에 유저 토큰 없을 시 에러 처리
     if (!userId) {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.UNAUTHORIZED));
