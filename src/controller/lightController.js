@@ -11,7 +11,6 @@ const addLight = async (req, res) => {
   if (req.file) {
     image = req.file.location;
   }
-  console.log(image);
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러

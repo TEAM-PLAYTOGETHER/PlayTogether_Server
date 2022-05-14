@@ -184,10 +184,17 @@ const deleteLight = async (lightId, organizerId) => {
     client = await db.connect(log);
     await client.query('BEGIN');
     // 번개 삭제하려는 사람이 organizer인지 검사
-    const organizer = await lightDao.getLightOrganizerById(client, organizerId);
+    const organizer = await lightDao.getLightOrganizerById(client, lightId,organizerId);
     if (!organizer) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_LIGHT_ORGANIZER);
     }
+    // 존재하는 번개인지 확인
+    const existLight = await lightDao.getExistLight(client, lightId);
+    if (!existLight) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
+    }
+    // 번개 삭제를 하려면 그 번개에 속해있는 사람 전부 제거.
+    await lightUserDao.deleteLightUser(client, lightId);
     await lightDao.deleteLight(client, lightId, organizerId);
 
     await client.query('COMMIT');
