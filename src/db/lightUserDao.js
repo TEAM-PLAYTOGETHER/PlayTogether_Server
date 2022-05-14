@@ -43,9 +43,23 @@ const deleteCancelLight = async(client, lightId, memberId) => {
     throw new Error('lightUserdao.deleteCancelLight에서 에러 발생했습니다' + error);
   }
 };
+const deleteLightUser = async(client, lightId) => {
+  try {
+    await client.query(
+      `
+      DELETE FROM light_user 
+      WHERE light_id = $1
+      `,
+      [lightId],
+    );
+  } catch (error) {
+    throw new Error('lightUserdao.deleteLightUser에서 에러 발생했습니다' + error);
+  }
+};
 
 module.exports = {
     postEnterLight,
     getEnterLightMember,
-    deleteCancelLight
+    deleteCancelLight,
+    deleteLightUser
 };

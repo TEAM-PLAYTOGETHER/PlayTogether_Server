@@ -31,6 +31,7 @@ const getUserByUserLoginId = async (userLoginId) => {
     const userData = {
       userLoginId: user.userLoginId,
       name: user.name,
+      gender: user.gender,
       age: age,
       mbti: user.mbti,
     };
