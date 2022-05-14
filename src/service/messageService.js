@@ -1,5 +1,5 @@
 const db = require('../loaders/db');
-const { messageDao, testDao, userDao } = require('../db');
+const { messageDao, userDao } = require('../db');
 
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');

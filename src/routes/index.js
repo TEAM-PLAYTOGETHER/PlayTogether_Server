@@ -6,9 +6,13 @@ const router = express.Router();
 router.use('/auth', require('./authApi'));
 router.use('/user', require('./userAPi'));
 
-router.use('/test', require('./testAPI'));
+// 번개 관련 라우터
 router.use('/light', require('./lightApi'));
+
+// 메시지 관련 라우터
 router.use('/message', require('./messageAPI'));
+
+// 동아리 관련 라우터
 router.use('/crew', require('./crewAPI'));
 
 // 스크랩 관련 라우터
