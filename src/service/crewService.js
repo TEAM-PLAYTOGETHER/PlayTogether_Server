@@ -1,5 +1,6 @@
 const db = require('../loaders/db');
 const { crewDao, crewUserDao } = require('../db');
+const redisClient = require('../loaders/redis');
 
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
@@ -20,16 +21,25 @@ const createCrew = async (name, masterId) => {
     client = await db.connect(log);
     await client.query('BEGIN');
 
+    // redis client 연결
+    await redisClient.connect();
+
     let code = '';
     let ok = false;
 
-    // db에 존재하는 모든 코드들을 가져옴
-    const existCodes = await crewDao.getAllCrewCode(client);
+    // redis의 "codes" key가 없는 상태라면 db에서 모든 코드를 가져와 초기화 진행
+    const redisReady = await redisClient.sMembers('codes');
+    if (!redisReady.length) {
+      const existCodes = await crewDao.getAllCrewCode(client);
+      existCodes.forEach((existCode) => {
+        redisClient.sAdd('codes', existCode.code);
+      });
+    }
 
     // 유일한 코드가 될 때까지 대문자 6자 랜덤 코드 생성
     while (!ok) {
       code = createCrewCode();
-      const exist = existCodes.find((data) => data.code === code);
+      const exist = await redisClient.sIsMember('codes', code);
       if (!exist) {
         ok = true;
       }
@@ -49,6 +59,10 @@ const createCrew = async (name, masterId) => {
       ...createdCrew,
       id: Number(createdCrew.id),
     };
+
+    // redis의 "codes" set에 새롭게 추가된 코드 추가
+    redisClient.sAdd('codes', code);
+    await redisClient.quit();
 
     return util.success(statusCode.OK, responseMessage.CREW_CREATE_SUCCESS, castedCreatedCrew);
   } catch (error) {
