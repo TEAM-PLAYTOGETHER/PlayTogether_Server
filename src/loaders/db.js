@@ -1,44 +1,40 @@
-// 필요한 모듈들
 const { Pool, Query } = require('pg');
 const dayjs = require('dayjs');
 const dotenv = require('dotenv');
+
 dotenv.config();
 
-// DB Config (유저, 호스트, DB 이름, 패스워드)를 로딩해줍시다.
+// db config 로딩
 const dbConfig = require('../config/dbConfig')[process.env.NODE_ENV];
 
-// NODE_ENV라는 글로벌 환경변수를 사용해서, 현재 환경이 어떤 '모드'인지 판별해줍시다.
+// process.env의 상태에 따라 로깅 여부 결정
 let devMode = process.env.NODE_ENV === 'development';
-
-// SQL 쿼리문을 콘솔에 프린트할지 말지 결정해주는 변수를 선언합시다.
 const sqlDebug = true;
 
-// 기본 설정에서는 우리가 실행하게 되는 SQL 쿼리문이 콘솔에 찍히지 않기 때문에,
-// pg 라이브러리 내부의 함수를 살짝 손봐서 SQL 쿼리문이 콘솔에 찍히게 만들어 줍시다.
+// pq 라이브러리의 prototype 중 submit을 재정의 -> 쿼리를 로그에 남김
 const submit = Query.prototype.submit;
 Query.prototype.submit = function () {
   const text = this.text;
   const values = this.values || [];
   const query = text.replace(/\$([0-9]+)/g, (m, v) => JSON.stringify(values[parseInt(v) - 1]));
-  // devMode === true 이면서 sqlDebug === true일 때 SQL 쿼리문을 콘솔에 찍겠다는 분기입니다.
   devMode && sqlDebug && console.log(`\n\n[👻 SQL STATEMENT]\n${query}\n_________\n`);
   submit.apply(this, arguments);
 };
 
-// 서버가 실행되면 현재 환경이 개발 모드(로컬)인지 프로덕션 모드(배포)인지 콘솔에 찍어줍시다.
 console.log(`[🔥DB] ${process.env.NODE_ENV}`);
 
-// 커넥션 풀을 생성해줍니다.
-// 커넥션 풀 => 여러개의 커넥션을 준비해두고 ...
+// 커넥션 풀 생성
 const pool = new Pool({
   ...dbConfig,
   connectionTimeoutMillis: 60 * 1000,
   idleTimeoutMillis: 60 * 1000,
 });
 
-// 위에서 생성한 커넥션 풀에서 커넥션을 빌려오는 함수를 재정의합니다.
-// 기본적으로 제공되는 pool.connect()와 pool.connect().release() 함수에 디버깅용 메시지를 추가하는 작업입니다.
-// 어디서 온 요청인지 파악하기 위해 req를 먹임
+/**
+ * connect
+ * 커넥션 풀에서 하나의 커넥션을 가져옴
+ * @param {*} log - 어디에서 온 요청인지 확인하기 위한 로그 문자열
+ */
 const connect = async (log) => {
   const now = dayjs();
   const callStack = new Error().stack;
@@ -46,6 +42,7 @@ const connect = async (log) => {
   const query = client.query;
   const release = client.release;
 
+  // 릴리즈 되지 않은 쿼리 체크
   const releaseChecker = setTimeout(() => {
     devMode
       ? console.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack })
@@ -61,11 +58,17 @@ const connect = async (log) => {
     client.lastQuery = args;
     return query.apply(client, args);
   };
+
   client.release = () => {
     clearTimeout(releaseChecker);
     const time = dayjs().diff(now, 'millisecond');
     const message = `[RELEASE] in ${time}ms | ${log}`;
+
+    // devMode일 때는 모든 쿼리 출력
     devMode && console.log(message);
+
+    // production일 경우에는 4초 이상 지속된 슬로우쿼리만 출력
+    !devMode && time > 4000 && console.log(message);
 
     client.query = query;
     client.release = release;
