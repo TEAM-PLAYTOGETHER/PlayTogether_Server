@@ -220,6 +220,39 @@ const getExistLight = async (client, lightId) => {
     throw new Error('lightdao.getExistLight에서 에러 발생했습니다' + error);
   }
 };
+const getNewLight = async (client) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select l.id, category, join_cnt, title, date, time, people_cnt, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      order by created_at desc
+      limit 5;
+      `,
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getNewLight에서 에러 발생했습니다' + error);
+  }
+};
+const getHotLight = async (client) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      where scp_cnt is not null
+      order by scp_cnt desc
+      limit 5;
+      `,
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getHotLight에서 에러 발생했습니다' + error);
+  }
+};
+
 
 module.exports = {
   addLight,
@@ -235,4 +268,6 @@ module.exports = {
   getLightOrganizerById,
   getExistLight,
   addLightOrganizer,
+  getNewLight,
+  getHotLight
 };

@@ -396,6 +396,78 @@ const getLightDetail = async (lightId) => {
     client.release();
   }
 };
+const getNewLight = async (memberId) => {
+  let client;
+
+  const log = `lightService.getNewLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, memberId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+
+    const result = await lightDao.getNewLight(client);
+
+    const data = result.map((light) => ({
+      light_id: Number(light.id),
+      category: light.category,
+      LightMemberCnt: Number(light.joinCnt),
+      title: light.title,
+      date: dayjs(light.date).format('YYYY-MM-DD'),
+      time: light.time.slice(0, -3),
+      people_cnt: light.peopleCnt,
+      place: light.place,
+    }));
+
+    await client.query('COMMIT');
+    return util.success(statusCode.OK, responseMessage.LIGHT_GET_NEW_SUCCESS, data);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.log('getNewLight error 발생' + error);
+  } finally {
+    client.release();
+  }
+};
+const getHotLight = async (memberId) => {
+  let client;
+
+  const log = `lightService.getHotLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, memberId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+
+    const result = await lightDao.getHotLight(client);
+
+    const data = result.map((light) => ({
+      light_id: Number(light.id),
+      category: light.category,
+      LightMemberCnt: Number(light.joinCnt),
+      title: light.title,
+      date: dayjs(light.date).format('YYYY-MM-DD'),
+      time: light.time.slice(0, -3),
+      people_cnt: light.peopleCnt,
+      place: light.place,
+    }));
+
+    await client.query('COMMIT');
+    return util.success(statusCode.OK, responseMessage.LIGHT_GET_HOT_SUCCESS, data);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.log('getHotLight error 발생' + error);
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   addLight,
@@ -409,4 +481,6 @@ module.exports = {
   getScrapLight,
   getCategoryLight,
   getLightDetail,
+  getNewLight,
+  getHotLight
 };

@@ -61,6 +61,8 @@ module.exports = {
   LIGHT_GET_SCRAP_SUCCESS: '내가 찜한 번개 리스트 조회 성공',
   LIGHT_GET_CATEGORY_SUCCESS: '카테고리별 번개 리스트 조회 성공',
   LIGHT_GET_DETAIL_SUCCESS: '번개 상세 조회 성공',
+  LIGHT_GET_NEW_SUCCESS: 'New 번개 조회 성공',
+  LIGHT_GET_HOT_SUCCESS: 'Hot 번개 조회 성공',
   NOT_LIGHT_ORGANIZER: '번개 소유자가 아닙니다.',
   NO_CATEGORY: '카테고리를 확인해주세요',
   NO_LIGHT: '없는 번개입니다.',
