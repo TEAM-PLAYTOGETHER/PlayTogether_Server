@@ -1,5 +1,6 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
+const { search } = require('../routes');
 
 const addLight = async (client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   try {
@@ -252,6 +253,36 @@ const getHotLight = async (client) => {
     throw new Error('lightdao.getHotLight에서 에러 발생했습니다' + error);
   }
 };
+const getSearchLightUseCategory = async (client, search, category) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2;
+      `,
+      [search, category]
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLight에서 에러 발생했습니다' + error);
+  }
+};
+const getSearchLightNotCategory = async (client, search) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%'));
+      `,
+      [search]
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLight에서 에러 발생했습니다' + error);
+  }
+};
 
 
 module.exports = {
@@ -269,5 +300,7 @@ module.exports = {
   getExistLight,
   addLightOrganizer,
   getNewLight,
-  getHotLight
+  getHotLight,
+  getSearchLightUseCategory,
+  getSearchLightNotCategory
 };

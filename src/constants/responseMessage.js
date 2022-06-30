@@ -63,10 +63,12 @@ module.exports = {
   LIGHT_GET_DETAIL_SUCCESS: '번개 상세 조회 성공',
   LIGHT_GET_NEW_SUCCESS: 'New 번개 조회 성공',
   LIGHT_GET_HOT_SUCCESS: 'Hot 번개 조회 성공',
+  LIGHT_GET_SEARCH_SUCCESS: 'Search 번개 조회 성공',
   NOT_LIGHT_ORGANIZER: '번개 소유자가 아닙니다.',
   NO_CATEGORY: '카테고리를 확인해주세요',
   NO_LIGHT: '없는 번개입니다.',
   NO_LIGHT_MEMBER: '번개에 참여한 사람이 아닙니다.',
+  NO_TWO_SEARCH_QUERY: '두글자 이상 입력해주세요.',
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',

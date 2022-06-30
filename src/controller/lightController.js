@@ -3,6 +3,7 @@ const { lightService } = require('../service');
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
+const { search } = require('../routes');
 
 const addLight = async (req, res) => {
   const organizerId = req.user.id;
@@ -180,6 +181,28 @@ const getHotLight = async (req, res) => {
   }
 };
 
+const getSearchLight = async (req, res) => {
+  const memberId = req.user.id;
+  const search = req.query.search;
+  const category = req.query.category;
+
+  if (!memberId){
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  if ((search).length < 2) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_TWO_SEARCH_QUERY));
+  }
+  try {
+    const lights = await lightService.getSearchLight(memberId, search, category);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    console.log(error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
 
 module.exports = {
   addLight,
@@ -192,5 +215,6 @@ module.exports = {
   getCategoryLight,
   getLightDetail,
   getNewLight,
-  getHotLight
+  getHotLight,
+  getSearchLight
 };

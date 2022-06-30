@@ -13,6 +13,7 @@ router.get('/open', authMiddleware, lightController.getOrganizerLight);
 router.get('/enter', authMiddleware, lightController.getEnterLight);
 router.get('/scrap', authMiddleware, lightController.getScrapLight);
 router.get('/new', authMiddleware, lightController.getNewLight);
+router.get('/search', authMiddleware, lightController.getSearchLight);
 router.get('/hot', authMiddleware, lightController.getNewLight);
 router.get('/', lightController.getCategoryLight);
 router.get('/:lightId', lightController.getLightDetail);
