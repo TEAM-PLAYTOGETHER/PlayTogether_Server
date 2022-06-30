@@ -23,6 +23,27 @@ const registerCrewMember = async (client, crewId, memberId) => {
 };
 
 /**
+ * getUserRegisteredCount
+ * 회원이 가입한 동아리의 갯수를 반환하는 메서드
+ * @param {*} userId - 회원의 id값
+ * @returns - 회원이 가입한 동아리의 갯수
+ */
+const getUserRegisteredCount = async (client, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+        select count(*) from crew_user
+        where member_id = $1;
+      `,
+      [userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('crewUserDao.getUserRegisteredCount에서 오류 발생: ' + error);
+  }
+};
+
+/**
  * getRegisteredMember
  * 해당 회원이 이미 해당 동아리에 가입했는지 확인해주는 메서드
  * @param crewId - 검사할 동아리의 id값
@@ -94,4 +115,5 @@ module.exports = {
   getRegisteredMember,
   getAllCrewByUserId,
   withdrawAllMemberByCrewId,
+  getUserRegisteredCount,
 };
