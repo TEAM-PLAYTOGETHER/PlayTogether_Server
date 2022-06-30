@@ -73,6 +73,13 @@ const registerMember = async (userId, crewCode) => {
     client = await db.connect(log);
     await client.query('BEGIN');
 
+    // 해당 회원이 가입한 동아리 갯수 확인하기
+    const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
+    console.log(userRegisteredCount);
+    if (userRegisteredCount >= 10) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    }
+
     // 인자로 받은 가입코드와 일치하는 동아리 찾기
     const crew = await crewDao.getCrewByCode(client, crewCode);
     if (!crew) {
