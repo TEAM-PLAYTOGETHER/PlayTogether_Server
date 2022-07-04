@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-
 const db = require('../loaders/db');
 const config = require('../config');
 const util = require('../lib/util');

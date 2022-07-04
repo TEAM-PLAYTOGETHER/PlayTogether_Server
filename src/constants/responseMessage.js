@@ -30,8 +30,10 @@ module.exports = {
 
   // 토큰
   TOKEN_EXPIRED: '토큰이 만료되었습니다.',
+  TOKEN_UNEXPIRED: '토큰이 만료되지 않았습니다.',
   TOKEN_INVALID: '토큰이 유효하지 않습니다.',
   TOKEN_EMPTY: '토큰이 없습니다.',
+  CREATED_TOKEN: '새로운 토큰이 발급되었습니다.',
 
   // 메시지
   MESSAGE_SEND_SUCCESS: '메시지 전송에 성공했습니다.',

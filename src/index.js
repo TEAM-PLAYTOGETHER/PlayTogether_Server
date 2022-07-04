@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const hpp = require('hpp');
 const helmet = require('helmet');
 const config = require('./config');
+const redis = require('redis');
 // const sentry = require('@sentry/node');
 // const tracing = require('@sentry/tracing');
 

@@ -4,6 +4,7 @@ const { authController } = require('../controller');
 const router = express.Router();
 
 // GET
+router.get('/refresh', authController.refresh);
 
 // POST
 router.post('/signup', authController.signup);
