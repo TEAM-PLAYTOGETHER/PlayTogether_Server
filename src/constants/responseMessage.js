@@ -49,6 +49,7 @@ module.exports = {
   ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
   READ_REGISTER_INFO_SUCCESS: '동아리 가입정보 가져오기 성공',
   NO_MASTER_USER: '동아리장이 아닙니다.',
+  LIMIT_EXCEED: '갯수 제한을 초과했습니다.',
 
   // 번개
   LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',

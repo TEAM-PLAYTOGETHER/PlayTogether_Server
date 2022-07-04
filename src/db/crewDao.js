@@ -25,6 +25,27 @@ const createCrew = async (client, name, code, masterId) => {
 };
 
 /**
+ * getCreatedByUserCount
+ * 해당 유저에 의해서 생성된 동아리의 갯수를 반환하는 메서드
+ * @param {*} masterId - 확인할 유저의 id값
+ * @returns 해당 유저가 생성한 동아리의 갯수
+ */
+const getCreatedByUserCount = async (client, masterId) => {
+  try {
+    const { rows } = await client.query(
+      `
+        select count(*) from crew
+        where master_id = $1
+      `,
+      [masterId],
+    );
+    return convertSnakeToCamel.keysToSnake(rows[0]);
+  } catch (error) {
+    throw new Error('crewDao.getCreatedByUserCount에서 오류 발생: ' + error);
+  }
+};
+
+/**
  * getCrewByCode
  * 가입코드가 인자로 받은 코드와 같은 동아리를 찾아주는 메서드
  * @param code - 가입코드
@@ -109,6 +130,7 @@ const getExistCrew = async (client, crewId) => {
 
 module.exports = {
   createCrew,
+  getCreatedByUserCount,
   getCrewByCode,
   deleteCrewByCrewId,
   getExistCrew,
