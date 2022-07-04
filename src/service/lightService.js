@@ -6,6 +6,7 @@ const db = require('../loaders/db');
 const dayjs = require('dayjs');
 const { calculateAge } = require('../lib/calculateAge');
 const { applyKoreanTime } = require('../lib/applyKoreanTime');
+const { search } = require('../routes');
 
 const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   let client;
@@ -468,6 +469,58 @@ const getHotLight = async (memberId) => {
     client.release();
   }
 };
+const getSearchLight = async (memberId, search, category) => {
+  let client;
+
+  const log = `lightService.getSearchLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, memberId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    if(category){
+      const result = await lightDao.getSearchLightUseCategory(client, search, category);
+      
+      const data = result.map((light) => ({
+        light_id: Number(light.id),
+        LightMemberCnt: Number(light.joinCnt),
+        title: light.title,
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+      }));
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_SEARCH_SUCCESS, data);
+    }
+    if(!category) {
+      const result = await lightDao.getSearchLightNotCategory(client, search);
+
+      const data = result.map((light) => ({
+        light_id: Number(light.id),
+        LightMemberCnt: Number(light.joinCnt),
+        title: light.title,
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+      }));
+  
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_SEARCH_SUCCESS, data);
+    }
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.log('getSearchLight error 발생' + error);
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   addLight,
@@ -482,5 +535,6 @@ module.exports = {
   getCategoryLight,
   getLightDetail,
   getNewLight,
-  getHotLight
+  getHotLight,
+  getSearchLight
 };
