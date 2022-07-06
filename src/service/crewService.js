@@ -12,9 +12,9 @@ const { createCrewCode } = require('../lib/createCrewCode');
  * @param name - 생성할 동아리 이름
  * @param masterId - 동아리장 유저 id값
  */
-const createCrew = async (name, masterId) => {
+const createCrew = async (name, masterId, description) => {
   let client;
-  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}`;
+  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}, description = ${description}`;
 
   try {
     client = await db.connect(log);
@@ -36,7 +36,7 @@ const createCrew = async (name, masterId) => {
     }
 
     // 동아리 생성
-    const createdCrew = await crewDao.createCrew(client, name, code, masterId);
+    const createdCrew = await crewDao.createCrew(client, name, code, masterId, description);
     if (!createdCrew) throw new Error('createCrew 동아리 생성 중 오류 발생');
 
     // 동아리장을 생성된 동아리에 가입시킴

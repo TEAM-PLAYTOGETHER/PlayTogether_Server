@@ -19,7 +19,7 @@ const createCrew = async (req, res) => {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
-    const result = await crewService.createCrew(name, userId);
+    const result = await crewService.createCrew(name, userId, description);
     return res.status(result.status).json(result);
   } catch (error) {
     console.log('createCrew Controller 에러: ' + error);
