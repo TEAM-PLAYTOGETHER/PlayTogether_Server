@@ -8,15 +8,15 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
  * @param masterId - 동아리장 id값
  * @returns 생성된 crew의 name, code, masterId
  */
-const createCrew = async (client, name, code, masterId) => {
+const createCrew = async (client, name, code, masterId, description) => {
   try {
     const { rows } = await client.query(
       `
-        insert into crew (name, code, master_id)
-        values ($1, $2, $3)
-        returning id, name, code
+        insert into crew (name, code, master_id, description)
+        values ($1, $2, $3, $4)
+        returning id, name, code, description
             `,
-      [name, code, masterId],
+      [name, code, masterId, description],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
