@@ -12,13 +12,19 @@ const { createCrewCode } = require('../lib/createCrewCode');
  * @param name - 생성할 동아리 이름
  * @param masterId - 동아리장 유저 id값
  */
-const createCrew = async (name, masterId) => {
+const createCrew = async (name, masterId, description) => {
   let client;
-  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}`;
+  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}, description = ${description}`;
 
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
+
+    // 동아리를 개설하려는 사람이 개설한 동아리의 수 확인
+    const { count: createdByUserCount } = await crewDao.getCreatedByUserCount(client, masterId);
+    if (createdByUserCount >= 5) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    }
 
     let code = '';
     let ok = false;
@@ -36,7 +42,7 @@ const createCrew = async (name, masterId) => {
     }
 
     // 동아리 생성
-    const createdCrew = await crewDao.createCrew(client, name, code, masterId);
+    const createdCrew = await crewDao.createCrew(client, name, code, masterId, description);
     if (!createdCrew) throw new Error('createCrew 동아리 생성 중 오류 발생');
 
     // 동아리장을 생성된 동아리에 가입시킴
@@ -72,6 +78,13 @@ const registerMember = async (userId, crewCode) => {
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
+
+    // 해당 회원이 가입한 동아리 갯수 확인하기
+    const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
+    console.log(userRegisteredCount);
+    if (userRegisteredCount >= 10) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    }
 
     // 인자로 받은 가입코드와 일치하는 동아리 찾기
     const crew = await crewDao.getCrewByCode(client, crewCode);

@@ -13,12 +13,13 @@ const createCrew = async (req, res) => {
   try {
     const userId = req.user.id;
     const name = req.body.crewName;
+    const description = req.body.description;
 
-    if (!name) {
+    if (!name || !description) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
-    const result = await crewService.createCrew(name, userId);
+    const result = await crewService.createCrew(name, userId, description);
     return res.status(result.status).json(result);
   } catch (error) {
     console.log('createCrew Controller 에러: ' + error);
