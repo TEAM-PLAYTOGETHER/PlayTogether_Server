@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 const hpp = require('hpp');
 const helmet = require('helmet');
 const config = require('./config');
+const passportConfig = require('./passport');
+const passport = require('passport');
+const session = require('express-session');
 // const sentry = require('@sentry/node');
 // const tracing = require('@sentry/tracing');
 
@@ -12,6 +15,7 @@ const config = require('./config');
 dotenv.config();
 
 const app = express();
+passportConfig();
 app.use(cors());
 
 /*
@@ -33,6 +37,19 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+  }),
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api', require('./routes'));
 

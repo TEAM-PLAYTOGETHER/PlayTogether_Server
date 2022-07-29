@@ -36,6 +36,23 @@ const getUserByUserLoginId = async (client, userLoginId) => {
   }
 };
 
+const getUserBySnsId = async (client, snsId, provider) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT *
+      FROM "user"
+      WHERE sns_id = $1 AND provider = $2
+      `,
+      [snsId, provider],
+    );
+
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('userDao.getUserBySnsId에서 오류 발생: ' + error);
+  }
+};
+
 // UPDATE
 const updateUserMbti = async (client, userId, mbit) => {
   try {
@@ -58,5 +75,6 @@ const updateUserMbti = async (client, userId, mbit) => {
 module.exports = {
   getUserById,
   getUserByUserLoginId,
+  getUserBySnsId,
   updateUserMbti,
 };
