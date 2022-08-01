@@ -409,6 +409,7 @@ const getLightDetail = async (lightId) => {
       light_id: Number(light.id),
       category: light.category,
       title: light.title,
+      scp_cnt: Number(light.scpCnt),
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0, -3),
       description: light.description,

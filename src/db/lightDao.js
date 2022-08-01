@@ -161,15 +161,16 @@ const getCategoryLight = async (client, category, sort, getPage) => {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다' + error);
   }
 };
-const getLightDetail = async (client, lightId, getPage) => {
+const getLightDetail = async (client, lightId) => {
   try {
     const { rows } = await client.query(
       `
-      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       where l.id = $1;
       `,
-      [lightId, getPage, FETCH_SIZE_LIGHT_POST],
+      [lightId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
