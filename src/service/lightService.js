@@ -235,6 +235,7 @@ const getOrganizerLight = async (organizerId, page, pageSize) => {
       light_id: Number(light.id),
       title: light.title,
       category: light.category,
+      scp_cnt: Number(light.scpCnt),
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0, -3),
       people_cnt: light.peopleCnt,
@@ -279,6 +280,7 @@ const getEnterLight = async (memberId, page, pageSize) => {
       light_id: Number(light.id),
       title: light.title,
       category: light.category,
+      scp_cnt: Number(light.scpCnt),
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0, -3),
       people_cnt: light.peopleCnt,
@@ -320,6 +322,7 @@ const getScrapLight = async (memberId, page, pageSize) => {
       light_id: Number(light.id),
       title: light.title,
       category: light.category,
+      scp_cnt: Number(light.scpCnt),
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0, -3),
       people_cnt: light.peopleCnt,
@@ -357,6 +360,7 @@ const getCategoryLight = async (category, sort, page, pageSize) => {
       light_id: Number(light.id),
       category: light.category,
       title: light.title,
+      scp_cnt: Number(light.scpCnt),
       date: dayjs(light.date).format('YYYY-MM-DD'),
       time: light.time.slice(0, -3),
       people_cnt: light.peopleCnt,
@@ -444,6 +448,7 @@ const getNewLight = async (memberId) => {
     const data = result.map((light) => ({
       light_id: Number(light.id),
       category: light.category,
+      scp_cnt: Number(light.scpCnt),
       LightMemberCnt: Number(light.joinCnt),
       title: light.title,
       date: dayjs(light.date).format('YYYY-MM-DD'),
@@ -480,6 +485,7 @@ const getHotLight = async (memberId) => {
     const data = result.map((light) => ({
       light_id: Number(light.id),
       category: light.category,
+      scp_cnt: Number(light.scpCnt),
       LightMemberCnt: Number(light.joinCnt),
       title: light.title,
       date: dayjs(light.date).format('YYYY-MM-DD'),
@@ -522,6 +528,8 @@ const getSearchLight = async (memberId, search, category, page, pageSize) => {
       
       const lightData = result.map((light) => ({
         light_id: Number(light.id),
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
         LightMemberCnt: Number(light.joinCnt),
         title: light.title,
         date: dayjs(light.date).format('YYYY-MM-DD'),
@@ -541,6 +549,8 @@ const getSearchLight = async (memberId, search, category, page, pageSize) => {
 
       const lightData = result.map((light) => ({
         light_id: Number(light.id),
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
         LightMemberCnt: Number(light.joinCnt),
         title: light.title,
         date: dayjs(light.date).format('YYYY-MM-DD'),
