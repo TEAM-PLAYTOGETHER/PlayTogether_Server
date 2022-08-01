@@ -83,9 +83,9 @@ const getOrganizerLight = async (client, organizerId, getPage) => {
   try {
     const { rows } = await client.query(
       `
-      select l.id, join_cnt, category, title, date, time, people_cnt, place from light l
-      left join (select light_id, count(id) join_cnt from light_user group by light_id) lu
-      on l.id = lu.light_id
+      select l.id, join_cnt, scp_cnt, category, title, date, time, people_cnt, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) lu on l.id = lu.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       where organizer_id = $1
       offset $2
       limit $3;
@@ -101,13 +101,14 @@ const getEnterLight = async (client, memberId, getPage) => {
   try {
     const { rows } = await client.query(
       `
-      select ll.id, ll.title, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      select ll.id, ll.title, scp_cnt, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
       from light ll
          right join (select lu.light_id, join_cnt
                     from light_user lu
                              left join (select light_id, count(id) join_cnt from light_user group by light_id) l_cnt
                                        on lu.light_id = l_cnt.light_id
-                    where member_id = $1) ls on ll.id = ls.light_id   
+                    where member_id = $1) ls on ll.id = ls.light_id
+                    left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on ll.id = ld.light_id
                     offset $2
                     limit $3;
       `,
@@ -122,15 +123,18 @@ const getScrapLight = async (client, memberId, getPage) => {
   try {
     const { rows } = await client.query(
       `
-      select ll.id, ll.title, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
+      select ll.id, ll.title, scp_cnt, ll.category, join_cnt, ll.date, ll.place, ll.people_cnt, ll.time
       from light ll
          right join (select lu.light_id, join_cnt
                     from scrap lu
                              left join (select light_id, count(id) join_cnt from light_user group by light_id) l_cnt
                                        on lu.light_id = l_cnt.light_id
-                    where member_id = $1) ls on ll.id = ls.light_id;
+                                       where member_id = $1) ls on ll.id = ls.light_id
+                                       left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on ll.id = ld.light_id
+                                       offset $2
+                                       limit $3;
       `,
-      [memberId],
+      [memberId, getPage, FETCH_SIZE_LIGHT_POST],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
@@ -141,8 +145,9 @@ const getCategoryLight = async (client, category, sort, getPage) => {
   try {
     const { rows } = await client.query(
       `
-      select l.id, l.category, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
+      select l.id, l.category, scp_cnt, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       where category = $1
       order by $2 DESC
       offset $3
@@ -234,8 +239,9 @@ const getNewLight = async (client) => {
   try {
     const { rows } = await client.query(
       `
-      select l.id, category, join_cnt, title, date, time, people_cnt, place from light l
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       order by created_at desc
       limit 5;
       `,
@@ -249,7 +255,7 @@ const getHotLight = async (client) => {
   try {
     const { rows } = await client.query(
       `
-      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       where scp_cnt is not null
@@ -266,8 +272,9 @@ const getSearchLightUseCategory = async (client, search, category) => {
   try {
     const { rows } = await client.query(
       `            
-      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2;
       `,
       [search, category]
@@ -281,8 +288,9 @@ const getSearchLightNotCategory = async (client, search) => {
   try {
     const { rows } = await client.query(
       `            
-      select l.id, category, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
       where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%'));
       `,
       [search]
