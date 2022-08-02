@@ -1,5 +1,6 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 
+// CREATE
 /**
  * registerCrewMember
  * 동아리에 회원을 가입시키는 메서드
@@ -22,6 +23,7 @@ const registerCrewMember = async (client, crewId, memberId) => {
   }
 };
 
+// READ
 /**
  * getUserRegisteredCount
  * 회원이 가입한 동아리의 갯수를 반환하는 메서드
@@ -88,6 +90,37 @@ const getAllCrewByUserId = async (client, userId) => {
   }
 };
 
+// UPDATE
+/**
+ * updateCrewUserProfile
+ * 해당 동아리에 유저 프로필 작성
+ * @param {*} memberId
+ * @param {*} crewId
+ * @param {*} nickname
+ * @param {*} description
+ * @param {Optional} firstStation
+ * @param {Optional} secondStation
+ * @returns 새로 생성된 프로필 정보
+ */
+const updateCrewUserProfile = async (client, memeberId, crewId, nickname, description, firstStation, secondStation) => {
+  try {
+    const { rows } = await client.query(
+      `
+      update "crew_user"
+      set nickname = $1, description = $2, first_station = $3, second_station = $4
+      where member_id = $5 AND crew_id = $6 AND is_deleted = false
+      returning nickname, description, first_station, second_station
+      `,
+      [nickname, description, firstStation, secondStation, memeberId, crewId],
+    );
+
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('crewUserDao.updateCrewUserProfile에서 오류 발생: ' + error);
+  }
+};
+
+// DELETE
 /**
  * withdrawAllMemberByCrewId
  * 동아리의 모든 멤버 탈퇴
@@ -116,4 +149,5 @@ module.exports = {
   getAllCrewByUserId,
   withdrawAllMemberByCrewId,
   getUserRegisteredCount,
+  updateCrewUserProfile,
 };

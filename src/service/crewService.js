@@ -5,6 +5,7 @@ const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const { createCrewCode } = require('../lib/createCrewCode');
+const { nicknameVerify } = require('../lib/nicknameVerify');
 
 /**
  * createCrew
@@ -113,6 +114,41 @@ const registerMember = async (userId, crewCode) => {
 };
 
 /**
+ * updateCrewUserProfile
+ * 동아리에 회원 프로필 등록하는 서비스
+ * @param userId - 프로필을 생성할 유저 아이디
+ * @param crewId - 프로필을 작성할 동아리 아이디
+ * @param nickname - 등록할 닉네임
+ * @param description - 등록할 유저 설명문
+ * @param {Optional} firstStation - 첫 번째 지하철
+ * @param {Optional} secondStation - 두 번째 지하철
+ */
+const updateCrewUserProfile = async (userId, crewId, nickname, description, firstStation, secondStation) => {
+  let client;
+  const log = `crewUserDao.updateCrewUserProfile | userId = ${userId}, crewId = ${crewId}, nickname = ${nickname}, description = ${description}, firstStation = ${firstStation}, secondStation = ${secondStation}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 닉네임 길이 15자 이상일 때
+    if (nickname.length > 15) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
+
+    if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
+
+    const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, nickname, description, firstStation, secondStation);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
+  } catch (error) {
+    console.log('updateCrewUserProfile에서 오류 발생: ' + error);
+    await client.query('ROLLBACK');
+  } finally {
+    client.release();
+  }
+};
+
+/**
  * getAllCrewByUserId
  * 회원이 가입한 모든 동아리의 정보 반환해주는 서비스
  * @param userId - 회원의 id값
@@ -187,4 +223,5 @@ module.exports = {
   registerMember,
   getAllCrewByUserId,
   deleteCrewByCrewId,
+  updateCrewUserProfile,
 };

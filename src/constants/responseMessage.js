@@ -24,6 +24,8 @@ module.exports = {
   // 유저
   GET_USER_SUCCESS: '사용자 조회 성공',
   UPDATE_USER_SUCCESS: '사용자 업데이트 성공',
+  UNUSABLE_NICKNAME: '사용불가능한 닉네임입니다.',
+  UPDATE_PROFILE_SUCCESS: '사용자 프로필 업데이트 성공',
 
   // 서버 내 오류
   INTERNAL_SERVER_ERROR: '서버 내 오류',
