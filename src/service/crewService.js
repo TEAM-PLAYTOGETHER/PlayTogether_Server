@@ -131,9 +131,6 @@ const updateCrewUserProfile = async (userId, crewId, nickname, description, firs
     client = await db.connect(log);
     await client.query('BEGIN');
 
-    // 닉네임 길이 15자 이상일 때
-    if (nickname.length > 15) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
-
     if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
 
     const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, nickname, description, firstStation, secondStation);
