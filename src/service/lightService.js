@@ -7,6 +7,7 @@ const dayjs = require('dayjs');
 const { calculateAge } = require('../lib/calculateAge');
 const { applyKoreanTime } = require('../lib/applyKoreanTime');
 const pageNation  = require("../lib/pageNation");
+const { now } = require('moment');
 
 
 const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
@@ -227,21 +228,25 @@ const getOrganizerLight = async (organizerId, page, pageSize) => {
     const getPage = (parseInt(page) * parseInt(pageSize))
 
     const result = await lightDao.getOrganizerLight(client, organizerId, getPage);
-    
+
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, pageSize);
 
-    const lightData = result.map((light) => ({
-      light_id: Number(light.id),
-      title: light.title,
-      category: light.category,
-      scp_cnt: Number(light.scpCnt),
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      people_cnt: light.peopleCnt,
-      place: light.place,
-      LightMemberCnt: Number(light.joinCnt),
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        title: light.title,
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened
+      }   
+    });
 
 
     await client.query('COMMIT');
@@ -268,7 +273,6 @@ const getEnterLight = async (memberId, page, pageSize) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
 
-    
     const getPage = (parseInt(page) * parseInt(pageSize));
 
     const result = await lightDao.getEnterLight(client, memberId, getPage);
@@ -276,17 +280,21 @@ const getEnterLight = async (memberId, page, pageSize) => {
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, pageSize);
 
-    const lightData = result.map((light) => ({
-      light_id: Number(light.id),
-      title: light.title,
-      category: light.category,
-      scp_cnt: Number(light.scpCnt),
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      people_cnt: light.peopleCnt,
-      place: light.place,
-      LightMemberCnt: Number(light.joinCnt),
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        title: light.title,
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened
+      }   
+    });
 
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_ENTER_SUCCESS, {lightData, totalCount, totalPage});
@@ -318,17 +326,21 @@ const getScrapLight = async (memberId, page, pageSize) => {
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, pageSize);
 
-    const lightData = result.map((light) => ({
-      light_id: Number(light.id),
-      title: light.title,
-      category: light.category,
-      scp_cnt: Number(light.scpCnt),
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      people_cnt: light.peopleCnt,
-      place: light.place,
-      LightMemberCnt: Number(light.joinCnt),
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        title: light.title,
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened
+      }   
+    });
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_SCRAP_SUCCESS, {lightData, totalCount, totalPage});
   } catch (error) {
@@ -356,17 +368,21 @@ const getCategoryLight = async (category, sort, page, pageSize) => {
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, pageSize);
 
-    const lightData = result.map((light) => ({
-      light_id: Number(light.id),
-      category: light.category,
-      title: light.title,
-      scp_cnt: Number(light.scpCnt),
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      people_cnt: light.peopleCnt,
-      place: light.place,
-      LightMemberCnt: Number(light.joinCnt),
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        title: light.title,
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened
+      }   
+    });
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_CATEGORY_SUCCESS, {lightData, totalCount, totalPage});
   } catch (error) {
@@ -405,24 +421,28 @@ const getLightDetail = async (lightId) => {
       name: o.name,
     }));
 
-    const data = result.map((light) => ({
-      light_id: Number(light.id),
-      category: light.category,
-      title: light.title,
-      scp_cnt: Number(light.scpCnt),
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      description: light.description,
-      image: light.image,
-      people_cnt: light.peopleCnt,
-      place: light.place,
-      LightMemberCnt: Number(light.joinCnt),
-      members: data2,
-      organizer: data3,
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        category: light.category,
+        title: light.title,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        description: light.description,
+        image: light.image,
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened,
+        members: data2,
+        organizer: data3,
+      }   
+    });
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.LIGHT_GET_DETAIL_SUCCESS, data);
+    return util.success(statusCode.OK, responseMessage.LIGHT_GET_DETAIL_SUCCESS, lightData);
   } catch (error) {
     await client.query('ROLLBACK');
     console.log('getLightDetail error 발생' + error);
@@ -446,20 +466,24 @@ const getNewLight = async (memberId) => {
 
     const result = await lightDao.getNewLight(client);
 
-    const data = result.map((light) => ({
-      light_id: Number(light.id),
-      category: light.category,
-      scp_cnt: Number(light.scpCnt),
-      LightMemberCnt: Number(light.joinCnt),
-      title: light.title,
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      people_cnt: light.peopleCnt,
-      place: light.place,
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        title: light.title,
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened
+      }   
+    });
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.LIGHT_GET_NEW_SUCCESS, data);
+    return util.success(statusCode.OK, responseMessage.LIGHT_GET_NEW_SUCCESS, lightData);
   } catch (error) {
     await client.query('ROLLBACK');
     console.log('getNewLight error 발생' + error);
@@ -483,20 +507,24 @@ const getHotLight = async (memberId) => {
 
     const result = await lightDao.getHotLight(client);
 
-    const data = result.map((light) => ({
-      light_id: Number(light.id),
-      category: light.category,
-      scp_cnt: Number(light.scpCnt),
-      LightMemberCnt: Number(light.joinCnt),
-      title: light.title,
-      date: dayjs(light.date).format('YYYY-MM-DD'),
-      time: light.time.slice(0, -3),
-      people_cnt: light.peopleCnt,
-      place: light.place,
-    }));
+    const lightData = result.map((light) => {
+      const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      return {
+        light_id: Number(light.id),
+        title: light.title,
+        category: light.category,
+        scp_cnt: Number(light.scpCnt),
+        date: dayjs(light.date).format('YYYY-MM-DD'),
+        time: light.time.slice(0, -3),
+        people_cnt: light.peopleCnt,
+        place: light.place,
+        LightMemberCnt: Number(light.joinCnt),
+        is_opened
+      }   
+    });
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.LIGHT_GET_HOT_SUCCESS, data);
+    return util.success(statusCode.OK, responseMessage.LIGHT_GET_HOT_SUCCESS, lightData);
   } catch (error) {
     await client.query('ROLLBACK');
     console.log('getHotLight error 발생' + error);
@@ -527,17 +555,21 @@ const getSearchLight = async (memberId, search, category, page, pageSize) => {
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, pageSize);
       
-      const lightData = result.map((light) => ({
-        light_id: Number(light.id),
-        category: light.category,
-        scp_cnt: Number(light.scpCnt),
-        LightMemberCnt: Number(light.joinCnt),
-        title: light.title,
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
-      }));
+      const lightData = result.map((light) => {
+        const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date: dayjs(light.date).format('YYYY-MM-DD'),
+          time: light.time.slice(0, -3),
+          people_cnt: light.peopleCnt,
+          place: light.place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened
+        }   
+      });
 
       await client.query('COMMIT');
       return util.success(statusCode.OK, responseMessage.LIGHT_GET_SEARCH_SUCCESS, {lightData, totalCount, totalPage});
@@ -548,17 +580,21 @@ const getSearchLight = async (memberId, search, category, page, pageSize) => {
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, pageSize);
 
-      const lightData = result.map((light) => ({
-        light_id: Number(light.id),
-        category: light.category,
-        scp_cnt: Number(light.scpCnt),
-        LightMemberCnt: Number(light.joinCnt),
-        title: light.title,
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
-      }));
+      const lightData = result.map((light) => {
+        const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date: dayjs(light.date).format('YYYY-MM-DD'),
+          time: light.time.slice(0, -3),
+          people_cnt: light.peopleCnt,
+          place: light.place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened
+        }   
+      });
   
       await client.query('COMMIT');
       return util.success(statusCode.OK, responseMessage.LIGHT_GET_SEARCH_SUCCESS, {lightData, totalCount, totalPage});
