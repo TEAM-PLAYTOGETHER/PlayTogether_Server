@@ -15,6 +15,8 @@ router.get('/kakao/callback', passport.authenticate('kakao', { failureRedirect: 
   res.redirect('/');
 });
 
+router.get('/refresh', authController.refresh);
+
 // POST
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);

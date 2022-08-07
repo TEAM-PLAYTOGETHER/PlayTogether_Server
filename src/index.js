@@ -8,6 +8,7 @@ const config = require('./config');
 const passportConfig = require('./passport');
 const passport = require('passport');
 const session = require('express-session');
+const redis = require('redis');
 // const sentry = require('@sentry/node');
 // const tracing = require('@sentry/tracing');
 
@@ -84,7 +85,7 @@ const server = app
     
     ##############################################
     🛡️  Server listening on port: ${PORT} 🛡️
-    ⚡️ Updated: 22.05.13              ⚡️
+    ⚡️ Updated: 22.07.27              ⚡️
     ##############################################
   `,
     );

@@ -1,8 +1,13 @@
 const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
 const util = require('../lib/util');
-const { userService } = require('../service');
+const { userService, crewService } = require('../service');
 
+/**
+ * GET ~/:userLoginId
+ * 유저 아이디로 유저 조회
+ * @public
+ */
 const getUserByUserId = async (req, res) => {
   try {
     const { userLoginId } = req.params;
@@ -21,6 +26,11 @@ const getUserByUserId = async (req, res) => {
   }
 };
 
+/**
+ * PUT ~/mbti
+ * 유저 mbti 추가
+ * @private
+ */
 const updateUserMbti = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -28,7 +38,7 @@ const updateUserMbti = async (req, res) => {
 
     // 헤더에 유저 토큰 없을 시 에러 처리
     if (!userId) {
-      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.UNAUTHORIZED));
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
     }
 
     // mbit값 없을 시 에러 처리
@@ -45,7 +55,36 @@ const updateUserMbti = async (req, res) => {
   }
 };
 
+/**
+ * PUT ~/:crewId
+ * 동아리 프로필 생성
+ * @private
+ */
+const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { crewId } = req.params;
+    const { nickname, description, firstStation, secondStation } = req.body;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    if (!nickname) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME));
+    }
+
+    const profile = await crewService.updateCrewUserProfile(userId, crewId, nickname, description, firstStation, secondStation);
+    return res.status(profile.status).json(profile);
+  } catch (error) {
+    console.log('UserController updateUserProfile error 발생: ', error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   getUserByUserId,
   updateUserMbti,
+  updateUserProfile,
 };

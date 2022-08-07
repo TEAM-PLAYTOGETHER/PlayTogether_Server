@@ -5,6 +5,7 @@ const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const { createCrewCode } = require('../lib/createCrewCode');
+const { nicknameVerify } = require('../lib/nicknameVerify');
 
 /**
  * createCrew
@@ -12,13 +13,19 @@ const { createCrewCode } = require('../lib/createCrewCode');
  * @param name - 생성할 동아리 이름
  * @param masterId - 동아리장 유저 id값
  */
-const createCrew = async (name, masterId) => {
+const createCrew = async (name, masterId, description) => {
   let client;
-  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}`;
+  const log = `crewDao.createCrew | name = ${name}, masterId = ${masterId}, description = ${description}`;
 
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
+
+    // 동아리를 개설하려는 사람이 개설한 동아리의 수 확인
+    const { count: createdByUserCount } = await crewDao.getCreatedByUserCount(client, masterId);
+    if (createdByUserCount >= 5) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    }
 
     let code = '';
     let ok = false;
@@ -36,7 +43,7 @@ const createCrew = async (name, masterId) => {
     }
 
     // 동아리 생성
-    const createdCrew = await crewDao.createCrew(client, name, code, masterId);
+    const createdCrew = await crewDao.createCrew(client, name, code, masterId, description);
     if (!createdCrew) throw new Error('createCrew 동아리 생성 중 오류 발생');
 
     // 동아리장을 생성된 동아리에 가입시킴
@@ -73,6 +80,13 @@ const registerMember = async (userId, crewCode) => {
     client = await db.connect(log);
     await client.query('BEGIN');
 
+    // 해당 회원이 가입한 동아리 갯수 확인하기
+    const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
+    console.log(userRegisteredCount);
+    if (userRegisteredCount >= 10) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    }
+
     // 인자로 받은 가입코드와 일치하는 동아리 찾기
     const crew = await crewDao.getCrewByCode(client, crewCode);
     if (!crew) {
@@ -93,6 +107,38 @@ const registerMember = async (userId, crewCode) => {
     return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
   } catch (error) {
     console.log('registerMember에서 오류 발생: ' + error);
+    await client.query('ROLLBACK');
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * updateCrewUserProfile
+ * 동아리에 회원 프로필 등록하는 서비스
+ * @param userId - 프로필을 생성할 유저 아이디
+ * @param crewId - 프로필을 작성할 동아리 아이디
+ * @param nickname - 등록할 닉네임
+ * @param description - 등록할 유저 설명문
+ * @param {Optional} firstStation - 첫 번째 지하철
+ * @param {Optional} secondStation - 두 번째 지하철
+ */
+const updateCrewUserProfile = async (userId, crewId, nickname, description, firstStation, secondStation) => {
+  let client;
+  const log = `crewUserDao.updateCrewUserProfile | userId = ${userId}, crewId = ${crewId}, nickname = ${nickname}, description = ${description}, firstStation = ${firstStation}, secondStation = ${secondStation}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
+
+    const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, nickname, description, firstStation, secondStation);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
+  } catch (error) {
+    console.log('updateCrewUserProfile에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
   } finally {
     client.release();
@@ -174,4 +220,5 @@ module.exports = {
   registerMember,
   getAllCrewByUserId,
   deleteCrewByCrewId,
+  updateCrewUserProfile,
 };

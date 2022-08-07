@@ -8,19 +8,40 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
  * @param masterId - 동아리장 id값
  * @returns 생성된 crew의 name, code, masterId
  */
-const createCrew = async (client, name, code, masterId) => {
+const createCrew = async (client, name, code, masterId, description) => {
   try {
     const { rows } = await client.query(
       `
-        insert into crew (name, code, master_id)
-        values ($1, $2, $3)
-        returning id, name, code
+        insert into crew (name, code, master_id, description)
+        values ($1, $2, $3, $4)
+        returning id, name, code, description
             `,
-      [name, code, masterId],
+      [name, code, masterId, description],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
     throw new Error('crewDao.createCrew에서 오류 발생: ' + error);
+  }
+};
+
+/**
+ * getCreatedByUserCount
+ * 해당 유저에 의해서 생성된 동아리의 갯수를 반환하는 메서드
+ * @param {*} masterId - 확인할 유저의 id값
+ * @returns 해당 유저가 생성한 동아리의 갯수
+ */
+const getCreatedByUserCount = async (client, masterId) => {
+  try {
+    const { rows } = await client.query(
+      `
+        select count(*) from crew
+        where master_id = $1
+      `,
+      [masterId],
+    );
+    return convertSnakeToCamel.keysToSnake(rows[0]);
+  } catch (error) {
+    throw new Error('crewDao.getCreatedByUserCount에서 오류 발생: ' + error);
   }
 };
 
@@ -109,6 +130,7 @@ const getExistCrew = async (client, crewId) => {
 
 module.exports = {
   createCrew,
+  getCreatedByUserCount,
   getCrewByCode,
   deleteCrewByCrewId,
   getExistCrew,

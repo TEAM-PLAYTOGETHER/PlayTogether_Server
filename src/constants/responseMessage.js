@@ -24,14 +24,18 @@ module.exports = {
   // 유저
   GET_USER_SUCCESS: '사용자 조회 성공',
   UPDATE_USER_SUCCESS: '사용자 업데이트 성공',
+  UNUSABLE_NICKNAME: '사용불가능한 닉네임입니다.',
+  UPDATE_PROFILE_SUCCESS: '사용자 프로필 업데이트 성공',
 
   // 서버 내 오류
   INTERNAL_SERVER_ERROR: '서버 내 오류',
 
   // 토큰
   TOKEN_EXPIRED: '토큰이 만료되었습니다.',
+  TOKEN_UNEXPIRED: '토큰이 만료되지 않았습니다.',
   TOKEN_INVALID: '토큰이 유효하지 않습니다.',
   TOKEN_EMPTY: '토큰이 없습니다.',
+  CREATED_TOKEN: '새로운 토큰이 발급되었습니다.',
 
   // 메시지
   MESSAGE_SEND_SUCCESS: '메시지 전송에 성공했습니다.',
@@ -49,6 +53,7 @@ module.exports = {
   ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
   READ_REGISTER_INFO_SUCCESS: '동아리 가입정보 가져오기 성공',
   NO_MASTER_USER: '동아리장이 아닙니다.',
+  LIMIT_EXCEED: '갯수 제한을 초과했습니다.',
 
   // 번개
   LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',
@@ -61,10 +66,14 @@ module.exports = {
   LIGHT_GET_SCRAP_SUCCESS: '내가 찜한 번개 리스트 조회 성공',
   LIGHT_GET_CATEGORY_SUCCESS: '카테고리별 번개 리스트 조회 성공',
   LIGHT_GET_DETAIL_SUCCESS: '번개 상세 조회 성공',
+  LIGHT_GET_NEW_SUCCESS: 'New 번개 조회 성공',
+  LIGHT_GET_HOT_SUCCESS: 'Hot 번개 조회 성공',
+  LIGHT_GET_SEARCH_SUCCESS: 'Search 번개 조회 성공',
   NOT_LIGHT_ORGANIZER: '번개 소유자가 아닙니다.',
   NO_CATEGORY: '카테고리를 확인해주세요',
   NO_LIGHT: '없는 번개입니다.',
   NO_LIGHT_MEMBER: '번개에 참여한 사람이 아닙니다.',
+  NO_TWO_SEARCH_QUERY: '두글자 이상 입력해주세요.',
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
