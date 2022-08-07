@@ -45,9 +45,30 @@ const getUserByUserLoginId = async (userLoginId) => {
   }
 };
 
+const getUserById = async (userId) => {
+  let client;
+  const log = `userService.getUserById | userId = ${userId}`;
+
+  try {
+    client = await db.connect(log);
+
+    const user = await userDao.getUserById(client, userId);
+    // 유저가 없을 때
+    if (!user) {
+      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER);
+    }
+
+    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, user);
+  } catch (error) {
+    console.log('userService getUserById에서 error 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
+  }
+};
+
 const updateUserMbti = async (userId, mbti) => {
   let client;
-
   const log = `userService.updateUserMbti | mbit = ${mbti}`;
   try {
     client = await db.connect(log);
@@ -72,5 +93,6 @@ const updateUserMbti = async (userId, mbti) => {
 
 module.exports = {
   getUserByUserLoginId,
+  getUserById,
   updateUserMbti,
 };

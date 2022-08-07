@@ -39,6 +39,27 @@ const createUser = async (userLoginId, password, userName, gender, birth) => {
   }
 };
 
+const createSnsUser = async (snsId, email, provider, name) => {
+  let client;
+  const log = `authService.createSnsUser | snsId = ${snsId}, email = ${email}, provider = ${provider}, name = ${name}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    const newUser = await authDao.createSnsUser(client, snsId, email, provider, name);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
+  } catch (error) {
+    console.log('authService createSnsUser에서 error 발생: ' + error);
+    await client.query('ROLLBACK');
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
+  }
+};
+
 const login = async (userLoginId, password) => {
   let client;
   const log = `authService.login | userLoginId = ${userLoginId}`;
@@ -97,6 +118,25 @@ const isUser = async (userLoginId) => {
   }
 };
 
+const isSnsUser = async (snsId, provider) => {
+  let client;
+  const log = `authService.isSnsUser | snsId = ${snsId}`;
+
+  try {
+    client = await db.connect(log);
+
+    const userExist = await userDao.getUserBySnsId(client, snsId, provider);
+    if (!userExist) null;
+
+    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, userExist);
+  } catch (error) {
+    console.log('authService isSnsUser에서 error 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
+  }
+};
+
 const refresh = async (user, authToken, refreshToken) => {
   // access token과 refresh token의 존재여부 확인
   if (authToken && refreshToken) {
@@ -134,7 +174,9 @@ const refresh = async (user, authToken, refreshToken) => {
 
 module.exports = {
   createUser,
+  createSnsUser,
   login,
   isUser,
+  isSnsUser,
   refresh,
 };

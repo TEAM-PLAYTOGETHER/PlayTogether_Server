@@ -17,6 +17,21 @@ const createUser = async (client, userId, password, userName, gender, birth) => 
   }
 };
 
+const createSnsUser = async (client, snsId, email, provider, name) => {
+  try {
+    const { rows } = await client.query(
+      `
+      INSERT INTO "user" (email, sns_id, provider, name)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [email, snsId, provider, name],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('authDao.createSnsUser에서 오류 발생: ' + error);
+  }
+};
+
 // READ
 
 // UPDATE
@@ -25,4 +40,5 @@ const createUser = async (client, userId, password, userName, gender, birth) => 
 
 module.exports = {
   createUser,
+  createSnsUser,
 };
