@@ -44,6 +44,8 @@ module.exports = {
   NO_ROOM: '채팅방이 없습니다.',
   MESSAGE_READ_SUCCESS: '메시지 불러오기 성공',
   MESSAGE_READ_FAIL: '메시지 불러오기 실패',
+  ROOM_SUCCESS: '방 불러오기 성공',
+  SELF_CHAT: '자신에게 메시지를 보낼 수 없습니다.',
 
   // 동아리
   CREW_CREATE_SUCCESS: '동아리 만들기 성공',
