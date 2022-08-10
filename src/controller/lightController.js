@@ -8,9 +8,10 @@ const addLight = async (req, res) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
   let image = null;
-  if (req.file) {
-    image = req.file.location;
+  if (req.files) {
+    image = req.files;
   }
+  const path = image.map(img =>img.location);
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러
@@ -21,7 +22,7 @@ const addLight = async (req, res) => {
     return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW));
   }
   try {
-    const result = await lightService.addLight(category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
+    const result = await lightService.addLight(category, title, date, place, people_cnt, description, path, organizerId, crewId, time);
 
     return res.status(result.status).json(result);
   } catch (error) {
