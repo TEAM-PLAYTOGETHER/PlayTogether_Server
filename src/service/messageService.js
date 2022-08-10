@@ -7,6 +7,49 @@ const util = require('../lib/util');
 const { applyKoreanTime } = require('../lib/applyKoreanTime');
 
 /**
+ * getRoomIdByUserId
+ * 상대방과 대화를 나눈 방 번호를 조회 또는 생성해서 반환해주는 서비스
+ * @param {*} sendId - 유저의 id값
+ * @param {*} recvId - 대화 상대방 id값
+ * @returns - 기존에 나눈 대화방 번호 or 새롭게 생성된 대화방 번호
+ */
+const getRoomIdByUserId = async (sendId, recvId) => {
+  let client;
+  const log = `messageService.getRoomIdByUserId | sendId = ${sendId}, recvId = ${recvId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // recvId가 존재하는 유저인지 검사
+    const exist = await userDao.getUserById(client, recvId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+
+    // Dao에서 Room 가져오기
+    let roomExist = await messageDao.getRoom(client, sendId, recvId);
+
+    // 만약 room이 없다면 생성
+    if (!roomExist) {
+      roomExist = await messageDao.createRoom(client, sendId, recvId);
+    }
+
+    // messageDao에서 message 보내기
+    const roomId = roomExist.id;
+
+    // 성공
+    await client.query('COMMIT');
+    return util.success(statusCode.OK, responseMessage.ROOM_SUCCESS, { roomId });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.log('sendMessage에서 error 발생: ' + error);
+  } finally {
+    client.release();
+  }
+};
+
+/**
  * sendMessage
  * 발신자가 수신자에게 메시지를 전송하는 서비스
  * @param {*} sendId - 발신자 id값
@@ -150,6 +193,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
 };
 
 module.exports = {
+  getRoomIdByUserId,
   sendMessage,
   getAllMessageById,
   getAllMessageByRoomId,
