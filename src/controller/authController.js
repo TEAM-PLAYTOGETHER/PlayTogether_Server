@@ -62,8 +62,23 @@ const isUser = async (req, res) => {
   }
 };
 
+const refresh = async (req, res) => {
+  try {
+    const user = req.user;
+    const authToken = req.headers.authorization;
+    const refreshToken = req.headers.refresh;
+
+    const refresh = await authService.refresh(user, authToken, refreshToken);
+
+    return res.status(refresh.status).json(refresh);
+  } catch (error) {
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   signup,
   login,
   isUser,
+  refresh,
 };

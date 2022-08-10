@@ -1,8 +1,6 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
 
-const FETCH_SIZE_LIGHT_POST = 10;
-
 const addLight = async (client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   try {
     const { rows } = await client.query(
@@ -78,7 +76,7 @@ const deleteLight = async (client, lightId, organizerId) => {
   }
 };
 
-const getOrganizerLight = async (client, organizerId, getPage) => {
+const getOrganizerLight = async (client, organizerId, offset, limit) => {
 
   try {
     const { rows } = await client.query(
@@ -90,14 +88,14 @@ const getOrganizerLight = async (client, organizerId, getPage) => {
       offset $2
       limit $3;
       `,
-      [organizerId, getPage, FETCH_SIZE_LIGHT_POST],
+      [organizerId, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getOrganizerLight에서 에러 발생했습니다' + error);
   }
 };
-const getEnterLight = async (client, memberId, getPage) => {
+const getEnterLight = async (client, memberId, offset, limit) => {
   try {
     const { rows } = await client.query(
       `
@@ -112,14 +110,14 @@ const getEnterLight = async (client, memberId, getPage) => {
                     offset $2
                     limit $3;
       `,
-      [memberId, getPage, FETCH_SIZE_LIGHT_POST],
+      [memberId, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getEnterLight에서 에러 발생했습니다' + error);
   }
 };
-const getScrapLight = async (client, memberId, getPage) => {
+const getScrapLight = async (client, memberId, offset, limit) => {
   try {
     const { rows } = await client.query(
       `
@@ -134,14 +132,14 @@ const getScrapLight = async (client, memberId, getPage) => {
                                        offset $2
                                        limit $3;
       `,
-      [memberId, getPage, FETCH_SIZE_LIGHT_POST],
+      [memberId, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getScrapLight에서 에러 발생했습니다' + error);
   }
 };
-const getCategoryLight = async (client, category, sort, getPage) => {
+const getCategoryLight = async (client, category, sort, offset, limit) => {
   try {
     const { rows } = await client.query(
       `
@@ -154,7 +152,7 @@ const getCategoryLight = async (client, category, sort, getPage) => {
       limit $4
       ;
       `,
-      [category, sort, getPage, FETCH_SIZE_LIGHT_POST],
+      [category, sort, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
@@ -269,36 +267,40 @@ const getHotLight = async (client) => {
     throw new Error('lightdao.getHotLight에서 에러 발생했습니다' + error);
   }
 };
-const getSearchLightUseCategory = async (client, search, category) => {
+const getSearchLightUseCategory = async (client, search, category, offset, limit) => {
   try {
     const { rows } = await client.query(
       `            
       select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
-      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2;
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2
+      offset $3
+      limit $4;
       `,
-      [search, category]
+      [search, category, offset, limit]
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getSearchLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getSearchLightUseCategory 에러 발생했습니다' + error);
   }
 };
-const getSearchLightNotCategory = async (client, search) => {
+const getSearchLightNotCategory = async (client, search, offset, limit) => {
   try {
     const { rows } = await client.query(
       `            
       select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
-      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%'));
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%'))
+      offset $2
+      limit $3;
       `,
-      [search]
+      [search, offset, limit]
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getSearchLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getSearchLightNotCategory 에러 발생했습니다' + error);
   }
 };
 

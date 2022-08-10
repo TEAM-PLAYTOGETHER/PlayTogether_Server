@@ -11,6 +11,7 @@ router.get('/:userLoginId', userController.getUserByUserId);
 
 // PUT
 router.put('/mbti', authMiddleware, userController.updateUserMbti);
+router.put('/:crewId', authMiddleware, userController.updateUserProfile);
 
 // DELETE
 

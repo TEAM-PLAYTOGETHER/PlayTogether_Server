@@ -8,20 +8,21 @@ const addLight = async (req, res) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
   let image = null;
-  if (req.file) {
-    image = req.file.location;
+  if (req.files) {
+    image = req.files;
   }
+  const path = image.map(img =>img.location);
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러
-  if (!category || !title || !date || !time || !description || !place || !people_cnt) {
+  if (!category || !title || !description ) {
     return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   }
   if (!crewId) {
     return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW));
   }
   try {
-    const result = await lightService.addLight(category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
+    const result = await lightService.addLight(category, title, date, place, people_cnt, description, path, organizerId, crewId, time);
 
     return res.status(result.status).json(result);
   } catch (error) {
@@ -36,13 +37,15 @@ const putLight = async (req, res) => {
 
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
-  // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
-  if (!(category == '먹을래' || category == '갈래' || category == '할래')) {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
-  }
+  
   try {
     const updatedPost = await lightService.putLight(lightId, organizerId, category, title, date, place, people_cnt, description, time);
 
+    // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
+    // if (!(updatedPost.category == "먹을래") || !(updatedPost.category == "갈래") || !(updatedPost.category == "할래")) {
+    //   return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
+    // }
+    
     if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
 
     return res.status(updatedPost.status).json(updatedPost);
@@ -85,13 +88,16 @@ const deleteLight = async (req, res) => {
 };
 const getOrganizerLight = async (req, res) => {
   const organizerId = req.user.id;
-  const page = req.query.page || 0;
-  const pageSize = req.query.pageSize || 5;
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize)
+  let limit = Number(pageSize)
 
   if (!organizerId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getOrganizerLight(organizerId, page, pageSize);
+    const lights = await lightService.getOrganizerLight(organizerId, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -101,12 +107,17 @@ const getOrganizerLight = async (req, res) => {
 };
 const getEnterLight = async (req, res) => {
   const memberId = req.user.id;
-  const page = req.query.page || 0;
-  const pageSize = req.query.pageSize || 5;
+  
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize)
+  let limit = Number(pageSize)
+
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getEnterLight(memberId, page, pageSize);
+    const lights = await lightService.getEnterLight(memberId, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -116,12 +127,17 @@ const getEnterLight = async (req, res) => {
 };
 const getScrapLight = async (req, res) => {
   const memberId = req.user.id;
-  const page = req.query.page || 0;
-  const pageSize = req.query.pageSize || 5;
+
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize)
+  let limit = Number(pageSize)
+
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getScrapLight(memberId, page, pageSize);
+    const lights = await lightService.getScrapLight(memberId, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -132,17 +148,22 @@ const getScrapLight = async (req, res) => {
 const getCategoryLight = async (req, res) => {
   const category = req.query.category;
   const sort = req.query.sort;
-  const page = req.query.page || 0;
-  const pageSize = req.query.pageSize || 5;
+
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize)
+  let limit = Number(pageSize)
+
   // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
   if (!(category == '먹을래' || category == '갈래' || category == '할래')) {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
   }
   if (!(sort == 'createdAt' || sort == 'peopleCnt')) {
-    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.OUT_OF_VALUE));
+    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_SORT_VALUE));
   }
   try {
-    const lights = await lightService.getCategoryLight(category, sort, page, pageSize);
+    const lights = await lightService.getCategoryLight(category, sort, offset, limit);
     return res.status(lights.status).json(lights);
   } catch (error) {
     console.log(error);
@@ -194,8 +215,12 @@ const getSearchLight = async (req, res) => {
   const memberId = req.user.id;
   const search = req.query.search;
   const category = req.query.category;
-  const page = req.query.page || 0;
-  const pageSize = req.query.pageSize || 5;
+  
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize)
+  let limit = Number(pageSize)
 
   if (!memberId){
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -205,7 +230,7 @@ const getSearchLight = async (req, res) => {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_TWO_SEARCH_QUERY));
   }
   try {
-    const lights = await lightService.getSearchLight(memberId, search, category, page, pageSize);
+    const lights = await lightService.getSearchLight(memberId, search, category, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {

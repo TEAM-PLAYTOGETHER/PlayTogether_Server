@@ -5,6 +5,36 @@ const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 
 /**
+ * GET ~/message/room-exist?recvId=:recvId
+ * 상대방과 대화를 나눈 방 번호를 조회 또는 생성
+ * @private
+ */
+const getRoomIdByUserId = async (req, res) => {
+  try {
+    const sendId = Number(req.user.id);
+    const recvId = Number(req.query.recvId);
+
+    // 수신자 id 빈 값 처리
+    if (!recvId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
+    }
+
+    // 자기자신에게 보내기 금지
+    if (sendId === recvId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.SELF_CHAT));
+    }
+
+    // 방 생성 or 가져오기
+    const result = await messageService.getRoomIdByUserId(sendId, recvId);
+
+    return res.status(result.status).json(result);
+  } catch (error) {
+    console.log('sendMessage Controller 에러: ' + error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
+/**
  * POST ~/message
  * 메시지 전송
  * @private
@@ -78,6 +108,7 @@ const getAllMessageByRoomId = async (req, res) => {
 };
 
 module.exports = {
+  getRoomIdByUserId,
   sendMessage,
   getAllMessageById,
   getAllMessageByRoomId,

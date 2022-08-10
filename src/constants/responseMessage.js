@@ -1,6 +1,7 @@
 module.exports = {
   NULL_VALUE: '필요한 값이 없습니다',
   OUT_OF_VALUE: '파라미터 값이 잘못되었습니다',
+  NO_SORT_VALUE: '정렬 조건이 없습니다.',
   NO_AUTHENTICATED: '접근 권한이 없습니다',
 
   // 회원가입
@@ -24,14 +25,18 @@ module.exports = {
   // 유저
   GET_USER_SUCCESS: '사용자 조회 성공',
   UPDATE_USER_SUCCESS: '사용자 업데이트 성공',
+  UNUSABLE_NICKNAME: '사용불가능한 닉네임입니다.',
+  UPDATE_PROFILE_SUCCESS: '사용자 프로필 업데이트 성공',
 
   // 서버 내 오류
   INTERNAL_SERVER_ERROR: '서버 내 오류',
 
   // 토큰
   TOKEN_EXPIRED: '토큰이 만료되었습니다.',
+  TOKEN_UNEXPIRED: '토큰이 만료되지 않았습니다.',
   TOKEN_INVALID: '토큰이 유효하지 않습니다.',
   TOKEN_EMPTY: '토큰이 없습니다.',
+  CREATED_TOKEN: '새로운 토큰이 발급되었습니다.',
 
   // 메시지
   MESSAGE_SEND_SUCCESS: '메시지 전송에 성공했습니다.',
@@ -40,6 +45,8 @@ module.exports = {
   NO_ROOM: '채팅방이 없습니다.',
   MESSAGE_READ_SUCCESS: '메시지 불러오기 성공',
   MESSAGE_READ_FAIL: '메시지 불러오기 실패',
+  ROOM_SUCCESS: '방 불러오기 성공',
+  SELF_CHAT: '자신에게 메시지를 보낼 수 없습니다.',
 
   // 동아리
   CREW_CREATE_SUCCESS: '동아리 만들기 성공',
