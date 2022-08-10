@@ -83,7 +83,7 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
     // 번개 수정하려는 사람이 organizer인지 검사
-    const organizer = await lightDao.getLightOrganizerById(client, organizerId);
+    const organizer = await lightDao.getLightOrganizerById(client, lightId, organizerId);
     if (!organizer) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_LIGHT_ORGANIZER);
     }
@@ -231,15 +231,19 @@ const getOrganizerLight = async (organizerId, offset, limit) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        date,
+        time,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened
       }   
@@ -277,18 +281,22 @@ const getEnterLight = async (memberId, offset, limit) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        date,
+        time,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened
-      }   
+      }
     });
 
     await client.query('COMMIT');
@@ -321,18 +329,22 @@ const getScrapLight = async (memberId, offset, limit) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        date,
+        time,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened
-      }   
+      }
     });
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_SCRAP_SUCCESS, {lightData, offset, limit, totalCount, totalPage});
@@ -361,18 +373,22 @@ const getCategoryLight = async (category, sort, offset, limit) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        date,
+        time,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened
-      }   
+      }  
     });
 
     return util.success(statusCode.OK, responseMessage.LIGHT_GET_CATEGORY_SUCCESS, {lightData, offset, limit, totalCount, totalPage});
@@ -414,17 +430,21 @@ const getLightDetail = async (lightId) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         category: light.category,
         title: light.title,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
+        date,
+        time,
         description: light.description,
         image: light.image,
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened,
         members: data2,
@@ -459,15 +479,19 @@ const getNewLight = async (memberId) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        date,
+        time,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened
       }   
@@ -500,18 +524,22 @@ const getHotLight = async (memberId) => {
 
     const lightData = result.map((light) => {
       const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+      const time = light.time == null ? null : light.time.slice(0, -3); 
+      const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+      const place = light.place == null ? null : light.place;
+      const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
       return {
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
         scp_cnt: Number(light.scpCnt),
-        date: dayjs(light.date).format('YYYY-MM-DD'),
-        time: light.time.slice(0, -3),
-        people_cnt: light.peopleCnt,
-        place: light.place,
+        date,
+        time,
+        people_cnt,
+        place,
         LightMemberCnt: Number(light.joinCnt),
         is_opened
-      }   
+      }  
     });
 
     await client.query('COMMIT');
@@ -546,18 +574,22 @@ const getSearchLight = async (memberId, search, category, offset, limit) => {
       
       const lightData = result.map((light) => {
         const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3); 
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
         return {
           light_id: Number(light.id),
           title: light.title,
           category: light.category,
           scp_cnt: Number(light.scpCnt),
-          date: dayjs(light.date).format('YYYY-MM-DD'),
-          time: light.time.slice(0, -3),
-          people_cnt: light.peopleCnt,
-          place: light.place,
+          date,
+          time,
+          people_cnt,
+          place,
           LightMemberCnt: Number(light.joinCnt),
           is_opened
-        }   
+        }    
       });
 
       await client.query('COMMIT');
@@ -571,18 +603,22 @@ const getSearchLight = async (memberId, search, category, offset, limit) => {
 
       const lightData = result.map((light) => {
         const is_opened = (light.joinCnt >= light.peopleCnt) || (light.date < new Date())? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3); 
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
         return {
           light_id: Number(light.id),
           title: light.title,
           category: light.category,
           scp_cnt: Number(light.scpCnt),
-          date: dayjs(light.date).format('YYYY-MM-DD'),
-          time: light.time.slice(0, -3),
-          people_cnt: light.peopleCnt,
-          place: light.place,
+          date,
+          time,
+          people_cnt,
+          place,
           LightMemberCnt: Number(light.joinCnt),
           is_opened
-        }   
+        }  
       });
   
       await client.query('COMMIT');

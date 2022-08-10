@@ -15,7 +15,7 @@ const addLight = async (req, res) => {
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러
-  if (!category || !title || !date || !time || !description || !place || !people_cnt) {
+  if (!category || !title || !description ) {
     return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   }
   if (!crewId) {
@@ -37,13 +37,15 @@ const putLight = async (req, res) => {
 
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
-  // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
-  if (!(category == '먹을래' || category == '갈래' || category == '할래')) {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
-  }
+  
   try {
     const updatedPost = await lightService.putLight(lightId, organizerId, category, title, date, place, people_cnt, description, time);
 
+    // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
+    // if (!(updatedPost.category == "먹을래") || !(updatedPost.category == "갈래") || !(updatedPost.category == "할래")) {
+    //   return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CATEGORY));
+    // }
+    
     if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
 
     return res.status(updatedPost.status).json(updatedPost);
@@ -158,7 +160,7 @@ const getCategoryLight = async (req, res) => {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
   }
   if (!(sort == 'createdAt' || sort == 'peopleCnt')) {
-    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.OUT_OF_VALUE));
+    return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_SORT_VALUE));
   }
   try {
     const lights = await lightService.getCategoryLight(category, sort, offset, limit);
