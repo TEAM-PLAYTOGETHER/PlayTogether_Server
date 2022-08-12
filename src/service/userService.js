@@ -91,8 +91,30 @@ const updateUserMbti = async (userId, mbti) => {
   }
 };
 
+const getUserByNickname = async (crewId, nickname) => {
+  let client;
+  const log = `userService.existNicknameCheck | crewId = ${crewId}, nickname = ${nickname}`;
+
+  try {
+    client = await db.connect(log);
+    const user = await userDao.getUserByNickname(client, crewId, nickname);
+
+    if (user) {
+      return util.fail(statusCode.CONFLICT, responseMessage.ALREADY_NICKNAME);
+    }
+
+    return util.success(statusCode.OK, responseMessage.USEABLE_NICKNAME);
+  } catch (error) {
+    console.log('userService existNicknameCheck에서 error 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getUserByUserLoginId,
   getUserById,
+  getUserByNickname,
   updateUserMbti,
 };

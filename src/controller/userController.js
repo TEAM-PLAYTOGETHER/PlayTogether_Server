@@ -56,6 +56,27 @@ const updateUserMbti = async (req, res) => {
 };
 
 /**
+ * GET ~/:crewId/?nickname=
+ * 유저 닉네임 중복확인
+ * @public
+ */
+const nicknameCheck = async (req, res) => {
+  try {
+    const { crewId } = req.params;
+    const { nickname } = req.query;
+
+    if (!nickname) return res.status(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE);
+
+    const isUsedNickname = await userService.getUserByNickname(crewId, nickname);
+
+    return res.status(isUsedNickname.status).json(isUsedNickname);
+  } catch (error) {
+    console.log('UserController updateUserMbti error 발생: ', error);
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  }
+};
+
+/**
  * PUT ~/:crewId
  * 동아리 프로필 생성
  * @private
@@ -87,4 +108,5 @@ module.exports = {
   getUserByUserId,
   updateUserMbti,
   updateUserProfile,
+  nicknameCheck,
 };
