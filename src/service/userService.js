@@ -4,6 +4,8 @@ const { userDao } = require('../db');
 const util = require('../lib/util');
 const db = require('../loaders/db');
 
+const { nicknameVerify } = require('../lib/nicknameVerify');
+
 const getUserByUserLoginId = async (userLoginId) => {
   let client;
   const log = `userService.getUserByUserLoginId | userLoginId = ${userLoginId}`;
@@ -102,6 +104,8 @@ const getUserByNickname = async (crewId, nickname) => {
     if (user) {
       return util.fail(statusCode.CONFLICT, responseMessage.ALREADY_NICKNAME);
     }
+
+    if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
 
     return util.success(statusCode.OK, responseMessage.USEABLE_NICKNAME);
   } catch (error) {
