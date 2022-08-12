@@ -1,3 +1,4 @@
+const { userDao } = require('.');
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const db = require('../loaders/db');
 
@@ -53,6 +54,23 @@ const getUserBySnsId = async (client, snsId, provider) => {
   }
 };
 
+const getUserByNickname = async (client, crewId, nickname) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT *
+      FROM "crew_user"
+      WHERE crew_id = $1 AND nickname = $2
+      `,
+      [crewId, nickname],
+    );
+
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('userDao.getUserByNickname에서 오류 발생: ' + error);
+  }
+};
+
 // UPDATE
 const updateUserMbti = async (client, userId, mbit) => {
   try {
@@ -76,5 +94,6 @@ module.exports = {
   getUserById,
   getUserByUserLoginId,
   getUserBySnsId,
+  getUserByNickname,
   updateUserMbti,
 };

@@ -6,6 +6,7 @@ const router = express.Router();
 
 // GET
 router.get('/:userLoginId', userController.getUserByUserId);
+router.get('/crew/:crewId', userController.nicknameCheck);
 
 // POST
 
