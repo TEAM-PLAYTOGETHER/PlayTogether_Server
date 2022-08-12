@@ -65,7 +65,7 @@ const nicknameCheck = async (req, res) => {
     const { crewId } = req.params;
     const { nickname } = req.query;
 
-    if (!nickname) return res.status(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE);
+    if (nickname.length === 0 || !nickname) return res.status(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE);
 
     const isUsedNickname = await userService.getUserByNickname(crewId, nickname);
 
