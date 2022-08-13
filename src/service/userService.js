@@ -4,6 +4,8 @@ const { userDao } = require('../db');
 const util = require('../lib/util');
 const db = require('../loaders/db');
 
+const { nicknameVerify } = require('../lib/nicknameVerify');
+
 const getUserByUserLoginId = async (userLoginId) => {
   let client;
   const log = `userService.getUserByUserLoginId | userLoginId = ${userLoginId}`;
@@ -91,8 +93,32 @@ const updateUserMbti = async (userId, mbti) => {
   }
 };
 
+const getUserByNickname = async (crewId, nickname) => {
+  let client;
+  const log = `userService.existNicknameCheck | crewId = ${crewId}, nickname = ${nickname}`;
+
+  try {
+    client = await db.connect(log);
+    const user = await userDao.getUserByNickname(client, crewId, nickname);
+
+    if (user) {
+      return util.fail(statusCode.CONFLICT, responseMessage.ALREADY_NICKNAME);
+    }
+
+    if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
+
+    return util.success(statusCode.OK, responseMessage.USEABLE_NICKNAME);
+  } catch (error) {
+    console.log('userService existNicknameCheck에서 error 발생: ' + error);
+    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getUserByUserLoginId,
   getUserById,
+  getUserByNickname,
   updateUserMbti,
 };
