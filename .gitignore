@@ -131,3 +131,6 @@ dist
 
 # s3 aws setting
 config
+
+# firebase
+play-together-66ddb-firebase-adminsdk-bx7fx-3b024f45fb.json
