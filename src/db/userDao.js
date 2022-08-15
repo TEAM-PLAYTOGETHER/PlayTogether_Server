@@ -1,4 +1,3 @@
-const { userDao } = require('.');
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const db = require('../loaders/db');
 
