@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/', authMiddleware, messageController.sendMessage);
 router.get('/', authMiddleware, messageController.getAllMessageById);
 
+router.get('/room-exist', authMiddleware, messageController.getRoomIdByUserId);
 router.get('/:roomId', authMiddleware, messageController.getAllMessageByRoomId);
 
 module.exports = router;
