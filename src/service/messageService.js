@@ -43,7 +43,7 @@ const getRoomIdByUserId = async (sendId, recvId) => {
     return util.success(statusCode.OK, responseMessage.ROOM_SUCCESS, { roomId });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('sendMessage에서 error 발생: ' + error);
+    throw new Error('messageService getRoomIdByUserId에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -94,7 +94,7 @@ const sendMessage = async (sendId, recvId, content) => {
     return util.success(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('sendMessage에서 error 발생: ' + error);
+    throw new Error('messageService sendMessage에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -132,7 +132,7 @@ const getAllMessageById = async (userId) => {
 
     return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
   } catch (error) {
-    console.log('getAllMessageById에서 error 발생: ' + error);
+    throw new Error('messageService getAllMessageById에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -186,7 +186,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
     return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.log('getAllMessageByRoomId에서 error 발생: ' + error);
+    throw new Error('messageService getAllMessageByRoomId에서 error 발생: \n' + error);
   } finally {
     client.release();
   }

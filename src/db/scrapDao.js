@@ -1,7 +1,6 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const _ = require('lodash');
 
-
 const addLightScrap = async (client, lightId, memberId) => {
   try {
     await client.query(
@@ -14,11 +13,11 @@ const addLightScrap = async (client, lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    throw new Error('ScrapDao.addLightScrap에서 에러 발생했습니다' + error);
+    throw new Error('ScrapDao.addLightScrap에서 에러 발생했습니다 \n' + error);
   }
 };
 
-const deleteLightScrap = async(client, lightId, memberId) => {
+const deleteLightScrap = async (client, lightId, memberId) => {
   try {
     await client.query(
       `
@@ -28,10 +27,10 @@ const deleteLightScrap = async(client, lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    throw new Error('ScrapDao.deleteLightScrap 에러 발생했습니다' + error);
+    throw new Error('ScrapDao.deleteLightScrap 에러 발생했습니다 \n' + error);
   }
 };
-const getLightScrap = async(client, lightId, memberId) => {
+const getLightScrap = async (client, lightId, memberId) => {
   try {
     const { rows } = await client.query(
       `
@@ -42,10 +41,10 @@ const getLightScrap = async(client, lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('ScrapDao.getLightScrap 에러 발생했습니다' + error);
-  } 
+    throw new Error('ScrapDao.getLightScrap 에러 발생했습니다 \n' + error);
+  }
 };
-const getLightScrapMember = async(client, lightId, memberId) => {
+const getLightScrapMember = async (client, lightId, memberId) => {
   try {
     const { rows } = await client.query(
       `
@@ -56,12 +55,12 @@ const getLightScrapMember = async(client, lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('ScrapDao.getLightScrapMember 에러 발생했습니다' + error);
+    throw new Error('ScrapDao.getLightScrapMember 에러 발생했습니다 \n' + error);
   }
 };
 module.exports = {
-    addLightScrap,
-    deleteLightScrap,
-    getLightScrap,
-    getLightScrapMember
+  addLightScrap,
+  deleteLightScrap,
+  getLightScrap,
+  getLightScrapMember,
 };

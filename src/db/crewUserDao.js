@@ -19,7 +19,7 @@ const registerCrewMember = async (client, crewId, memberId) => {
     );
     return rowCount;
   } catch (error) {
-    throw new Error('crewUserDao.registerCrewMember에서 오류 발생: ' + error);
+    throw new Error('crewUserDao.registerCrewMember에서 오류 발생: \n' + error);
   }
 };
 
@@ -41,7 +41,7 @@ const getUserRegisteredCount = async (client, userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewUserDao.getUserRegisteredCount에서 오류 발생: ' + error);
+    throw new Error('crewUserDao.getUserRegisteredCount에서 오류 발생: \n' + error);
   }
 };
 
@@ -63,7 +63,7 @@ const getRegisteredMember = async (client, crewId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewUserDao.getRegisteredMember에서 오류 발생: ' + error);
+    throw new Error('crewUserDao.getRegisteredMember에서 오류 발생: \n' + error);
   }
 };
 
@@ -86,7 +86,7 @@ const getAllCrewByUserId = async (client, userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('crewUserDao.getAllCrewByUserId에서 오류 발생: ' + error);
+    throw new Error('crewUserDao.getAllCrewByUserId에서 오류 발생: \n' + error);
   }
 };
 
@@ -116,7 +116,7 @@ const updateCrewUserProfile = async (client, memeberId, crewId, nickname, descri
 
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewUserDao.updateCrewUserProfile에서 오류 발생: ' + error);
+    throw new Error('crewUserDao.updateCrewUserProfile에서 오류 발생: \n' + error);
   }
 };
 
@@ -139,7 +139,7 @@ const withdrawAllMemberByCrewId = async (client, crewId) => {
     );
     return rowCount;
   } catch (error) {
-    throw new Error('crewUserDao.withdrawAllMemberByCrewId에서 오류 발생: ' + error);
+    throw new Error('crewUserDao.withdrawAllMemberByCrewId에서 오류 발생: \n' + error);
   }
 };
 

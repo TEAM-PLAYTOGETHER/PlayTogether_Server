@@ -40,8 +40,7 @@ const getUserByUserLoginId = async (userLoginId) => {
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, userData);
   } catch (error) {
-    console.log('userService getUserByLoginId에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('userService getUserByLoginId에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -62,8 +61,7 @@ const getUserById = async (userId) => {
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, user);
   } catch (error) {
-    console.log('userService getUserById에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('userService getUserById에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -86,8 +84,7 @@ const updateUserMbti = async (userId, mbti) => {
 
     return util.success(statusCode.OK, responseMessage.UPDATE_USER_SUCCESS, updateUser);
   } catch (error) {
-    console.log('userService updateUserMbti에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('userService updateUserMbti에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -109,8 +106,7 @@ const getUserByNickname = async (crewId, nickname) => {
 
     return util.success(statusCode.OK, responseMessage.USEABLE_NICKNAME);
   } catch (error) {
-    console.log('userService existNicknameCheck에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('userService existNicknameCheck에서 error 발생: \n' + error);
   } finally {
     client.release();
   }

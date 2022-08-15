@@ -2,8 +2,6 @@ const { Server } = require('socket.io');
 const http = require('./app');
 const io = new Server(http);
 
-console.log('hi');
-
 io.on('connection', (socket) => {
   // 클라가 io 서버 접속시 고유 id를 얻음
   console.log(`Connection : SocketId = ${socket.id}`);

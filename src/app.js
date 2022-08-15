@@ -8,6 +8,9 @@ const helmet = require('helmet');
 const passportConfig = require('./passport');
 const passport = require('passport');
 const session = require('express-session');
+const statusCode = require('./constants/statusCode');
+const util = require('./lib/util');
+const responseMessage = require('./constants/responseMessage');
 
 // const sentry = require('@sentry/node');
 // const tracing = require('@sentry/tracing');
@@ -56,12 +59,23 @@ app.use(passport.session());
 
 app.use('/api', require('./routes'));
 
+app.use('*', (req, res) => {
+  res.status(404).json({
+    statusCode: 404,
+    message: '존재하지 않는 경로입니다.',
+  });
+});
+
 /*
 app.use(sentry.Handlers.errorHandler());
 */
 
-app.use(function onError(err, req, res, next) {
-  console.log('error!!');
+app.use(function (err, req, res, next) {
+  console.log('에러는 이 곳에서 처리');
+  console.log(err);
+  return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+
+  // 슬랙봇 연결하기
   /*
   slackBot
     .send(
@@ -73,13 +87,6 @@ app.use(function onError(err, req, res, next) {
 
   res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, err.message));
   */
-});
-
-app.use('*', (req, res) => {
-  res.status(404).json({
-    statusCode: 404,
-    message: '존재하지 않는 경로입니다.',
-  });
 });
 
 module.exports = http;
