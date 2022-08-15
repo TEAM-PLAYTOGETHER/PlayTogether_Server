@@ -1,4 +1,6 @@
 const express = require('express');
+const admin = require('firebase-admin');
+const serviceAccount = require('./play-together-66ddb-firebase-adminsdk-bx7fx-3b024f45fb.json');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
@@ -51,6 +53,15 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+let firebase;
+if (admin.apps.length === 0) {
+  firebase = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} else {
+  firebase = admin.app();
+}
 
 app.use('/api', require('./routes'));
 
