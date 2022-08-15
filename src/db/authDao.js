@@ -13,7 +13,7 @@ const createUser = async (client, userId, password, userName, gender, birth) => 
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('authDao.createUser에서 오류 발생: ' + error);
+    throw new Error('authDao.createUser에서 오류 발생: \n' + error);
   }
 };
 
@@ -28,7 +28,7 @@ const createSnsUser = async (client, snsId, email, provider, name) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('authDao.createSnsUser에서 오류 발생: ' + error);
+    throw new Error('authDao.createSnsUser에서 오류 발생: \n' + error);
   }
 };
 
