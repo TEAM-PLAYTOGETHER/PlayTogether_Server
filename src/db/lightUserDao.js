@@ -58,9 +58,25 @@ const deleteLightUser = async (client, lightId) => {
   }
 };
 
+const existLightUser = async (client, lightId, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select l.id from light_user l
+      where l.light_id = $1 and l.member_id = $2
+      `,
+      [lightId, userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('lightUserdao.existLightUser에서 에러 발생했습니다 \n' + error);
+  }
+};
+
 module.exports = {
   postEnterLight,
   getEnterLightMember,
   deleteCancelLight,
   deleteLightUser,
+  existLightUser
 };

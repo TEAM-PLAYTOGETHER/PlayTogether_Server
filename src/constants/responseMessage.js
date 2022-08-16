@@ -73,6 +73,8 @@ module.exports = {
   LIGHT_GET_HOT_SUCCESS: 'Hot 번개 조회 성공',
   LIGHT_GET_SEARCH_SUCCESS: 'Search 번개 조회 성공',
   NOT_LIGHT_ORGANIZER: '번개 소유자가 아닙니다.',
+  EXIST_LIGHT_USER: '해당 번개에 참여중 입니다.',
+  EXIST_NOT_LIGHT_USER: '해당 번개에 참여중이 아닙니다.',
   NO_CATEGORY: '카테고리를 확인해주세요',
   NO_LIGHT: '없는 번개입니다.',
   NO_LIGHT_MEMBER: '번개에 참여한 사람이 아닙니다.',

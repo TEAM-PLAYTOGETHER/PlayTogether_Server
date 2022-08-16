@@ -626,6 +626,37 @@ const getSearchLight = async (memberId, search, category, offset, limit) => {
     client.release();
   }
 };
+const existLightUser = async (lightId, memberId) => {
+  let client;
+
+  const log = `lightService.existLightUser | lightId = ${lightId}, memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    const data = await lightUserDao.existLightUser(client, lightId, memberId);
+    // 존재하는 유저인지 확인
+    const existUser = await userDao.getUserById(client, memberId);
+    if (!existUser) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 존재하는 번개인지 확인
+    const existLight = await lightDao.getExistLight(client, lightId);
+    if (!existLight) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
+    }
+    if(data){
+      const is_entered = true;
+      return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, is_entered);
+    }
+    if(!data){
+      const is_entered = false;
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.EXIST_NOT_LIGHT_USER, is_entered);
+    }
+  } catch (error) {
+    throw new Error('lightService getEnterLightMember error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   addLight,
@@ -642,4 +673,5 @@ module.exports = {
   getNewLight,
   getHotLight,
   getSearchLight,
+  existLightUser,
 };
