@@ -1,4 +1,3 @@
-const { userDao } = require('.');
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const db = require('../loaders/db');
 
@@ -17,7 +16,7 @@ const getUserById = async (client, userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('userDao.getUserById에서 오류 발생: ' + error);
+    throw new Error('userDao.getUserById에서 오류 발생: \n' + error);
   }
 };
 
@@ -33,7 +32,7 @@ const getUserByUserLoginId = async (client, userLoginId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('userDao.getUserByLoginId에서 오류 발생: ' + error);
+    throw new Error('userDao.getUserByLoginId에서 오류 발생: \n' + error);
   }
 };
 
@@ -50,7 +49,7 @@ const getUserBySnsId = async (client, snsId, provider) => {
 
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('userDao.getUserBySnsId에서 오류 발생: ' + error);
+    throw new Error('userDao.getUserBySnsId에서 오류 발생: \n' + error);
   }
 };
 
@@ -67,7 +66,7 @@ const getUserByNickname = async (client, crewId, nickname) => {
 
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('userDao.getUserByNickname에서 오류 발생: ' + error);
+    throw new Error('userDao.getUserByNickname에서 오류 발생: \n' + error);
   }
 };
 
@@ -84,7 +83,7 @@ const updateUserMbti = async (client, userId, mbit) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('userDao.updateUserMbti에서 오류 발생: ' + error);
+    throw new Error('userDao.updateUserMbti에서 오류 발생: \n' + error);
   }
 };
 

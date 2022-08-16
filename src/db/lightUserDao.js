@@ -13,10 +13,10 @@ const postEnterLight = async (client, lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    throw new Error('lightUserdao.postEnterLight에서 에러 발생했습니다' + error);
+    throw new Error('lightUserdao.postEnterLight에서 에러 발생했습니다 \n' + error);
   }
 };
-const getEnterLightMember = async(client, lightId, memberId) => {
+const getEnterLightMember = async (client, lightId, memberId) => {
   try {
     const { rows } = await client.query(
       `
@@ -27,10 +27,10 @@ const getEnterLightMember = async(client, lightId, memberId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightUserdao.getEnterLightMember에서 에러 발생했습니다' + error);
+    throw new Error('lightUserdao.getEnterLightMember에서 에러 발생했습니다 \n' + error);
   }
 };
-const deleteCancelLight = async(client, lightId, memberId) => {
+const deleteCancelLight = async (client, lightId, memberId) => {
   try {
     await client.query(
       `
@@ -40,11 +40,11 @@ const deleteCancelLight = async(client, lightId, memberId) => {
       [lightId, memberId],
     );
   } catch (error) {
-    throw new Error('lightUserdao.deleteCancelLight에서 에러 발생했습니다' + error);
+    throw new Error('lightUserdao.deleteCancelLight에서 에러 발생했습니다 \n' + error);
   }
 };
 
-const deleteLightUser = async(client, lightId) => {
+const deleteLightUser = async (client, lightId) => {
   try {
     await client.query(
       `
@@ -54,13 +54,13 @@ const deleteLightUser = async(client, lightId) => {
       [lightId],
     );
   } catch (error) {
-    throw new Error('lightUserdao.deleteLightUser에서 에러 발생했습니다' + error);
+    throw new Error('lightUserdao.deleteLightUser에서 에러 발생했습니다 \n' + error);
   }
 };
 
 module.exports = {
-    postEnterLight,
-    getEnterLightMember,
-    deleteCancelLight,
-    deleteLightUser
+  postEnterLight,
+  getEnterLightMember,
+  deleteCancelLight,
+  deleteLightUser,
 };

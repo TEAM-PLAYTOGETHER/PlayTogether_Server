@@ -8,7 +8,7 @@ const { userService, crewService } = require('../service');
  * 유저 아이디로 유저 조회
  * @public
  */
-const getUserByUserId = async (req, res) => {
+const getUserByUserId = async (req, res, next) => {
   try {
     const { userLoginId } = req.params;
 
@@ -21,8 +21,7 @@ const getUserByUserId = async (req, res) => {
 
     return res.status(getUserByUserLoginId.status).json(getUserByUserLoginId);
   } catch (error) {
-    console.log('UserController getUserByUserId error 발생: ', error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('getUserByUserId Controller 에러: \n' + error));
   }
 };
 
@@ -31,7 +30,7 @@ const getUserByUserId = async (req, res) => {
  * 유저 mbti 추가
  * @private
  */
-const updateUserMbti = async (req, res) => {
+const updateUserMbti = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { mbti } = req.body;
@@ -50,8 +49,7 @@ const updateUserMbti = async (req, res) => {
 
     return res.status(updateUser.status).json(updateUser);
   } catch (error) {
-    console.log('UserController updateUserMbti error 발생: ', error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('updateUserMbti Controller 에러: \n' + error));
   }
 };
 
@@ -60,7 +58,7 @@ const updateUserMbti = async (req, res) => {
  * 유저 닉네임 중복확인
  * @public
  */
-const nicknameCheck = async (req, res) => {
+const nicknameCheck = async (req, res, next) => {
   try {
     const { crewId } = req.params;
     const { nickname } = req.query;
@@ -71,8 +69,7 @@ const nicknameCheck = async (req, res) => {
 
     return res.status(isUsedNickname.status).json(isUsedNickname);
   } catch (error) {
-    console.log('UserController updateUserMbti error 발생: ', error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('nicknameCheck Controller 에러: \n' + error));
   }
 };
 
@@ -81,7 +78,7 @@ const nicknameCheck = async (req, res) => {
  * 동아리 프로필 생성
  * @private
  */
-const updateUserProfile = async (req, res) => {
+const updateUserProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { crewId } = req.params;
@@ -99,8 +96,7 @@ const updateUserProfile = async (req, res) => {
     const profile = await crewService.updateCrewUserProfile(userId, crewId, nickname, description, firstStation, secondStation);
     return res.status(profile.status).json(profile);
   } catch (error) {
-    console.log('UserController updateUserProfile error 발생: ', error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('updateUserProfile Controller 에러: \n' + error));
   }
 };
 

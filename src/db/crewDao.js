@@ -20,7 +20,7 @@ const createCrew = async (client, name, code, masterId, description) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewDao.createCrew에서 오류 발생: ' + error);
+    throw new Error('crewDao.createCrew에서 오류 발생: \n' + error);
   }
 };
 
@@ -41,7 +41,7 @@ const getCreatedByUserCount = async (client, masterId) => {
     );
     return convertSnakeToCamel.keysToSnake(rows[0]);
   } catch (error) {
-    throw new Error('crewDao.getCreatedByUserCount에서 오류 발생: ' + error);
+    throw new Error('crewDao.getCreatedByUserCount에서 오류 발생: \n' + error);
   }
 };
 
@@ -62,7 +62,7 @@ const getCrewByCode = async (client, code) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewDao.getCrewByCode에서 오류 발생: ' + error);
+    throw new Error('crewDao.getCrewByCode에서 오류 발생: \n' + error);
   }
 };
 
@@ -82,7 +82,7 @@ const getAllCrewCode = async (client) => {
 
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('crewDao.getAllCrewCode에서 오류 발생: ' + error);
+    throw new Error('crewDao.getAllCrewCode에서 오류 발생: \n' + error);
   }
 };
 
@@ -103,7 +103,7 @@ const deleteCrewByCrewId = async (client, crewId) => {
     );
     return rowCount;
   } catch (error) {
-    throw new Error('crewDao.deleteCrewByCrewId에서 오류 발생: ' + error);
+    throw new Error('crewDao.deleteCrewByCrewId에서 오류 발생: \n' + error);
   }
 };
 
@@ -124,7 +124,7 @@ const getExistCrew = async (client, crewId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('crewDao.getExistCrew에서 오류 발생: ' + error);
+    throw new Error('crewDao.getExistCrew에서 오류 발생: \n' + error);
   }
 };
 

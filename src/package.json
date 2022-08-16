@@ -4,7 +4,7 @@
   "description": "⚡ 플투 서버 ⚡️",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon index.js --delay 1",
+    "dev": "cross-env NODE_ENV=development nodemon --trace-warnings index.js --delay 1",
     "lint": "eslint ."
   },
   "repository": {
@@ -33,6 +33,7 @@
     "firebase-admin": "^11.0.1",
     "helmet": "^5.0.2",
     "hpp": "^0.2.3",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.3",
     "multer": "^1.4.4",
@@ -45,7 +46,8 @@
     "pg": "^8.7.3",
     "redis": "^4.1.0",
     "release": "^6.3.1",
-    "session-file-store": "^1.5.0"
+    "session-file-store": "^1.5.0",
+    "socket.io": "^4.5.1"
   },
   "devDependencies": {
     "eslint": "^8.13.0",

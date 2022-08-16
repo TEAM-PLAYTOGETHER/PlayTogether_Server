@@ -9,7 +9,7 @@ const responseMessage = require('../constants/responseMessage');
  * 상대방과 대화를 나눈 방 번호를 조회 또는 생성
  * @private
  */
-const getRoomIdByUserId = async (req, res) => {
+const getRoomIdByUserId = async (req, res, next) => {
   try {
     const sendId = Number(req.user.id);
     const recvId = Number(req.query.recvId);
@@ -29,8 +29,7 @@ const getRoomIdByUserId = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ' + error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('getRoomIdByUserId Controller 에러: \n' + error));
   }
 };
 
@@ -39,7 +38,7 @@ const getRoomIdByUserId = async (req, res) => {
  * 메시지 전송
  * @private
  */
-const sendMessage = async (req, res) => {
+const sendMessage = async (req, res, next) => {
   try {
     const sendId = req.user.id;
     const { recvId, content } = req.body;
@@ -64,8 +63,7 @@ const sendMessage = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ' + error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('sendMessage Controller 에러: \n' + error));
   }
 };
 
@@ -74,13 +72,12 @@ const sendMessage = async (req, res) => {
  * 유저가 최근에 받은 모든 쪽지 리스트 조회
  * @private
  */
-const getAllMessageById = async (req, res) => {
+const getAllMessageById = async (req, res, next) => {
   try {
     const result = await messageService.getAllMessageById(req.user.id);
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ' + error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('getAllMessageById Controller 에러: \n' + error));
   }
 };
 
@@ -89,7 +86,7 @@ const getAllMessageById = async (req, res) => {
  * 톡방 메시지 읽어오기
  * @private
  */
-const getAllMessageByRoomId = async (req, res) => {
+const getAllMessageByRoomId = async (req, res, next) => {
   try {
     const { roomId } = req.params;
     const userId = Number(req.user.id);
@@ -102,8 +99,7 @@ const getAllMessageByRoomId = async (req, res) => {
 
     return res.status(result.status).json(result);
   } catch (error) {
-    console.log('sendMessage Controller 에러: ' + error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('getAllMessageByRoomId Controller 에러: \n' + error));
   }
 };
 

@@ -31,9 +31,8 @@ const createUser = async (userLoginId, password, userName, gender, birth) => {
 
     return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
   } catch (error) {
-    console.log('authService createUser에서 error 발생: ' + error);
     await client.query('ROLLBACK');
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('authService createUser에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -52,9 +51,8 @@ const createSnsUser = async (snsId, email, provider, name) => {
 
     return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
   } catch (error) {
-    console.log('authService createSnsUser에서 error 발생: ' + error);
     await client.query('ROLLBACK');
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('authService createSnsUser에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -89,8 +87,7 @@ const login = async (userLoginId, password) => {
 
     return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userLoginId: isUser.userLoginId, userName: isUser.name, accessToken: accessToken, refreshToken: refreshToken });
   } catch (error) {
-    console.log('authService login에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('authService login에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -111,8 +108,7 @@ const isUser = async (userLoginId) => {
 
     return util.success(statusCode.OK, responseMessage.USEABLE_ID, { isUser: false });
   } catch (error) {
-    console.log('authService isUser에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('authService isUser에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -130,8 +126,7 @@ const isSnsUser = async (snsId, provider) => {
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, userExist);
   } catch (error) {
-    console.log('authService isSnsUser에서 error 발생: ' + error);
-    return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR);
+    throw new Error('authService isSnsUser에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
