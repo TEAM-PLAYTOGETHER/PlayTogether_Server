@@ -58,9 +58,24 @@ const getLightScrapMember = async (client, lightId, memberId) => {
     throw new Error('ScrapDao.getLightScrapMember 에러 발생했습니다 \n' + error);
   }
 };
+const existLightScrap = async (client, lightId, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select id from scrap
+      where light_id = $1 and member_id = $2
+      `,
+      [lightId, userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('existLightScrap.existLightUser에서 에러 발생했습니다 \n' + error);
+  }
+};
 module.exports = {
   addLightScrap,
   deleteLightScrap,
   getLightScrap,
   getLightScrapMember,
+  existLightScrap
 };
