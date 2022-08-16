@@ -164,7 +164,7 @@ const getCategoryLight = async (req, res, next) => {
 const getLightDetail = async (req, res, next) => {
   const { lightId } = req.params;
 
-  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
 
   try {
     const lights = await lightService.getLightDetail(lightId);
@@ -225,6 +225,22 @@ const getSearchLight = async (req, res, next) => {
     return next(new Error('getSearchLight Controller 에러: \n' + error));
   }
 };
+const ExistLightUser = async (req, res, next) => {
+  const memberId = req.user.id;
+  const { lightId } = req.params;
+
+  if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
+
+  try {
+    const lights = await lightService.existLightUser(lightId, memberId);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('existLightUser Controller 에러: \n' + error));
+  }
+};
 
 module.exports = {
   addLight,
@@ -239,4 +255,5 @@ module.exports = {
   getNewLight,
   getHotLight,
   getSearchLight,
+  ExistLightUser
 };
