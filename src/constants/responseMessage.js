@@ -84,4 +84,7 @@ module.exports = {
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
   SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.',
   NO_SCRAP: '스크랩 한적이 없습니다.',
+  EXIST_SCRAP_LIGHT: '해당 번개를 찜하는 중입니다.',
+  EXIST_NOT_SCRAP_LIGHT: '해당 번개를 찜하는 중이 아닙니다.',
+  
 };
