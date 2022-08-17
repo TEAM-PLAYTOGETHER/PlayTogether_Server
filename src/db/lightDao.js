@@ -14,7 +14,7 @@ const addLight = async (client, category, title, date, place, people_cnt, descri
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightdao.addLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.addLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const addLightOrganizer = async (client, organizerId) => {
@@ -29,7 +29,7 @@ const addLightOrganizer = async (client, organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightdao.addLightOrganizer에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.addLightOrganizer에서 에러 발생했습니다 \n' + error);
   }
 };
 
@@ -58,7 +58,7 @@ const putLight = async (client, lightId, organizerId, category, title, date, pla
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.putLight에서 에러 발생했습니다 \n' + error);
   }
 };
 
@@ -72,12 +72,11 @@ const deleteLight = async (client, lightId, organizerId) => {
       [lightId, organizerId],
     );
   } catch (error) {
-    throw new Error('lightdao.deleteLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.deleteLight에서 에러 발생했습니다 \n' + error);
   }
 };
 
 const getOrganizerLight = async (client, organizerId, offset, limit) => {
-
   try {
     const { rows } = await client.query(
       `
@@ -92,7 +91,7 @@ const getOrganizerLight = async (client, organizerId, offset, limit) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getOrganizerLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getOrganizerLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getEnterLight = async (client, memberId, offset, limit) => {
@@ -114,7 +113,7 @@ const getEnterLight = async (client, memberId, offset, limit) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getEnterLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getEnterLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getScrapLight = async (client, memberId, offset, limit) => {
@@ -136,7 +135,7 @@ const getScrapLight = async (client, memberId, offset, limit) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getScrapLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getScrapLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getCategoryLight = async (client, category, sort, offset, limit) => {
@@ -156,7 +155,7 @@ const getCategoryLight = async (client, category, sort, offset, limit) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getLightDetail = async (client, lightId) => {
@@ -172,7 +171,7 @@ const getLightDetail = async (client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getLightDetail에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightDetail에서 에러 발생했습니다 \n' + error);
   }
 };
 const getLightDetailMember = async (client, lightId) => {
@@ -188,7 +187,7 @@ const getLightDetailMember = async (client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getLightDetailMember에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightDetailMember에서 에러 발생했습니다 \n' + error);
   }
 };
 const getLightDetailOrganizer = async (client, lightId) => {
@@ -203,7 +202,7 @@ const getLightDetailOrganizer = async (client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getLightDetailOrganizer에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightDetailOrganizer에서 에러 발생했습니다 \n' + error);
   }
 };
 const getLightOrganizerById = async (client, lightId, organizerId) => {
@@ -217,7 +216,7 @@ const getLightOrganizerById = async (client, lightId, organizerId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightdao.getLightOrganizerById에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getLightOrganizerById에서 에러 발생했습니다 \n' + error);
   }
 };
 const getExistLight = async (client, lightId) => {
@@ -231,7 +230,7 @@ const getExistLight = async (client, lightId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('lightdao.getExistLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getExistLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getNewLight = async (client) => {
@@ -247,7 +246,7 @@ const getNewLight = async (client) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getNewLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getNewLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getHotLight = async (client) => {
@@ -264,7 +263,7 @@ const getHotLight = async (client) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getHotLight에서 에러 발생했습니다' + error);
+    throw new Error('lightdao.getHotLight에서 에러 발생했습니다 \n' + error);
   }
 };
 const getSearchLightUseCategory = async (client, search, category, offset, limit) => {
@@ -278,11 +277,11 @@ const getSearchLightUseCategory = async (client, search, category, offset, limit
       offset $3
       limit $4;
       `,
-      [search, category, offset, limit]
+      [search, category, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getSearchLightUseCategory 에러 발생했습니다' + error);
+    throw new Error('lightdao.getSearchLightUseCategory 에러 발생했습니다 \n' + error);
   }
 };
 const getSearchLightNotCategory = async (client, search, offset, limit) => {
@@ -296,14 +295,13 @@ const getSearchLightNotCategory = async (client, search, offset, limit) => {
       offset $2
       limit $3;
       `,
-      [search, offset, limit]
+      [search, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('lightdao.getSearchLightNotCategory 에러 발생했습니다' + error);
+    throw new Error('lightdao.getSearchLightNotCategory 에러 발생했습니다 \n' + error);
   }
 };
-
 
 module.exports = {
   addLight,
@@ -322,5 +320,5 @@ module.exports = {
   getNewLight,
   getHotLight,
   getSearchLightUseCategory,
-  getSearchLightNotCategory
+  getSearchLightNotCategory,
 };

@@ -3,7 +3,7 @@ const statusCode = require('../constants/statusCode');
 const util = require('../lib/util');
 const { authService } = require('../service');
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { userLoginId, password } = req.body;
 
@@ -16,12 +16,11 @@ const login = async (req, res) => {
 
     return res.status(login.status).json(login);
   } catch (error) {
-    console.log('AuthController login error 발생: ', error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('AuthController login error 발생: \n' + error));
   }
 };
 
-const signup = async (req, res) => {
+const signup = async (req, res, next) => {
   try {
     const { userLoginId, password, userName, gender, birth } = req.body;
 
@@ -40,12 +39,11 @@ const signup = async (req, res) => {
 
     return res.status(newUser.status).json(newUser);
   } catch (error) {
-    console.log('AuthController signup error 발생: ', error);
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('AuthController signup error 발생: \n' + error));
   }
 };
 
-const isUser = async (req, res) => {
+const isUser = async (req, res, next) => {
   try {
     const { userLoginId } = req.body;
 
@@ -58,11 +56,11 @@ const isUser = async (req, res) => {
 
     return res.status(userExist.status).json(userExist);
   } catch (error) {
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('AuthController isUser error 발생: \n' + error));
   }
 };
 
-const refresh = async (req, res) => {
+const refresh = async (req, res, next) => {
   try {
     const user = req.user;
     const authToken = req.headers.authorization;
@@ -72,7 +70,7 @@ const refresh = async (req, res) => {
 
     return res.status(refresh.status).json(refresh);
   } catch (error) {
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+    return next(new Error('AuthController refresh error 발생: \n' + error));
   }
 };
 

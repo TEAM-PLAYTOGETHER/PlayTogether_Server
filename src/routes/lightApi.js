@@ -17,5 +17,6 @@ router.get('/search', authMiddleware, lightController.getSearchLight);
 router.get('/hot', authMiddleware, lightController.getHotLight);
 router.get('/', lightController.getCategoryLight);
 router.get('/:lightId', lightController.getLightDetail);
+router.get('/exist/:lightId', authMiddleware, lightController.ExistLightUser);
 
 module.exports = router;

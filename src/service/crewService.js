@@ -59,8 +59,8 @@ const createCrew = async (name, masterId, description) => {
 
     return util.success(statusCode.OK, responseMessage.CREW_CREATE_SUCCESS, castedCreatedCrew);
   } catch (error) {
-    console.log('createCrew error 발생: ' + error);
     await client.query('ROLLBACK');
+    throw new Error('crewService createCrew error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -106,8 +106,8 @@ const registerMember = async (userId, crewCode) => {
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
   } catch (error) {
-    console.log('registerMember에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
+    throw new Error('crewService registerMember에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -138,8 +138,8 @@ const updateCrewUserProfile = async (userId, crewId, nickname, description, firs
 
     return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
   } catch (error) {
-    console.log('updateCrewUserProfile에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
+    throw new Error('crewService updateCrewUserProfile에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -168,7 +168,7 @@ const getAllCrewByUserId = async (userId) => {
 
     return util.success(statusCode.OK, responseMessage.READ_REGISTER_INFO_SUCCESS, { list: castedCrews });
   } catch (error) {
-    console.log('getAllCrewByUserId에서 오류 발생: ' + error);
+    throw new Error('crewService getAllCrewByUserId에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -208,8 +208,8 @@ const deleteCrewByCrewId = async (userId, crewCode) => {
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_DELETE_SUCCESS);
   } catch (error) {
-    console.log('deleteCrewByCrewId에서 오류 발생: ' + error);
     await client.query('ROLLBACK');
+    throw new Error('crewService deleteCrewByCrewId에서 error 발생: \n' + error);
   } finally {
     client.release();
   }

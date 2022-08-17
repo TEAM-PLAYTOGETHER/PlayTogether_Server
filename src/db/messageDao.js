@@ -20,7 +20,7 @@ const getRoom = async (client, sendId, recvId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('messageDao.getRoom에서 오류 발생: ' + error);
+    throw new Error('messageDao.getRoom에서 오류 발생: \n' + error);
   }
 };
 
@@ -42,7 +42,7 @@ const getRoomByRoomId = async (client, roomId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('messageDao.getRoom에서 오류 발생: ' + error);
+    throw new Error('messageDao.getRoom에서 오류 발생: \n' + error);
   }
 };
 
@@ -65,7 +65,7 @@ const createRoom = async (client, sendId, recvId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('messageDao.createRoom에서 오류 발생: ' + error);
+    throw new Error('messageDao.createRoom에서 오류 발생: \n' + error);
   }
 };
 
@@ -89,7 +89,7 @@ const sendMessage = async (client, roomId, sendId, recvId, content) => {
     );
     return rowCount;
   } catch (error) {
-    throw new Error('messageDao.sendMessage에서 오류 발생: ' + error);
+    throw new Error('messageDao.sendMessage에서 오류 발생: \n' + error);
   }
 };
 
@@ -135,7 +135,7 @@ const getAllMessageById = async (client, userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('messageDao.getAllMessageById에서 오류 발생: ' + error);
+    throw new Error('messageDao.getAllMessageById에서 오류 발생: \n' + error);
   }
 };
 
@@ -160,7 +160,7 @@ const getAllMessageByRoomId = async (client, roomId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
-    throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: ' + error);
+    throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: \n' + error);
   }
 };
 
@@ -183,7 +183,7 @@ const readAllMessage = async (client, roomId, userId) => {
     );
     return rowCount;
   } catch (error) {
-    throw new Error('messageDao.readAllMessage에서 오류 발생: ' + error);
+    throw new Error('messageDao.readAllMessage에서 오류 발생: \n' + error);
   }
 };
 
