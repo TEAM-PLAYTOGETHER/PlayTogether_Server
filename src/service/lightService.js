@@ -632,7 +632,6 @@ const existLightUser = async (lightId, memberId) => {
   const log = `lightService.existLightUser | lightId = ${lightId}, memberId = ${memberId}`;
   try {
     client = await db.connect(log);
-    const data = await lightUserDao.existLightUser(client, lightId, memberId);
     // 존재하는 유저인지 확인
     const existUser = await userDao.getUserById(client, memberId);
     if (!existUser) {
@@ -643,14 +642,26 @@ const existLightUser = async (lightId, memberId) => {
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
-    if(data){
+    // 본인이 그 번개의 소유자인지 확인
+    const is_organizer = await lightDao.IsLightOrganizer(client, lightId, memberId);
+    // 본인이 참여한 번개인지 확인
+    const is_entered = await lightUserDao.existLightUser(client, lightId, memberId);
+    if(is_entered && is_organizer){
+      const is_organizer = true;
       const is_entered = true;
-      return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, is_entered);
+      return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
     }
-    if(!data){
+    if(!is_entered && !is_organizer){
+      const is_organizer = false;
       const is_entered = false;
-      return util.fail(statusCode.BAD_REQUEST, responseMessage.EXIST_NOT_LIGHT_USER, is_entered);
+      return util.success(statusCode.OK, responseMessage.EXIST_NOT_LIGHT_USER, { is_entered, is_organizer });
     }
+    if(is_entered && !is_organizer){
+      const is_organizer = false;
+      const is_entered = true;
+      return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
+    }
+    
   } catch (error) {
     throw new Error('lightService getEnterLightMember error 발생: \n' + error);
   } finally {
