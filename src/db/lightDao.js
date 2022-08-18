@@ -302,6 +302,20 @@ const getSearchLightNotCategory = async (client, search, offset, limit) => {
     throw new Error('lightdao.getSearchLightNotCategory 에러 발생했습니다 \n' + error);
   }
 };
+const IsLightOrganizer = async (client, lightId, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select l.id from light l
+      where l.id = $1 and l.organizer_id = $2
+      `,
+      [lightId, userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('lightdao.IsLightOrganizer 에러 발생했습니다 \n' + error);
+  }
+};
 
 module.exports = {
   addLight,
@@ -321,4 +335,5 @@ module.exports = {
   getHotLight,
   getSearchLightUseCategory,
   getSearchLightNotCategory,
+  IsLightOrganizer
 };
