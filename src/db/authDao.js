@@ -35,10 +35,27 @@ const createSnsUser = async (client, snsId, email, provider, name) => {
 // READ
 
 // UPDATE
+const updateFcmToken = async (client, snsId, fcmToken) => {
+  try {
+    const { rows } = await client.query(
+      `
+      UPDATE "user"
+      SET device_token = $1
+      WHERE sns_id = $2
+      RETURNING *
+      `,
+      [fcmToken, snsId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('authDao.updateFcmToken에서 오류 발생: \n' + error);
+  }
+};
 
 // DELETE
 
 module.exports = {
   createUser,
   createSnsUser,
+  updateFcmToken,
 };

@@ -8,36 +8,6 @@ const jwt = require('jsonwebtoken');
 const redisClient = require('../lib/redis');
 const db = require('../loaders/db');
 
-const createUser = async (userLoginId, password, userName, gender, birth) => {
-  let client;
-  const log = `authService.createUser | userLoginId = ${userLoginId}, password = ${password}, userName = ${userName}, gender = ${gender}, birth = ${birth}`;
-
-  try {
-    client = await db.connect(log);
-    await client.query('BEGIN');
-
-    // 이미 존재하는 유저인지 확인
-    const isUser = await userDao.getUserByUserLoginId(client, userLoginId);
-
-    if (isUser) {
-      return util.fail(statusCode.CONFLICT, responseMessage.ALREADY_USER_ID);
-    }
-
-    // bcrypt를 이용한 비밀번호 암호화
-    const encryptedPassword = bcrypt.hashSync(password, 10);
-
-    const newUser = await authDao.createUser(client, userLoginId, encryptedPassword, userName, gender, birth);
-    await client.query('COMMIT');
-
-    return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw new Error('authService createUser에서 error 발생: \n' + error);
-  } finally {
-    client.release();
-  }
-};
-
 const createSnsUser = async (snsId, email, provider, name) => {
   let client;
   const log = `authService.createSnsUser | snsId = ${snsId}, email = ${email}, provider = ${provider}, name = ${name}`;
@@ -58,36 +28,32 @@ const createSnsUser = async (snsId, email, provider, name) => {
   }
 };
 
-const login = async (userLoginId, password) => {
+const snsLogin = async (snsId, email, provider, name) => {
   let client;
-  const log = `authService.login | userLoginId = ${userLoginId}`;
+  const log = `authService.snsLogin | userSnsId = ${snsId}`;
+  let user;
 
   try {
     client = await db.connect(log);
+    await client.query('BEGIN');
 
-    // 유저가 존재하는지 확인
-    const isUser = await userDao.getUserByUserLoginId(client, userLoginId);
+    // 정상적으로 등록된 유저인지 확인
+    user = await userDao.getUserBySnsId(client, snsId);
 
-    if (!isUser) {
-      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER);
+    if (!user) {
+      user = await authDao.createSnsUser(client, snsId, email, provider, name);
     }
 
-    // bcrypt로 암호화된 비밀번호 비교
-    const passwordCheck = bcrypt.compareSync(password, isUser.password);
-
-    if (!passwordCheck) {
-      return util.fail(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PW);
-    }
-
-    // jwt 토큰 생성
-    const accessToken = jwtUtil.sign(isUser);
+    const accessToken = jwtUtil.sign(user);
     const refreshToken = jwtUtil.refresh();
 
-    redisClient.set(isUser.id, refreshToken);
+    redisClient.set(user.id, refreshToken);
+    await client.query('COMMIT');
 
-    return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userLoginId: isUser.userLoginId, userName: isUser.name, accessToken: accessToken, refreshToken: refreshToken });
+    return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userName: isSnsUser.name, accessToken: accessToken, refreshToken: refreshToken });
   } catch (error) {
-    throw new Error('authService login에서 error 발생: \n' + error);
+    await client.query('ROLLBACK');
+    throw new Error('authService snsLogin에서 error 발생: \n', error);
   } finally {
     client.release();
   }
@@ -114,19 +80,39 @@ const isUser = async (userLoginId) => {
   }
 };
 
-const isSnsUser = async (snsId, provider) => {
+const isSnsUser = async (snsId) => {
   let client;
   const log = `authService.isSnsUser | snsId = ${snsId}`;
 
   try {
     client = await db.connect(log);
 
-    const userExist = await userDao.getUserBySnsId(client, snsId, provider);
+    const userExist = await userDao.getUserBySnsId(client, snsId);
     if (!userExist) null;
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, userExist);
   } catch (error) {
     throw new Error('authService isSnsUser에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
+const updateFcmToken = async (snsId, fcmToken) => {
+  let client;
+  const log = `authService.saveFcmToken | snsId = ${snsId}, fcmToken = ${fcmToken}`;
+
+  try {
+    client = await db.connect(log);
+
+    const saveFcmToken = await authDao.updateFcmToken(client, snsId, fcmToken);
+    if (!saveFcmToken) {
+      return util.fail(statusCode.DB_ERROR, responseMessage.DB_ERROR);
+    }
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_DEVICE_TOKEN_SUCCESS);
+  } catch (error) {
+    throw new Error('authService saveFcmToken에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -168,10 +154,10 @@ const refresh = async (user, authToken, refreshToken) => {
 };
 
 module.exports = {
-  createUser,
   createSnsUser,
-  login,
+  snsLogin,
   isUser,
   isSnsUser,
+  updateFcmToken,
   refresh,
 };
