@@ -321,7 +321,125 @@ const IsLightOrganizer = async (client, lightId, userId) => {
     throw new Error('lightdao.IsLightOrganizer 에러 발생했습니다 \n' + error);
   }
 };
+const getSearchLightUseCategoryInMyEnterLight = async (client, search, category, crewId,memberId, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      inner join light_user lu on l.id = lu.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2 and l.crew_id = $3
+      and lu.member_id = $4
+      offset $5
+      limit $6;
+      `,
+      [search, category, crewId, memberId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLightUseCategoryInMyEnterLight 에러 발생했습니다 \n' + error);
+  }
+};
+const getSearchLightNotCategoryInMyEnterLight = async (client, search, crewId, memberId, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      inner join light_user lu on l.id = lu.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and l.crew_id = $2
+      and lu.member_id = $3
+      offset $4
+      limit $5;
+      `,
+      [search, crewId, memberId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLightNotCategoryInMyEnterLight 에러 발생했습니다 \n' + error);
+  }
+};
+const getSearchLightUseCategoryInMyScrapLight = async (client, search, category, crewId,memberId, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      inner join scrap s on l.id = s.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2 and l.crew_id = $3
+      and s.member_id = $4
+      offset $5
+      limit $6;
+      `,
+      [search, category, crewId, memberId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLightUseCategoryInMyScrapLight 에러 발생했습니다 \n' + error);
+  }
+};
+const getSearchLightNotCategoryInMyScrapLight = async (client, search, crewId, memberId, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      inner join scrap s on l.id = s.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and l.crew_id = $2
+      and s.member_id = $3
+      offset $4
+      limit $5;
+      `,
+      [search, crewId, memberId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLightNotCategoryInMyScrapLight 에러 발생했습니다 \n' + error);
+  }
+};
+const getSearchLightUseCategoryInMyOpenLight = async (client, search, category, crewId,memberId, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and category = $2 and l.crew_id = $3
+      and l.organizer_id = $4
+      offset $5
+      limit $6;
+      `,
+      [search, category, crewId, memberId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLightUseCategoryInMyOpenLight 에러 발생했습니다 \n' + error);
+  }
+};
 
+const getSearchLightNotCategoryInMyOpenLight = async (client, search, crewId, memberId, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `            
+      select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and l.crew_id = $2
+      and l.organizer_id = $3
+      offset $4
+      limit $5;
+      `,
+      [search, crewId, memberId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getSearchLightNotCategoryInMyOpenLight 에러 발생했습니다 \n' + error);
+  }
+};
 module.exports = {
   addLight,
   putLight,
@@ -340,5 +458,12 @@ module.exports = {
   getHotLight,
   getSearchLightUseCategory,
   getSearchLightNotCategory,
-  IsLightOrganizer
+  IsLightOrganizer,
+  getSearchLightUseCategoryInMyEnterLight,
+  getSearchLightNotCategoryInMyEnterLight,
+  getSearchLightUseCategoryInMyScrapLight,
+  getSearchLightNotCategoryInMyScrapLight,
+  getSearchLightUseCategoryInMyOpenLight,
+  getSearchLightNotCategoryInMyOpenLight
+
 };

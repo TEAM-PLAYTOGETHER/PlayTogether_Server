@@ -248,6 +248,87 @@ const ExistLightUser = async (req, res, next) => {
     return next(new Error('existLightUser Controller 에러: \n' + error));
   }
 };
+const getSearchMyEnterLight = async (req, res, next) => {
+  const memberId = req.user.id;
+  const { crewId } = req.params;
+  const search = req.query.search;
+  const category = req.query.category;
+
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize);
+  let limit = Number(pageSize);
+
+  if (!memberId) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  if (search.length < 2) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_TWO_SEARCH_QUERY));
+  }
+  try {
+    const lights = await lightService.getSearchMyEnterLight(memberId, crewId, search, category, offset, limit);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('getSearchLight Controller 에러: \n' + error));
+  }
+};
+const getSearchMyScrapLight = async (req, res, next) => {
+  const memberId = req.user.id;
+  const { crewId } = req.params;
+  const search = req.query.search;
+  const category = req.query.category;
+
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize);
+  let limit = Number(pageSize);
+
+  if (!memberId) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  if (search.length < 2) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_TWO_SEARCH_QUERY));
+  }
+  try {
+    const lights = await lightService.getSearchMyScrapLight(memberId, crewId, search, category, offset, limit);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('getSearchLight Controller 에러: \n' + error));
+  }
+};
+const getSearchMyOpenLight = async (req, res, next) => {
+  const memberId = req.user.id;
+  const { crewId } = req.params;
+  const search = req.query.search;
+  const category = req.query.category;
+
+  var curpage = req.query.curpage || 1;
+  var pageSize = req.query.pageSize || 5;
+
+  let offset = (curpage - 1) * Number(pageSize);
+  let limit = Number(pageSize);
+
+  if (!memberId) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  if (search.length < 2) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_TWO_SEARCH_QUERY));
+  }
+  try {
+    const lights = await lightService.getSearchMyOpenLight(memberId, crewId, search, category, offset, limit);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('getSearchLight Controller 에러: \n' + error));
+  }
+};
 
 module.exports = {
   addLight,
@@ -262,5 +343,8 @@ module.exports = {
   getNewLight,
   getHotLight,
   getSearchLight,
-  ExistLightUser
+  ExistLightUser,
+  getSearchMyEnterLight,
+  getSearchMyScrapLight,
+  getSearchMyOpenLight
 };
