@@ -36,15 +36,15 @@ const getUserByUserLoginId = async (client, userLoginId) => {
   }
 };
 
-const getUserBySnsId = async (client, snsId, provider) => {
+const getUserBySnsId = async (client, snsId) => {
   try {
     const { rows } = await client.query(
       `
       SELECT *
       FROM "user"
-      WHERE sns_id = $1 AND provider = $2
+      WHERE sns_id = $1
       `,
-      [snsId, provider],
+      [snsId],
     );
 
     return convertSnakeToCamel.keysToCamel(rows[0]);

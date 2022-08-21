@@ -12,7 +12,7 @@ module.exports = () => {
         passReqToCallback: true,
       },
       async (req, accessToken, refreshToken, profile, done) => {
-        console.log('google profile', profile);
+        console.log(accessToken);
         try {
           const existUser = await authService.isSnsUser(profile.id, 'google');
 

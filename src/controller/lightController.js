@@ -83,6 +83,7 @@ const deleteLight = async (req, res, next) => {
 };
 const getOrganizerLight = async (req, res, next) => {
   const organizerId = req.user.id;
+  const { crewId } = req.params;
   var curpage = req.query.curpage || 1;
   var pageSize = req.query.pageSize || 5;
 
@@ -92,7 +93,7 @@ const getOrganizerLight = async (req, res, next) => {
   if (!organizerId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getOrganizerLight(organizerId, offset, limit);
+    const lights = await lightService.getOrganizerLight(organizerId, crewId, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -101,6 +102,7 @@ const getOrganizerLight = async (req, res, next) => {
 };
 const getEnterLight = async (req, res, next) => {
   const memberId = req.user.id;
+  const { crewId } = req.params;
 
   var curpage = req.query.curpage || 1;
   var pageSize = req.query.pageSize || 5;
@@ -111,7 +113,7 @@ const getEnterLight = async (req, res, next) => {
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getEnterLight(memberId, offset, limit);
+    const lights = await lightService.getEnterLight(memberId, crewId, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -120,6 +122,7 @@ const getEnterLight = async (req, res, next) => {
 };
 const getScrapLight = async (req, res, next) => {
   const memberId = req.user.id;
+  const { crewId } = req.params;
 
   var curpage = req.query.curpage || 1;
   var pageSize = req.query.pageSize || 5;
@@ -130,7 +133,7 @@ const getScrapLight = async (req, res, next) => {
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getScrapLight(memberId, offset, limit);
+    const lights = await lightService.getScrapLight(memberId, crewId, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -138,6 +141,7 @@ const getScrapLight = async (req, res, next) => {
   }
 };
 const getCategoryLight = async (req, res, next) => {
+  const { crewId } = req.params;
   const category = req.query.category;
   const sort = req.query.sort;
 
@@ -155,7 +159,7 @@ const getCategoryLight = async (req, res, next) => {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_SORT_VALUE));
   }
   try {
-    const lights = await lightService.getCategoryLight(category, sort, offset, limit);
+    const lights = await lightService.getCategoryLight(crewId, category, sort, offset, limit);
     return res.status(lights.status).json(lights);
   } catch (error) {
     return next(new Error('getCategoryLight Controller 에러: \n' + error));
@@ -176,10 +180,11 @@ const getLightDetail = async (req, res, next) => {
 };
 const getNewLight = async (req, res, next) => {
   const memberId = req.user.id;
+  const { crewId } = req.params;
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getNewLight(memberId);
+    const lights = await lightService.getNewLight(memberId, crewId);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -188,10 +193,11 @@ const getNewLight = async (req, res, next) => {
 };
 const getHotLight = async (req, res, next) => {
   const memberId = req.user.id;
+  const { crewId } = req.params;
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const lights = await lightService.getHotLight(memberId);
+    const lights = await lightService.getHotLight(memberId, crewId);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
@@ -201,6 +207,7 @@ const getHotLight = async (req, res, next) => {
 
 const getSearchLight = async (req, res, next) => {
   const memberId = req.user.id;
+  const { crewId } = req.params;
   const search = req.query.search;
   const category = req.query.category;
 
@@ -218,7 +225,7 @@ const getSearchLight = async (req, res, next) => {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_TWO_SEARCH_QUERY));
   }
   try {
-    const lights = await lightService.getSearchLight(memberId, search, category, offset, limit);
+    const lights = await lightService.getSearchLight(memberId, crewId, search, category, offset, limit);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
