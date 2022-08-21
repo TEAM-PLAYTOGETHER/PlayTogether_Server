@@ -705,7 +705,259 @@ const existLightUser = async (lightId, memberId) => {
     client.release();
   }
 };
+const getSearchMyEnterLight = async (memberId, crewId, search, category, offset, limit) => {
+  let client;
 
+  const log = `lightService.getSearchMyEnterLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, memberId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+
+    if (category) {
+      const result = await lightDao.getSearchLightUseCategoryInMyEnterLight(client, search, category,crewId, memberId,  offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_MY_ENTER_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
+    if (!category) {
+      const result = await lightDao.getSearchLightNotCategoryInMyEnterLight(client, search, crewId, memberId,offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_MY_ENTER_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('lightService getSearchMyEnterLight error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+const getSearchMyScrapLight = async (memberId, crewId, search, category, offset, limit) => {
+  let client;
+
+  const log = `lightService.getSearchMyScrapLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, memberId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+
+    if (category) {
+      const result = await lightDao.getSearchLightUseCategoryInMyScrapLight(client, search, category,crewId, memberId,  offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_MY_SCARP_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
+    if (!category) {
+      const result = await lightDao.getSearchLightNotCategoryInMyScrapLight(client, search, crewId, memberId,offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_MY_SCARP_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('lightService getSearchMyScrapLight error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
+const getSearchMyOpenLight = async (memberId, crewId, search, category, offset, limit) => {
+  let client;
+
+  const log = `lightService.getSearchMyOpenLight | memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, memberId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+
+    if (category) {
+      const result = await lightDao.getSearchLightUseCategoryInMyOpenLight(client, search, category,crewId, memberId,  offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_MY_OPEN_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
+    if (!category) {
+      const result = await lightDao.getSearchLightNotCategoryInMyOpenLight(client, search, crewId, memberId,offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: Number(light.scpCnt),
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_MY_OPEN_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('lightService getSearchMyOpenLight error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 module.exports = {
   addLight,
   putLight,
@@ -722,4 +974,7 @@ module.exports = {
   getHotLight,
   getSearchLight,
   existLightUser,
+  getSearchMyEnterLight,
+  getSearchMyScrapLight,
+  getSearchMyOpenLight
 };
