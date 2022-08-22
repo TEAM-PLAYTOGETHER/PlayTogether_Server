@@ -6,6 +6,16 @@ const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
 const { userDao } = require('../db');
 
+const getUserIdByToken = (accessToken) => {
+  try {
+    const decoded = jwt.verify(accessToken, config.jwt.secret);
+
+    return decoded.id;
+  } catch (e) {
+    return null;
+  }
+};
+
 const authMiddleware = async (req, res, next) => {
   let client;
   const log = `authMiddleware`;
@@ -17,8 +27,8 @@ const authMiddleware = async (req, res, next) => {
   try {
     client = await db.connect(log);
     const token = req.headers.authorization;
-    const decoded = jwt.verify(token, config.jwt.secret);
-    const user = await userDao.getUserById(client, decoded.id);
+    const userId = getUserIdByToken(token);
+    const user = await userDao.getUserById(client, userId);
 
     // decoded된 userId가 가르키는 회원이 없는 경우
     if (!user) {
@@ -40,5 +50,6 @@ const authMiddleware = async (req, res, next) => {
 };
 
 module.exports = {
+  getUserIdByToken,
   authMiddleware,
 };
