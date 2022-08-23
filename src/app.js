@@ -11,11 +11,11 @@ const session = require('express-session');
 const statusCode = require('./constants/statusCode');
 const util = require('./lib/util');
 const responseMessage = require('./constants/responseMessage');
+const slackWebhook = require('./lib/slack');
 
 // const sentry = require('@sentry/node');
 // const tracing = require('@sentry/tracing');
 
-// const slackBot = require('../utils/slackBot');
 dotenv.config();
 
 const app = express();
@@ -70,23 +70,10 @@ app.use('*', (req, res) => {
 app.use(sentry.Handlers.errorHandler());
 */
 
+// 모든 에러가 오게되는 미들웨어 -> 슬랙으로 에러 전송
 app.use(function (err, req, res, next) {
-  console.log('에러는 이 곳에서 처리');
-  console.log(err);
+  slackWebhook(req, err);
   return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
-
-  // 슬랙봇 연결하기
-  /*
-  slackBot
-    .send(
-      'api-서버-로그',
-      `오류가 발생했습니다 !\n
-        \`Error Message\`: ${err.message}\n`,
-    )
-    .then();
-
-  res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, err.message));
-  */
 });
 
 module.exports = http;
