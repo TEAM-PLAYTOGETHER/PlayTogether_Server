@@ -23,10 +23,10 @@ const createCrew = async (name, masterId, description) => {
     await client.query('BEGIN');
 
     // 동아리를 개설하려는 사람이 개설한 동아리의 수 확인
-    const { count: createdByUserCount } = await crewDao.getCreatedByUserCount(client, masterId);
-    if (createdByUserCount >= 5) {
-      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
-    }
+    // const { count: createdByUserCount } = await crewDao.getCreatedByUserCount(client, masterId);
+    // if (createdByUserCount >= 5) {
+    //   return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    // }
 
     let code = '';
     let ok = false;
