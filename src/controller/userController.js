@@ -4,6 +4,34 @@ const util = require('../lib/util');
 const { userService, crewService } = require('../service');
 
 /**
+ * PUT ~/signup
+ * 유저 회원가입 시 기본정보 등록
+ * @private
+ */
+const signup = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { gender, birth } = req.body;
+
+    // 헤더에 유저 토큰 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    // body값이 없을 경우
+    if (!gender || !birth) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    const updateUser = await userService.signup(userId, gender, birth);
+
+    return res.status(updateUser.status).json(updateUser);
+  } catch (error) {
+    return next(new Error('signup Controller 에러: \n' + error));
+  }
+};
+
+/**
  * GET ~/:userLoginId
  * 유저 아이디로 유저 조회
  * @public
@@ -101,6 +129,7 @@ const updateUserProfile = async (req, res, next) => {
 };
 
 module.exports = {
+  signup,
   getUserByUserId,
   updateUserMbti,
   updateUserProfile,
