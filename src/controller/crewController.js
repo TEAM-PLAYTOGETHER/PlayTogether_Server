@@ -84,10 +84,28 @@ const deleteCrewByCrewId = async (req, res, next) => {
     return next(new Error('deleteCrewByCrewId Controller 에러: \n' + error));
   }
 };
+const putCrew = async (req, res, next) => {
+  const masterId = req.user.id;
+  const { crewId } = req.params;
+  const { name, description} = req.body;
+
+  if (!crewId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  try {
+    const updatedPost = await crewService.putCrew(crewId, masterId, name,description);
+
+    if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
+
+    return res.status(updatedPost.status).json(updatedPost);
+  } catch (error) {
+    return next(new Error('putCrew Controller 에러: \n' + error));
+  }
+};
 
 module.exports = {
   createCrew,
   registerMember,
   getAllCrewByUserId,
   deleteCrewByCrewId,
+  putCrew
 };
