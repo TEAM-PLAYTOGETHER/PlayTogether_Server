@@ -11,6 +11,7 @@ router.get('/crew/:crewId', userController.nicknameCheck);
 // POST
 
 // PUT
+router.put('/signup', authMiddleware, userController.signup);
 router.put('/mbti', authMiddleware, userController.updateUserMbti);
 router.put('/:crewId', authMiddleware, userController.updateUserProfile);
 
