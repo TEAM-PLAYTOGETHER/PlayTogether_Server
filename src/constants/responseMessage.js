@@ -54,6 +54,7 @@ module.exports = {
   CREW_CREATE_SUCCESS: '동아리 만들기 성공',
   CREW_REGISTER_SUCCESS: '동아리 가입 성공',
   CREW_DELETE_SUCCESS: '동아리 삭제 성공',
+  CREW_PUT_SUCCESS: "동아리 수정 성공",
   NO_CREW: '존재하지 않는 동아리입니다.',
   ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
   READ_REGISTER_INFO_SUCCESS: '동아리 가입정보 가져오기 성공',

@@ -1,4 +1,5 @@
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
+const _ = require('lodash');
 
 /**
  * createCrew
@@ -127,6 +128,48 @@ const getExistCrew = async (client, crewId) => {
     throw new Error('crewDao.getExistCrew에서 오류 발생: \n' + error);
   }
 };
+const putCrew = async (client, crewId, masterId, description, name) => {
+  try {
+    const { rows: existingRows } = await client.query(
+      `
+      SELECT * FROM crew
+      WHERE id = $1 and master_id = $2
+      `,
+      [crewId, masterId],
+    );
+
+    if (existingRows.length === 0) return false;
+
+    const data = _.merge({}, convertSnakeToCamel.keysToCamel(existingRows[0]), { name, description });
+
+    const { rows } = await client.query(
+      `
+      UPDATE crew
+      SET name = $1, description = $2, updated_at = now()
+      WHERE id = $3 and master_id = $4
+      RETURNING * 
+      `,
+      [data.name, data.description, crewId, masterId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('crewdao.putCrew 에러 발생했습니다 \n' + error);
+  }
+};
+const getCrewMaster = async (client, crewId, masterId) => {
+  try {
+    const { rows } = await client.query(
+      `
+        select * from crew
+        where id = $1 and master_id = $2;
+            `,
+      [crewId, masterId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('crewDao.getExistCrew에서 오류 발생: \n' + error);
+  }
+};
 
 module.exports = {
   createCrew,
@@ -135,4 +178,6 @@ module.exports = {
   deleteCrewByCrewId,
   getExistCrew,
   getAllCrewCode,
+  putCrew,
+  getCrewMaster
 };
