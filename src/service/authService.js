@@ -32,6 +32,7 @@ const snsLogin = async (snsId, email, provider, name) => {
   let client;
   const log = `authService.snsLogin | userSnsId = ${snsId}`;
   let user;
+  let isSignup = false;
 
   try {
     client = await db.connect(log);
@@ -44,13 +45,18 @@ const snsLogin = async (snsId, email, provider, name) => {
       user = await authDao.createSnsUser(client, snsId, email, provider, name);
     }
 
+    // 회원가입이 완료된 유저인지 확인
+    if (user.gender && user.birth) {
+      isSignup = true;
+    }
+
     const accessToken = jwtUtil.sign(user);
     const refreshToken = jwtUtil.refresh();
 
     redisClient.set(user.id, refreshToken);
     await client.query('COMMIT');
 
-    return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userName: isSnsUser.name, accessToken: accessToken, refreshToken: refreshToken });
+    return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userName: user.name, accessToken: accessToken, refreshToken: refreshToken, isSignup: isSignup });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('authService snsLogin에서 error 발생: \n', error);

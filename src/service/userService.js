@@ -6,6 +6,26 @@ const db = require('../loaders/db');
 
 const { nicknameVerify } = require('../lib/nicknameVerify');
 
+const signup = async (userId, gender, birth) => {
+  let client;
+  const log = `userService.signup | userId = ${userId}, gender = ${gender}, birth = ${birth}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    await userDao.signup(client, userId, gender, birth);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_USER_SUCCESS);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('userService signup에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 const getUserByUserLoginId = async (userLoginId) => {
   let client;
   const log = `userService.getUserByUserLoginId | userLoginId = ${userLoginId}`;
@@ -113,6 +133,7 @@ const getUserByNickname = async (crewId, nickname) => {
 };
 
 module.exports = {
+  signup,
   getUserByUserLoginId,
   getUserById,
   getUserByNickname,

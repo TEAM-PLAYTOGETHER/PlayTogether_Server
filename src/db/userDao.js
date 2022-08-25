@@ -87,9 +87,26 @@ const updateUserMbti = async (client, userId, mbit) => {
   }
 };
 
+const signup = async (client, userId, gender, birth) => {
+  try {
+    const { rows } = await client.query(
+      `
+      UPDATE "user"
+      SET gender = $1, birth = $2
+      WHERE id = $3
+      `,
+      [gender, birth, userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('userDao.signup에서 오류 발생: \n' + error);
+  }
+};
+
 // DELETE
 
 module.exports = {
+  signup,
   getUserById,
   getUserByUserLoginId,
   getUserBySnsId,
