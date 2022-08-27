@@ -434,14 +434,12 @@ const getLightDetail = async (lightId) => {
 
     const data2 = members.map((o) => ({
       user_id: Number(o.id),
-      mbti: o.mbti,
       gender: o.gender,
       name: o.name,
       age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))),
     }));
 
     const data3 = organizer.map((o) => ({
-      userLoginId: o.userLoginId,
       organizer_id: Number(o.id),
       name: o.name,
     }));
