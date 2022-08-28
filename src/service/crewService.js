@@ -105,7 +105,7 @@ const registerMember = async (userId, crewCode) => {
     if (cnt !== 1) throw new Error('registerMember 회원 등록과정에서 오류 발생');
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewId: Number(crew.id), crewName: crew.name });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('crewService registerMember에서 error 발생: \n' + error);
