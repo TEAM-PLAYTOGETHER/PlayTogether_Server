@@ -2,9 +2,9 @@ const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
 const { userDao, authDao } = require('../db');
 const util = require('../lib/util');
-const bcrypt = require('bcrypt');
 const jwtUtil = require('../lib/jwtUtil');
 const jwt = require('jsonwebtoken');
+const jwtConstants = require('../constants/jwt');
 const redisClient = require('../lib/redis');
 const db = require('../loaders/db');
 
@@ -28,7 +28,7 @@ const createSnsUser = async (snsId, email, provider, name) => {
   }
 };
 
-const snsLogin = async (snsId, email, provider, name) => {
+const snsLogin = async (snsId, email, provider, name, picture) => {
   let client;
   const log = `authService.snsLogin | userSnsId = ${snsId}`;
   let user;
@@ -40,18 +40,21 @@ const snsLogin = async (snsId, email, provider, name) => {
 
     // 정상적으로 등록된 유저인지 확인
     user = await userDao.getUserBySnsId(client, snsId);
+    if (user) {
+      user = await authDao.updateSnsUser(client, snsId, email, name, picture);
+    }
 
     if (!user) {
-      user = await authDao.createSnsUser(client, snsId, email, provider, name);
+      user = await authDao.createSnsUser(client, snsId, email, provider, name, picture);
     }
 
     // 회원가입이 완료된 유저인지 확인
-    if (user.gender && user.birth) {
+    if (user.gender && user.birthDay) {
       isSignup = true;
     }
 
     const accessToken = jwtUtil.sign(user);
-    const refreshToken = jwtUtil.refresh();
+    const refreshToken = jwtUtil.refresh(user);
 
     redisClient.set(user.id, refreshToken);
     await client.query('COMMIT');
@@ -129,33 +132,21 @@ const refresh = async (user, authToken, refreshToken) => {
   if (authToken && refreshToken) {
     // access token 검증
     const authResult = jwtUtil.verify(authToken);
+    const refreshResult = jwtUtil.verify(refreshToken);
 
-    // 유저 정보
-    const decoded = jwt.decode(authToken);
-
-    if (!decoded) {
-      return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
-    }
-    // refresh token 검증
-    const refreshResult = jwtUtil.refreshVerify(refreshToken, decoded.id);
-
-    if (authResult.ok === false && authResult.message === 'jwt expired') {
-      // 1. access token & refresh token 모두 만료된 경우 새로 로그인
-      if (refreshResult.ok === false) {
+    // accessToken이 만료 됐을 경우
+    if (authResult.message === jwtConstants.TOKEN_EXPIRED || authResult.message === jwtConstants.TOKEN_INVALID) {
+      // refreshToken도 만료 됐을 경우
+      if (refreshResult.message === jwtConstants.TOKEN_EXPIRED || refreshResult.message === jwtConstants.TOKEN_INVALID) {
         return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
       } else {
-        // 2. access token만 만료되었을 경우
         const newAccessToken = jwtUtil.sign(user);
 
         return util.success(statusCode.OK, responseMessage.CREATED_TOKEN, { accessToken: newAccessToken, refreshToken: refreshToken });
       }
     } else {
-      // 3. access token이 만료되지 않았을 때
       return util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_UNEXPIRED);
     }
-  } else {
-    // 헤더에 토큰이 없는 경우
-    return util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_EMPTY);
   }
 };
 
