@@ -20,7 +20,7 @@ const googleLogin = async (req, res, next) => {
       },
     });
 
-    const snsLogin = await authService.snsLogin(profile.data.id, profile.data.email, 'google', profile.data.name);
+    const snsLogin = await authService.snsLogin(profile.data.id, profile.data.email, 'google', profile.data.name, profile.data.picture);
     if (!snsLogin) {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
     }
@@ -29,10 +29,7 @@ const googleLogin = async (req, res, next) => {
 
     return res.status(snsLogin.status).json(snsLogin);
   } catch (error) {
-    if (error.config.data === undefined) {
-      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
-    }
-    return next(new Error('AuthController snsLogin error 발생: \n' + error));
+    return next(new Error('AuthController googleLogin error 발생: \n' + error));
   }
 };
 
@@ -52,7 +49,7 @@ const kakaoLogin = async (req, res, next) => {
       },
     });
 
-    const snsLogin = await authService.snsLogin(profile.data.id, profile.data.kakao_account.email, 'kakao', profile.data.properties.nickname);
+    const snsLogin = await authService.snsLogin(profile.data.id, profile.data.kakao_account.email, 'kakao', profile.data.properties.nickname, profile.data.properties.profile_image);
     if (!snsLogin) {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
     }
@@ -61,10 +58,36 @@ const kakaoLogin = async (req, res, next) => {
 
     return res.status(snsLogin.status).json(snsLogin);
   } catch (error) {
-    if (error.config.data === undefined) {
+    return next(new Error('AuthController kakaoLogin error 발생: \n' + error));
+  }
+};
+
+const appleLogin = async (req, res, next) => {
+  const accessToken = req.headers.accesstoken;
+  const fcmToken = req.headers.fcmtoken;
+
+  if (!accessToken || !fcmToken) {
+    return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  try {
+    const profile = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const snsLogin = await authService.snsLogin(profile.data.id, profile.data.kakao_account.email, 'kakao', profile.data.properties.nickname, profile.data.properties.profile_image);
+    if (!snsLogin) {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
     }
-    return next(new Error('AuthController snsLogin error 발생: \n' + error));
+
+    await authService.updateFcmToken(profile.data.id, fcmToken);
+
+    return res.status(snsLogin.status).json(snsLogin);
+  } catch (error) {
+    return next(new Error('AuthController appleLogin error 발생: \n' + error));
   }
 };
 
@@ -85,5 +108,6 @@ const refresh = async (req, res, next) => {
 module.exports = {
   kakaoLogin,
   googleLogin,
+  appleLogin,
   refresh,
 };

@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const db = require('../loaders/db');
 
@@ -88,14 +89,15 @@ const updateUserMbti = async (client, userId, mbit) => {
 };
 
 const signup = async (client, userId, gender, birth) => {
+  let birthDay = dayjs(birth).format();
   try {
     const { rows } = await client.query(
       `
       UPDATE "user"
-      SET gender = $1, birth = $2
+      SET gender = $1, birth_day = $2
       WHERE id = $3
       `,
-      [gender, birth, userId],
+      [gender, birthDay, userId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
