@@ -26,39 +26,21 @@ const signup = async (userId, gender, birth) => {
   }
 };
 
-const getUserByUserLoginId = async (userLoginId) => {
+const getCrewUserByEmail = async (crewId, email) => {
   let client;
-  const log = `userService.getUserByUserLoginId | userLoginId = ${userLoginId}`;
+  const log = `userService.getUserByEmail | crewId = ${crewId}, email = ${email}`;
 
   try {
     client = await db.connect(log);
 
-    const user = await userDao.getUserByUserLoginId(client, userLoginId);
+    const user = await userDao.getCrewUserByEmail(client, crewId, email);
 
     // 해당 유저가 없는 경우
     if (!user) {
       return util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER);
     }
 
-    // 만 나이 계산 로직 -> 따로 분리하는게 좋을지도
-    const now = new Date();
-    const birth = new Date(user.birthDay);
-
-    let age = now.getFullYear() - birth.getFullYear();
-    const month = now.getMonth() - birth.getMonth();
-    if (month < 0 || (month === 0 && now.getDate() < birth.getDate())) {
-      age--;
-    }
-
-    const userData = {
-      userLoginId: user.userLoginId,
-      name: user.name,
-      gender: user.gender,
-      age: age,
-      mbti: user.mbti,
-    };
-
-    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, userData);
+    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, user);
   } catch (error) {
     throw new Error('userService getUserByLoginId에서 error 발생: \n' + error);
   } finally {
@@ -111,7 +93,7 @@ const getUserByNickname = async (crewId, nickname) => {
 
 module.exports = {
   signup,
-  getUserByUserLoginId,
+  getCrewUserByEmail,
   getUserById,
   getUserByNickname,
 };
