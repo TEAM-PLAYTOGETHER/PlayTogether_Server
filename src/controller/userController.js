@@ -32,52 +32,25 @@ const signup = async (req, res, next) => {
 };
 
 /**
- * GET ~/:userLoginId
+ * GET ~/:crewId
  * 유저 아이디로 유저 조회
  * @public
  */
-const getUserByUserId = async (req, res, next) => {
+const getCrewUserByEmail = async (req, res, next) => {
   try {
-    const { userLoginId } = req.params;
+    const { crewId } = req.params;
+    const { email } = req.query;
 
-    if (!userLoginId) {
+    if (!crewId || !email) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
     // 유저 조회
-    const getUserByUserLoginId = await userService.getUserByUserLoginId(userLoginId);
+    const getUserByEmail = await userService.getCrewUserByEmail(crewId, email);
 
-    return res.status(getUserByUserLoginId.status).json(getUserByUserLoginId);
+    return res.status(getUserByEmail.status).json(getUserByEmail);
   } catch (error) {
     return next(new Error('getUserByUserId Controller 에러: \n' + error));
-  }
-};
-
-/**
- * PUT ~/mbti
- * 유저 mbti 추가
- * @private
- */
-const updateUserMbti = async (req, res, next) => {
-  try {
-    const userId = req.user.id;
-    const { mbti } = req.body;
-
-    // 헤더에 유저 토큰 없을 시 에러 처리
-    if (!userId) {
-      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
-    }
-
-    // mbit값 없을 시 에러 처리
-    if (!mbti) {
-      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-    }
-
-    const updateUser = await userService.updateUserMbti(userId, mbti);
-
-    return res.status(updateUser.status).json(updateUser);
-  } catch (error) {
-    return next(new Error('updateUserMbti Controller 에러: \n' + error));
   }
 };
 
@@ -127,11 +100,28 @@ const updateUserProfile = async (req, res, next) => {
     return next(new Error('updateUserProfile Controller 에러: \n' + error));
   }
 };
+const updateUserProfileImage = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { crewId } = req.params;
+    const image = req.file.location;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    const profile = await crewService.updateCrewUserProfileImage(userId, crewId, image);
+    return res.status(profile.status).json(profile);
+  } catch (error) {
+    return next(new Error('updateUserProfile Controller 에러: \n' + error));
+  }
+};
 
 module.exports = {
   signup,
-  getUserByUserId,
-  updateUserMbti,
+  getCrewUserByEmail,
   updateUserProfile,
   nicknameCheck,
+  updateUserProfileImage,
 };

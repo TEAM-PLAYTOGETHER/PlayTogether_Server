@@ -2,29 +2,15 @@ const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const db = require('../loaders/db');
 
 // CREATE
-const createUser = async (client, userId, password, userName, gender, birth) => {
+const createSnsUser = async (client, snsId, email, provider, name, picture) => {
   try {
     const { rows } = await client.query(
       `
-      INSERT INTO "user" (user_login_id, password, name, gender, birth_day)
+      INSERT INTO "user" (email, sns_id, provider, name, picture)
       VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
       `,
-      [userId, password, userName, gender, birth],
-    );
-    return convertSnakeToCamel.keysToCamel(rows[0]);
-  } catch (error) {
-    throw new Error('authDao.createUser에서 오류 발생: \n' + error);
-  }
-};
-
-const createSnsUser = async (client, snsId, email, provider, name) => {
-  try {
-    const { rows } = await client.query(
-      `
-      INSERT INTO "user" (email, sns_id, provider, name)
-      VALUES ($1, $2, $3, $4)
-      `,
-      [email, snsId, provider, name],
+      [email, snsId, provider, name, picture],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
@@ -35,6 +21,22 @@ const createSnsUser = async (client, snsId, email, provider, name) => {
 // READ
 
 // UPDATE
+const updateSnsUser = async (client, snsId, email, name, picture) => {
+  try {
+    const { rows } = await client.query(
+      `
+      UPDATE "user"
+      SET email = $1, name = $2, picture = $3
+      WHERE sns_id = $4
+      RETURNING *
+      `,
+      [email, name, picture, snsId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('authDao.updateSnsUser에서 오류 발생: \n' + error);
+  }
+};
 const updateFcmToken = async (client, snsId, fcmToken) => {
   try {
     const { rows } = await client.query(
@@ -55,7 +57,7 @@ const updateFcmToken = async (client, snsId, fcmToken) => {
 // DELETE
 
 module.exports = {
-  createUser,
   createSnsUser,
+  updateSnsUser,
   updateFcmToken,
 };

@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const db = require('../loaders/db');
 
@@ -20,15 +21,15 @@ const getUserById = async (client, userId) => {
   }
 };
 
-const getUserByUserLoginId = async (client, userLoginId) => {
+const getCrewUserByEmail = async (client, crewId, email) => {
   try {
     const { rows } = await client.query(
       `
-      SELECT *
-      FROM "user"
-      WHERE user_login_id = $1
+      SELECT u.id, u.is_deleted, nickname, description, first_station, second_station, profile_image, gender, birth
+      FROM "crew_user" JOIN "user" u on u.id = crew_user.member_id
+      WHERE crew_id = $1 AND email = $2
       `,
-      [userLoginId],
+      [crewId, email],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
@@ -88,14 +89,15 @@ const updateUserMbti = async (client, userId, mbit) => {
 };
 
 const signup = async (client, userId, gender, birth) => {
+  let birthDay = dayjs(birth).format();
   try {
     const { rows } = await client.query(
       `
       UPDATE "user"
-      SET gender = $1, birth = $2
+      SET gender = $1, birth_day = $2
       WHERE id = $3
       `,
-      [gender, birth, userId],
+      [gender, birthDay, userId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
@@ -108,7 +110,7 @@ const signup = async (client, userId, gender, birth) => {
 module.exports = {
   signup,
   getUserById,
-  getUserByUserLoginId,
+  getCrewUserByEmail,
   getUserBySnsId,
   getUserByNickname,
   updateUserMbti,

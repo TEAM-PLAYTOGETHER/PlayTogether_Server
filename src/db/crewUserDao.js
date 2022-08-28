@@ -77,7 +77,7 @@ const getAllCrewByUserId = async (client, userId) => {
   try {
     const { rows } = await client.query(
       `
-      select c.id, c.name, c.description
+      select c.id, c.name, c.description, c.master_id
       from crew_user cu
       left join crew c on cu.crew_id = c.id
       where member_id = $1;
@@ -102,21 +102,36 @@ const getAllCrewByUserId = async (client, userId) => {
  * @param {Optional} secondStation
  * @returns 새로 생성된 프로필 정보
  */
-const updateCrewUserProfile = async (client, memeberId, crewId, nickname, description, firstStation, secondStation) => {
+const updateCrewUserProfile = async (client, memberId, crewId, nickname, description, firstStation, secondStation) => {
   try {
     const { rows } = await client.query(
       `
-      update "crew_user"
+      update crew_user
       set nickname = $1, description = $2, first_station = $3, second_station = $4
       where member_id = $5 AND crew_id = $6 AND is_deleted = false
-      returning nickname, description, first_station, second_station
       `,
-      [nickname, description, firstStation, secondStation, memeberId, crewId],
+      [nickname, description, firstStation, secondStation, memberId, crewId],
     );
 
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
     throw new Error('crewUserDao.updateCrewUserProfile에서 오류 발생: \n' + error);
+  }
+};
+const updateCrewUserProfileImage = async (client, memberId, crewId, image) => {
+  try {
+    const { rows } = await client.query(
+      `
+      update crew_user
+      set profile_image = $1
+      where member_id = $2 AND crew_id = $3 AND is_deleted = false
+      `,
+      [image, memberId, crewId],
+    );
+
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('crewUserDao.updateCrewUserProfileImage 오류 발생: \n' + error);
   }
 };
 
@@ -150,4 +165,5 @@ module.exports = {
   withdrawAllMemberByCrewId,
   getUserRegisteredCount,
   updateCrewUserProfile,
+  updateCrewUserProfileImage,
 };

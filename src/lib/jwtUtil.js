@@ -20,7 +20,7 @@ const refreshTokenOptions = {
 const sign = (user) => {
   const payload = {
     id: user.id,
-    userLoginId: user.userLoginId,
+    email: user.email,
   };
 
   return jwt.sign(payload, secret, accessTokenOptions);
@@ -30,24 +30,35 @@ const verify = (token) => {
   let decoded;
   try {
     decoded = jwt.verify(token, secret);
+    return {
+      ok: true,
+      decoded: decoded,
+    };
   } catch (error) {
+    let jwtErrorCode;
     if (error.message === 'jwt expired') {
-      console.log('expired token');
-      return TOKEN_EXPIRED;
+      jwtErrorCode = TOKEN_EXPIRED;
     } else if (error.message === 'invalid token') {
-      console.log('invalid token');
-      return TOKEN_INVALID;
+      jwtErrorCode = TOKEN_INVALID;
     } else {
-      console.log('invalid token');
-      return TOKEN_INVALID;
+      jwtErrorCode = TOKEN_INVALID;
     }
+    return {
+      ok: false,
+      decoded: decoded,
+      message: jwtErrorCode,
+    };
   }
-
-  return decoded;
 };
 
-const refresh = () => {
-  return jwt.sign({}, secret, refreshTokenOptions);
+const refresh = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+    },
+    secret,
+    refreshTokenOptions,
+  );
 };
 
 const refreshVerify = async (token, userId) => {

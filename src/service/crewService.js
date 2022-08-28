@@ -83,7 +83,6 @@ const registerMember = async (userId, crewCode) => {
 
     // 해당 회원이 가입한 동아리 갯수 확인하기
     const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
-    console.log(userRegisteredCount);
     if (userRegisteredCount >= 10) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
     }
@@ -105,7 +104,7 @@ const registerMember = async (userId, crewCode) => {
     if (cnt !== 1) throw new Error('registerMember 회원 등록과정에서 오류 발생');
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewId: Number(crew.id), crewName: crew.name });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('crewService registerMember에서 error 발생: \n' + error);
@@ -145,6 +144,26 @@ const updateCrewUserProfile = async (userId, crewId, nickname, description, firs
     client.release();
   }
 };
+const updateCrewUserProfileImage = async (userId, crewId, image) => {
+  let client;
+  const log = `crewUserDao.const updateCrewUserProfileImage = async (userId, crewId, image) => {
+    | userId = ${userId}, crewId = ${crewId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    const profile = await crewUserDao.updateCrewUserProfileImage(client, userId, crewId, image);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('crewService updateCrewUserProfileImage error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 
 /**
  * getAllCrewByUserId
@@ -161,9 +180,13 @@ const getAllCrewByUserId = async (userId) => {
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
     const castedCrews = crews.map((crew) => {
+      let isAdmin = false;
+      if (crew.masterId === userId) isAdmin = true;
       return {
-        ...crew,
         id: Number(crew.id),
+        name: crew.name,
+        description: crew.description,
+        isAdmin,
       };
     });
 
@@ -264,5 +287,6 @@ module.exports = {
   getAllCrewByUserId,
   deleteCrewByCrewId,
   updateCrewUserProfile,
-  putCrew
+  putCrew,
+  updateCrewUserProfileImage,
 };
