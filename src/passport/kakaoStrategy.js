@@ -11,7 +11,6 @@ module.exports = () => {
         callbackURL: 'http://localhost:3000/api/auth/kakao/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log(accessToken);
         try {
           const existUser = await authService.isSnsUser(profile.id, 'kakao');
 

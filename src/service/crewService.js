@@ -83,7 +83,6 @@ const registerMember = async (userId, crewCode) => {
 
     // 해당 회원이 가입한 동아리 갯수 확인하기
     const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
-    console.log(userRegisteredCount);
     if (userRegisteredCount >= 10) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
     }
@@ -105,7 +104,7 @@ const registerMember = async (userId, crewCode) => {
     if (cnt !== 1) throw new Error('registerMember 회원 등록과정에서 오류 발생');
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewId: Number(crew.id), crewName: crew.name });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('crewService registerMember에서 error 발생: \n' + error);
@@ -180,7 +179,6 @@ const getAllCrewByUserId = async (userId) => {
 
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
-    console.log(crews);
     const castedCrews = crews.map((crew) => {
       let isAdmin = false;
       if (crew.masterId === userId) isAdmin = true;

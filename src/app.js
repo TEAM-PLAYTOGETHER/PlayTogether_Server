@@ -72,7 +72,9 @@ app.use(sentry.Handlers.errorHandler());
 
 // 모든 에러가 오게되는 미들웨어 -> 슬랙으로 에러 전송
 app.use(function (err, req, res, next) {
-  slackWebhook(req, err);
+  if (process.env.NODE_ENV !== 'development') {
+    slackWebhook(req, err);
+  }
   return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
 });
 
