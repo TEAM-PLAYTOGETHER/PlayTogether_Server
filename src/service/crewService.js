@@ -83,7 +83,6 @@ const registerMember = async (userId, crewCode) => {
 
     // 해당 회원이 가입한 동아리 갯수 확인하기
     const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
-    console.log(userRegisteredCount);
     if (userRegisteredCount >= 10) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
     }
@@ -180,7 +179,6 @@ const getAllCrewByUserId = async (userId) => {
 
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
-    console.log(crews);
     const castedCrews = crews.map((crew) => {
       let isAdmin = false;
       if (crew.masterId === userId) isAdmin = true;
