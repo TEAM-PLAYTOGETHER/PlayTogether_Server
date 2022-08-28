@@ -54,34 +54,6 @@ const getUserByUserId = async (req, res, next) => {
 };
 
 /**
- * PUT ~/mbti
- * 유저 mbti 추가
- * @private
- */
-const updateUserMbti = async (req, res, next) => {
-  try {
-    const userId = req.user.id;
-    const { mbti } = req.body;
-
-    // 헤더에 유저 토큰 없을 시 에러 처리
-    if (!userId) {
-      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
-    }
-
-    // mbit값 없을 시 에러 처리
-    if (!mbti) {
-      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-    }
-
-    const updateUser = await userService.updateUserMbti(userId, mbti);
-
-    return res.status(updateUser.status).json(updateUser);
-  } catch (error) {
-    return next(new Error('updateUserMbti Controller 에러: \n' + error));
-  }
-};
-
-/**
  * GET ~/:crewId/?nickname=
  * 유저 닉네임 중복확인
  * @public
@@ -122,7 +94,7 @@ const updateUserProfile = async (req, res, next) => {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME));
     }
 
-    const profile = await crewService.updateCrewUserProfile(userId, crewId,image, nickname, description, firstStation, secondStation);
+    const profile = await crewService.updateCrewUserProfile(userId, crewId, image, nickname, description, firstStation, secondStation);
     return res.status(profile.status).json(profile);
   } catch (error) {
     return next(new Error('updateUserProfile Controller 에러: \n' + error));
@@ -132,7 +104,6 @@ const updateUserProfile = async (req, res, next) => {
 module.exports = {
   signup,
   getUserByUserId,
-  updateUserMbti,
   updateUserProfile,
   nicknameCheck,
 };
