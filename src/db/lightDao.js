@@ -33,7 +33,35 @@ const addLightOrganizer = async (client, organizerId) => {
   }
 };
 
-const putLight = async (client, lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
+const putLightWhereImageFull = async (client, lightId, organizerId, image, category, title, date, place, people_cnt, description, time) => {
+  try {
+    const { rows: existingRows } = await client.query(
+      `
+      SELECT * FROM light l
+      WHERE id = $1 and organizer_id = $2
+      `,
+      [lightId, organizerId],
+    );
+
+    if (existingRows.length === 0) return false;
+
+    const data = _.merge({}, convertSnakeToCamel.keysToCamel(existingRows[0]), { image, category, title, date, place, people_cnt, description, time });
+
+    const { rows } = await client.query(
+      `
+      UPDATE light l
+      SET image = $1, category = $2, title = $3, date = $4, place = $5, people_cnt = $6, description = $7, time = $8, updated_at = now()
+      WHERE id = $9 and organizer_id = $10
+      RETURNING * 
+      `,
+      [data.image, data.category, data.title, data.date, data.place, data.people_cnt, data.description, data.time, lightId, organizerId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('lightdao.putLight에서 에러 발생했습니다 \n' + error);
+  }
+};
+const putLightWhereImageNotFull = async (client, lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
   try {
     const { rows: existingRows } = await client.query(
       `
@@ -321,10 +349,37 @@ const IsLightOrganizer = async (client, lightId, userId) => {
     throw new Error('lightdao.IsLightOrganizer 에러 발생했습니다 \n' + error);
   }
 };
+const getLightImage = async (client, lightId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select l.image from light l
+      where id = $1
+      `,
+      [lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('lightdao.getLightImageCnt 에러 발생했습니다 \n' + error);
+  }
+};
+const addLightImage = async (client, cnt, image, lightId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      UPDATE light SET image[$1] = $2
+      WHERE id = $3;
+      `,
+      [cnt, image, lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('lightdao.getLightImageCnt 에러 발생했습니다 \n' + error);
+  }
+};
 
 module.exports = {
   addLight,
-  putLight,
   deleteLight,
   getOrganizerLight,
   getEnterLight,
@@ -340,5 +395,9 @@ module.exports = {
   getHotLight,
   getSearchLightUseCategory,
   getSearchLightNotCategory,
-  IsLightOrganizer
+  IsLightOrganizer,
+  getLightImage,
+  putLightWhereImageFull,
+  putLightWhereImageNotFull,
+  addLightImage
 };

@@ -31,13 +31,18 @@ const addLight = async (req, res, next) => {
 };
 const putLight = async (req, res, next) => {
   const organizerId = req.user.id;
+  let image = null;
+  if (req.files) {
+    image = req.files;
+  }
+  const path = image.map((img) => img.location);
   const { lightId } = req.params;
   const { category, title, date, place, people_cnt, description, time } = req.body;
 
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const updatedPost = await lightService.putLight(lightId, organizerId, category, title, date, place, people_cnt, description, time);
+    const updatedPost = await lightService.putLight(lightId, organizerId, path, category, title, date, place, people_cnt, description, time);
 
     // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
     // if (!(updatedPost.category == "먹을래") || !(updatedPost.category == "갈래") || !(updatedPost.category == "할래")) {
