@@ -180,10 +180,15 @@ const getAllCrewByUserId = async (userId) => {
 
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
+    console.log(crews);
     const castedCrews = crews.map((crew) => {
+      let isAdmin = false;
+      if (crew.masterId === userId) isAdmin = true;
       return {
-        ...crew,
         id: Number(crew.id),
+        name: crew.name,
+        description: crew.description,
+        isAdmin,
       };
     });
 
@@ -285,5 +290,5 @@ module.exports = {
   deleteCrewByCrewId,
   updateCrewUserProfile,
   putCrew,
-  updateCrewUserProfileImage
+  updateCrewUserProfileImage,
 };
