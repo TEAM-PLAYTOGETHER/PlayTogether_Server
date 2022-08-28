@@ -15,7 +15,7 @@ router.get('/crew/:crewId', userController.nicknameCheck);
 router.put('/signup', authMiddleware, userController.signup);
 router.put('/:crewId', authMiddleware, userController.updateUserProfile);
 
-router.put('/profile/:crewId', authMiddleware, uploader.imageUploader.single('image'), userController.updateUserProfileImage);
+router.put('/:crewId/image', authMiddleware, uploader.imageUploader.single('image'), userController.updateUserProfileImage);
 
 // DELETE
 
