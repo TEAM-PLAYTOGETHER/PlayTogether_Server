@@ -81,7 +81,6 @@ const nicknameCheck = async (req, res, next) => {
 const updateUserProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const image = req.file.location;
     const { crewId } = req.params;
     const { nickname, description, firstStation, secondStation } = req.body;
 
@@ -94,7 +93,24 @@ const updateUserProfile = async (req, res, next) => {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME));
     }
 
-    const profile = await crewService.updateCrewUserProfile(userId, crewId, image, nickname, description, firstStation, secondStation);
+    const profile = await crewService.updateCrewUserProfile(userId, crewId, nickname, description, firstStation, secondStation);
+    return res.status(profile.status).json(profile);
+  } catch (error) {
+    return next(new Error('updateUserProfile Controller 에러: \n' + error));
+  }
+};
+const updateUserProfileImage = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { crewId } = req.params;
+    const image = req.file.location;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    const profile = await crewService.updateCrewUserProfileImage(userId, crewId, image);
     return res.status(profile.status).json(profile);
   } catch (error) {
     return next(new Error('updateUserProfile Controller 에러: \n' + error));
@@ -106,4 +122,5 @@ module.exports = {
   getUserByUserId,
   updateUserProfile,
   nicknameCheck,
+  updateUserProfileImage
 };

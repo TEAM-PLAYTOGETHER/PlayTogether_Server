@@ -124,7 +124,7 @@ const registerMember = async (userId, crewCode) => {
  * @param {Optional} firstStation - 첫 번째 지하철
  * @param {Optional} secondStation - 두 번째 지하철
  */
-const updateCrewUserProfile = async (userId, crewId, image, nickname, description, firstStation, secondStation) => {
+const updateCrewUserProfile = async (userId, crewId, nickname, description, firstStation, secondStation) => {
   let client;
   const log = `crewUserDao.updateCrewUserProfile | userId = ${userId}, crewId = ${crewId}, nickname = ${nickname}, description = ${description}, firstStation = ${firstStation}, secondStation = ${secondStation}`;
 
@@ -134,13 +134,33 @@ const updateCrewUserProfile = async (userId, crewId, image, nickname, descriptio
 
     if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
 
-    const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, image, nickname, description, firstStation, secondStation);
+    const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, nickname, description, firstStation, secondStation);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('crewService updateCrewUserProfile에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+const updateCrewUserProfileImage = async (userId, crewId, image) => {
+  let client;
+  const log = `crewUserDao.const updateCrewUserProfileImage = async (userId, crewId, image) => {
+    | userId = ${userId}, crewId = ${crewId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    const profile = await crewUserDao.updateCrewUserProfileImage(client, userId, crewId, image);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('crewService updateCrewUserProfileImage error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -264,5 +284,6 @@ module.exports = {
   getAllCrewByUserId,
   deleteCrewByCrewId,
   updateCrewUserProfile,
-  putCrew
+  putCrew,
+  updateCrewUserProfileImage
 };
