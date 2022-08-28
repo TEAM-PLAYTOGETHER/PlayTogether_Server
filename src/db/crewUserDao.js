@@ -102,16 +102,15 @@ const getAllCrewByUserId = async (client, userId) => {
  * @param {Optional} secondStation
  * @returns 새로 생성된 프로필 정보
  */
-const updateCrewUserProfile = async (client, memeberId, crewId, nickname, description, firstStation, secondStation) => {
+const updateCrewUserProfile = async (client, memeberId, crewId, image, nickname, description, firstStation, secondStation) => {
   try {
     const { rows } = await client.query(
       `
-      update "crew_user"
-      set nickname = $1, description = $2, first_station = $3, second_station = $4
-      where member_id = $5 AND crew_id = $6 AND is_deleted = false
-      returning nickname, description, first_station, second_station
+      update crew_user
+      set nickname = $1, description = $2, profile_image = $3, first_station = $4, second_station = $5
+      where member_id = $6 AND crew_id = $7 AND is_deleted = false
       `,
-      [nickname, description, firstStation, secondStation, memeberId, crewId],
+      [nickname, description, image, firstStation, secondStation, memeberId, crewId],
     );
 
     return convertSnakeToCamel.keysToCamel(rows[0]);

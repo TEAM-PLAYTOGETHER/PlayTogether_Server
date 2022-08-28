@@ -109,6 +109,7 @@ const nicknameCheck = async (req, res, next) => {
 const updateUserProfile = async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const image = req.file.location;
     const { crewId } = req.params;
     const { nickname, description, firstStation, secondStation } = req.body;
 
@@ -121,7 +122,7 @@ const updateUserProfile = async (req, res, next) => {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME));
     }
 
-    const profile = await crewService.updateCrewUserProfile(userId, crewId, nickname, description, firstStation, secondStation);
+    const profile = await crewService.updateCrewUserProfile(userId, crewId,image, nickname, description, firstStation, secondStation);
     return res.status(profile.status).json(profile);
   } catch (error) {
     return next(new Error('updateUserProfile Controller 에러: \n' + error));

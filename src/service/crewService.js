@@ -124,7 +124,7 @@ const registerMember = async (userId, crewCode) => {
  * @param {Optional} firstStation - 첫 번째 지하철
  * @param {Optional} secondStation - 두 번째 지하철
  */
-const updateCrewUserProfile = async (userId, crewId, nickname, description, firstStation, secondStation) => {
+const updateCrewUserProfile = async (userId, crewId, image, nickname, description, firstStation, secondStation) => {
   let client;
   const log = `crewUserDao.updateCrewUserProfile | userId = ${userId}, crewId = ${crewId}, nickname = ${nickname}, description = ${description}, firstStation = ${firstStation}, secondStation = ${secondStation}`;
 
@@ -134,7 +134,7 @@ const updateCrewUserProfile = async (userId, crewId, nickname, description, firs
 
     if (nicknameVerify(nickname)) return util.fail(statusCode.BAD_REQUEST, responseMessage.UNUSABLE_NICKNAME);
 
-    const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, nickname, description, firstStation, secondStation);
+    const profile = await crewUserDao.updateCrewUserProfile(client, userId, crewId, image, nickname, description, firstStation, secondStation);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);

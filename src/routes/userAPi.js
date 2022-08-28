@@ -1,4 +1,5 @@
 const express = require('express');
+const uploader = require('../middlewares/imageUpload');
 const { userController } = require('../controller');
 const { authMiddleware } = require('../middlewares/jwtAuthorization');
 
@@ -13,7 +14,7 @@ router.get('/crew/:crewId', userController.nicknameCheck);
 // PUT
 router.put('/signup', authMiddleware, userController.signup);
 router.put('/mbti', authMiddleware, userController.updateUserMbti);
-router.put('/:crewId', authMiddleware, userController.updateUserProfile);
+router.put('/:crewId', authMiddleware,  uploader.imageUploader.single('image'), userController.updateUserProfile);
 
 // DELETE
 
