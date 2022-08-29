@@ -32,6 +32,8 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     }
 
     const data = await lightDao.addLight(client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
+    const lightId = data.id;
+
     const result = [data];
     const data_result = result.map((o) => ({
       id: Number(o.id),
@@ -51,7 +53,7 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     }));
 
     // 번개 생성 후 번개 소유자도 번개에 참여시키기
-    await lightDao.addLightOrganizer(client, organizerId);
+    await lightDao.addLightOrganizer(client, organizerId, lightId);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS, data_result);
@@ -63,7 +65,7 @@ const addLight = async (category, title, date, place, people_cnt, description, i
   }
 };
 
-const putLight = async (lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
+const putLight = async (lightId, organizerId, image, category, title, date, place, people_cnt, description, time) => {
   let client;
 
   const log = `lightService.putLight | lightId = ${lightId}, title = ${title}, date = ${date}, place = ${place}
@@ -86,9 +88,13 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
     if (!organizer) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_LIGHT_ORGANIZER);
     }
-    const data = await lightDao.putLight(client, lightId, organizerId, category, title, date, place, people_cnt, description, time);
-    const result = [data];
-    const data_result = result.map((o) => ({
+    const imagePath = await lightDao.getLightImage(client, lightId);
+    const imageCnt = imagePath.image.length;
+
+    if (imageCnt >= 3) {
+      const data = await lightDao.putLightWhereImageFull(client, lightId, organizerId, image, category, title, date, place, people_cnt, description, time);
+      const result = [data];
+      const data_result = result.map((o) => ({
       id: Number(o.id),
       category: o.category,
       title: o.title,
@@ -107,6 +113,33 @@ const putLight = async (lightId, organizerId, category, title, date, place, peop
 
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
+    } else if(1 < imageCnt < 3){
+      for (let i = 0; i < image.length; i++) {
+        let imagePathString = image[i].toString();
+        await lightDao.addLightImage(client,i + 2, imagePathString, lightId);
+      }
+      const data = await lightDao.putLightWhereImageNotFull(client, lightId, organizerId, category, title, date, place, people_cnt, description, time);
+      const result = [data];
+      const imageData = await lightDao.getLightImage(client, lightId);
+      const data_result = result.map((o) => ({
+        id: Number(o.id),
+        category: o.category,
+        title: o.title,
+        date: o.date,
+        place: o.place,
+        peopleCnt: o.peopleCnt,
+        imageData,
+        description: o.description,
+        isDeleted: o.isDeleted,
+        createdAt: applyKoreanTime(o.createdAt),
+        updatedAt: applyKoreanTime(o.updatedAt),
+        organizerId: Number(o.organizerId),
+        crewId: Number(o.crewId),
+        time: o.time,
+      }));
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
+    }
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('lightService putLight에서 error 발생: \n' + error);

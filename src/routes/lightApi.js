@@ -6,7 +6,7 @@ const { authMiddleware } = require('../middlewares/jwtAuthorization');
 const router = express.Router();
 
 router.post('/add/:crewId', authMiddleware, uploader.imageUploader.array('image', 3), lightController.addLight);
-router.put('/:lightId', authMiddleware, lightController.putLight);
+router.put('/:lightId', authMiddleware, uploader.imageUploader.array('image', 3), lightController.putLight);
 router.post('/enter/:lightId', authMiddleware, lightController.postEnterLight);
 router.post('/remove/:lightId', authMiddleware, lightController.deleteLight);
 router.get('/:crewId/open', authMiddleware, lightController.getOrganizerLight);
