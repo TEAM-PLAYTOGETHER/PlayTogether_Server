@@ -19,6 +19,21 @@ const createSnsUser = async (client, snsId, email, provider, name, picture) => {
 };
 
 // READ
+const getFcmTokenById = async (client, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT device_token
+      FROM "user"
+      WHERE id = $1
+      `,
+      [userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('authDao.getFcmTokenById에서 오류 발생: \n' + error);
+  }
+};
 
 // UPDATE
 const updateSnsUser = async (client, snsId, email, name, picture) => {
@@ -58,6 +73,7 @@ const updateFcmToken = async (client, snsId, fcmToken) => {
 
 module.exports = {
   createSnsUser,
+  getFcmTokenById,
   updateSnsUser,
   updateFcmToken,
 };
