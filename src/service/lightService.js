@@ -209,10 +209,10 @@ const deleteLight = async (lightId, organizerId) => {
     client.release();
   }
 };
-const getOrganizerLight = async (organizerId, offset, limit) => {
+const getOrganizerLight = async (organizerId, crewId, offset, limit) => {
   let client;
 
-  const log = `lightService.getOrganizerLight | organizerId = ${organizerId}`;
+  const log = `lightService.getOrganizerLight | organizerId = ${organizerId}, crewId = ${crewId}`;
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
@@ -221,8 +221,13 @@ const getOrganizerLight = async (organizerId, offset, limit) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
-    const result = await lightDao.getOrganizerLight(client, organizerId, offset, limit);
+    const result = await lightDao.getOrganizerLight(client, organizerId, crewId, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -256,10 +261,10 @@ const getOrganizerLight = async (organizerId, offset, limit) => {
     client.release();
   }
 };
-const getEnterLight = async (memberId, offset, limit) => {
+const getEnterLight = async (memberId, crewId, offset, limit) => {
   let client;
 
-  const log = `lightService.getEnterLight | memberId = ${memberId}`;
+  const log = `lightService.getEnterLight | memberId = ${memberId}, crewId = ${crewId}`;
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
@@ -269,8 +274,14 @@ const getEnterLight = async (memberId, offset, limit) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
+    
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
-    const result = await lightDao.getEnterLight(client, memberId, offset, limit);
+    const result = await lightDao.getEnterLight(client, memberId, crewId, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -304,10 +315,10 @@ const getEnterLight = async (memberId, offset, limit) => {
     client.release();
   }
 };
-const getScrapLight = async (memberId, offset, limit) => {
+const getScrapLight = async (memberId, crewId, offset, limit) => {
   let client;
 
-  const log = `lightService.getScrapLight | memberId = ${memberId}`;
+  const log = `lightService.getScrapLight | memberId = ${memberId}, crewId = ${crewId}`;
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
@@ -317,8 +328,13 @@ const getScrapLight = async (memberId, offset, limit) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
-    const result = await lightDao.getScrapLight(client, memberId, offset, limit);
+    const result = await lightDao.getScrapLight(client, memberId,crewId, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -351,18 +367,24 @@ const getScrapLight = async (memberId, offset, limit) => {
     client.release();
   }
 };
-const getCategoryLight = async (category, sort, offset, limit) => {
+const getCategoryLight = async (crewId, category, sort, offset, limit) => {
   let client;
 
-  const log = `lightService.getCategoryLight | category = ${category}, sort = ${sort}`;
+  const log = `lightService.getCategoryLight | category = ${category}, sort = ${sort}, crewId = ${crewId}`;
   // 카테고리가 없으면 없는 번개
   if (!category) {
     return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
   }
+  
   try {
     client = await db.connect(log);
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
-    const result = await lightDao.getCategoryLight(client, category, sort, offset, limit);
+    const result = await lightDao.getCategoryLight(client,crewId, category, sort, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -412,14 +434,12 @@ const getLightDetail = async (lightId) => {
 
     const data2 = members.map((o) => ({
       user_id: Number(o.id),
-      mbti: o.mbti,
       gender: o.gender,
       name: o.name,
       age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))),
     }));
 
     const data3 = organizer.map((o) => ({
-      userLoginId: o.userLoginId,
       organizer_id: Number(o.id),
       name: o.name,
     }));
@@ -457,10 +477,10 @@ const getLightDetail = async (lightId) => {
     client.release();
   }
 };
-const getNewLight = async (memberId) => {
+const getNewLight = async (memberId, crewId) => {
   let client;
 
-  const log = `lightService.getNewLight | memberId = ${memberId}`;
+  const log = `lightService.getNewLight | memberId = ${memberId} crewId = ${crewId}`;
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
@@ -470,8 +490,13 @@ const getNewLight = async (memberId) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
-    const result = await lightDao.getNewLight(client);
+    const result = await lightDao.getNewLight(client, crewId);
 
     const lightData = result.map((light) => {
       const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
@@ -502,10 +527,10 @@ const getNewLight = async (memberId) => {
     client.release();
   }
 };
-const getHotLight = async (memberId) => {
+const getHotLight = async (memberId, crewId) => {
   let client;
 
-  const log = `lightService.getHotLight | memberId = ${memberId}`;
+  const log = `lightService.getHotLight | memberId = ${memberId}, crewId = ${crewId}`;
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
@@ -515,8 +540,13 @@ const getHotLight = async (memberId) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
-    const result = await lightDao.getHotLight(client);
+    const result = await lightDao.getHotLight(client, crewId);
 
     const lightData = result.map((light) => {
       const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
@@ -547,7 +577,7 @@ const getHotLight = async (memberId) => {
     client.release();
   }
 };
-const getSearchLight = async (memberId, search, category, offset, limit) => {
+const getSearchLight = async (memberId, crewId, search, category, offset, limit) => {
   let client;
 
   const log = `lightService.getSearchLight | memberId = ${memberId}`;
@@ -560,9 +590,14 @@ const getSearchLight = async (memberId, search, category, offset, limit) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
 
     if (category) {
-      const result = await lightDao.getSearchLightUseCategory(client, search, category, offset, limit);
+      const result = await lightDao.getSearchLightUseCategory(client, search, crewId,  category, offset, limit);
 
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -591,7 +626,7 @@ const getSearchLight = async (memberId, search, category, offset, limit) => {
       return util.success(statusCode.OK, responseMessage.LIGHT_GET_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
     }
     if (!category) {
-      const result = await lightDao.getSearchLightNotCategory(client, search, offset, limit);
+      const result = await lightDao.getSearchLightNotCategory(client, search, crewId, offset, limit);
 
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -626,6 +661,48 @@ const getSearchLight = async (memberId, search, category, offset, limit) => {
     client.release();
   }
 };
+const existLightUser = async (lightId, memberId) => {
+  let client;
+
+  const log = `lightService.existLightUser | lightId = ${lightId}, memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    // 존재하는 유저인지 확인
+    const existUser = await userDao.getUserById(client, memberId);
+    if (!existUser) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 존재하는 번개인지 확인
+    const existLight = await lightDao.getExistLight(client, lightId);
+    if (!existLight) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
+    }
+    // 본인이 그 번개의 소유자인지 확인
+    const is_organizer = await lightDao.IsLightOrganizer(client, lightId, memberId);
+    // 본인이 참여한 번개인지 확인
+    const is_entered = await lightUserDao.existLightUser(client, lightId, memberId);
+    if(is_entered && is_organizer){
+      const is_organizer = true;
+      const is_entered = true;
+      return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
+    }
+    if(!is_entered && !is_organizer){
+      const is_organizer = false;
+      const is_entered = false;
+      return util.success(statusCode.OK, responseMessage.EXIST_NOT_LIGHT_USER, { is_entered, is_organizer });
+    }
+    if(is_entered && !is_organizer){
+      const is_organizer = false;
+      const is_entered = true;
+      return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
+    }
+    
+  } catch (error) {
+    throw new Error('lightService getEnterLightMember error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   addLight,
@@ -642,4 +719,5 @@ module.exports = {
   getNewLight,
   getHotLight,
   getSearchLight,
+  existLightUser,
 };

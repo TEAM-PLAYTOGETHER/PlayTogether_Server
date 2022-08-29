@@ -2,41 +2,11 @@ const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
 const { userDao, authDao } = require('../db');
 const util = require('../lib/util');
-const bcrypt = require('bcrypt');
 const jwtUtil = require('../lib/jwtUtil');
 const jwt = require('jsonwebtoken');
+const jwtConstants = require('../constants/jwt');
 const redisClient = require('../lib/redis');
 const db = require('../loaders/db');
-
-const createUser = async (userLoginId, password, userName, gender, birth) => {
-  let client;
-  const log = `authService.createUser | userLoginId = ${userLoginId}, password = ${password}, userName = ${userName}, gender = ${gender}, birth = ${birth}`;
-
-  try {
-    client = await db.connect(log);
-    await client.query('BEGIN');
-
-    // 이미 존재하는 유저인지 확인
-    const isUser = await userDao.getUserByUserLoginId(client, userLoginId);
-
-    if (isUser) {
-      return util.fail(statusCode.CONFLICT, responseMessage.ALREADY_USER_ID);
-    }
-
-    // bcrypt를 이용한 비밀번호 암호화
-    const encryptedPassword = bcrypt.hashSync(password, 10);
-
-    const newUser = await authDao.createUser(client, userLoginId, encryptedPassword, userName, gender, birth);
-    await client.query('COMMIT');
-
-    return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw new Error('authService createUser에서 error 발생: \n' + error);
-  } finally {
-    client.release();
-  }
-};
 
 const createSnsUser = async (snsId, email, provider, name) => {
   let client;
@@ -58,36 +28,41 @@ const createSnsUser = async (snsId, email, provider, name) => {
   }
 };
 
-const login = async (userLoginId, password) => {
+const snsLogin = async (snsId, email, provider, name, picture) => {
   let client;
-  const log = `authService.login | userLoginId = ${userLoginId}`;
+  const log = `authService.snsLogin | userSnsId = ${snsId}`;
+  let user;
+  let isSignup = false;
 
   try {
     client = await db.connect(log);
+    await client.query('BEGIN');
 
-    // 유저가 존재하는지 확인
-    const isUser = await userDao.getUserByUserLoginId(client, userLoginId);
-
-    if (!isUser) {
-      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER);
+    // 정상적으로 등록된 유저인지 확인
+    user = await userDao.getUserBySnsId(client, snsId);
+    if (user) {
+      user = await authDao.updateSnsUser(client, snsId, email, name, picture);
     }
 
-    // bcrypt로 암호화된 비밀번호 비교
-    const passwordCheck = bcrypt.compareSync(password, isUser.password);
-
-    if (!passwordCheck) {
-      return util.fail(statusCode.UNAUTHORIZED, responseMessage.MISS_MATCH_PW);
+    if (!user) {
+      user = await authDao.createSnsUser(client, snsId, email, provider, name, picture);
     }
 
-    // jwt 토큰 생성
-    const accessToken = jwtUtil.sign(isUser);
-    const refreshToken = jwtUtil.refresh();
+    // 회원가입이 완료된 유저인지 확인
+    if (user.gender && user.birthDay) {
+      isSignup = true;
+    }
 
-    redisClient.set(isUser.id, refreshToken);
+    const accessToken = jwtUtil.sign(user);
+    const refreshToken = jwtUtil.refresh(user);
 
-    return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userLoginId: isUser.userLoginId, userName: isUser.name, accessToken: accessToken, refreshToken: refreshToken });
+    redisClient.set(user.id, refreshToken);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userName: user.name, accessToken: accessToken, refreshToken: refreshToken, isSignup: isSignup });
   } catch (error) {
-    throw new Error('authService login에서 error 발생: \n' + error);
+    await client.query('ROLLBACK');
+    throw new Error('authService snsLogin에서 error 발생: \n', error);
   } finally {
     client.release();
   }
@@ -114,14 +89,14 @@ const isUser = async (userLoginId) => {
   }
 };
 
-const isSnsUser = async (snsId, provider) => {
+const isSnsUser = async (snsId) => {
   let client;
   const log = `authService.isSnsUser | snsId = ${snsId}`;
 
   try {
     client = await db.connect(log);
 
-    const userExist = await userDao.getUserBySnsId(client, snsId, provider);
+    const userExist = await userDao.getUserBySnsId(client, snsId);
     if (!userExist) null;
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, userExist);
@@ -132,46 +107,54 @@ const isSnsUser = async (snsId, provider) => {
   }
 };
 
+const updateFcmToken = async (snsId, fcmToken) => {
+  let client;
+  const log = `authService.saveFcmToken | snsId = ${snsId}, fcmToken = ${fcmToken}`;
+
+  try {
+    client = await db.connect(log);
+
+    const saveFcmToken = await authDao.updateFcmToken(client, snsId, fcmToken);
+    if (!saveFcmToken) {
+      return util.fail(statusCode.DB_ERROR, responseMessage.DB_ERROR);
+    }
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_DEVICE_TOKEN_SUCCESS);
+  } catch (error) {
+    throw new Error('authService saveFcmToken에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 const refresh = async (user, authToken, refreshToken) => {
   // access token과 refresh token의 존재여부 확인
   if (authToken && refreshToken) {
     // access token 검증
     const authResult = jwtUtil.verify(authToken);
+    const refreshResult = jwtUtil.verify(refreshToken);
 
-    // 유저 정보
-    const decoded = jwt.decode(authToken);
-
-    if (!decoded) {
-      return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
-    }
-    // refresh token 검증
-    const refreshResult = jwtUtil.refreshVerify(refreshToken, decoded.id);
-
-    if (authResult.ok === false && authResult.message === 'jwt expired') {
-      // 1. access token & refresh token 모두 만료된 경우 새로 로그인
-      if (refreshResult.ok === false) {
+    // accessToken이 만료 됐을 경우
+    if (authResult.message === jwtConstants.TOKEN_EXPIRED || authResult.message === jwtConstants.TOKEN_INVALID) {
+      // refreshToken도 만료 됐을 경우
+      if (refreshResult.message === jwtConstants.TOKEN_EXPIRED || refreshResult.message === jwtConstants.TOKEN_INVALID) {
         return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
       } else {
-        // 2. access token만 만료되었을 경우
         const newAccessToken = jwtUtil.sign(user);
 
         return util.success(statusCode.OK, responseMessage.CREATED_TOKEN, { accessToken: newAccessToken, refreshToken: refreshToken });
       }
     } else {
-      // 3. access token이 만료되지 않았을 때
       return util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_UNEXPIRED);
     }
-  } else {
-    // 헤더에 토큰이 없는 경우
-    return util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_EMPTY);
   }
 };
 
 module.exports = {
-  createUser,
   createSnsUser,
-  login,
+  snsLogin,
   isUser,
   isSnsUser,
+  updateFcmToken,
   refresh,
 };

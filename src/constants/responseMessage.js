@@ -3,6 +3,7 @@ module.exports = {
   OUT_OF_VALUE: '파라미터 값이 잘못되었습니다',
   NO_SORT_VALUE: '정렬 조건이 없습니다.',
   NO_AUTHENTICATED: '접근 권한이 없습니다',
+  DB_ERROR: '데이터베이스에서 오류가 발생했습니다',
 
   // 회원가입
   CREATED_USER: '회원 가입 성공',
@@ -25,8 +26,10 @@ module.exports = {
   // 유저
   GET_USER_SUCCESS: '사용자 조회 성공',
   UPDATE_USER_SUCCESS: '사용자 업데이트 성공',
+  UPDATE_USER_FAIL: '사용자 업데이트 실패',
   UNUSABLE_NICKNAME: '사용불가능한 닉네임입니다.',
   UPDATE_PROFILE_SUCCESS: '사용자 프로필 업데이트 성공',
+  UPDATE_DEVICE_TOKEN_SUCCESS: '사용자 디바이스 토큰 저장 성공',
 
   // 서버 내 오류
   INTERNAL_SERVER_ERROR: '서버 내 오류',
@@ -52,6 +55,7 @@ module.exports = {
   CREW_CREATE_SUCCESS: '동아리 만들기 성공',
   CREW_REGISTER_SUCCESS: '동아리 가입 성공',
   CREW_DELETE_SUCCESS: '동아리 삭제 성공',
+  CREW_PUT_SUCCESS: '동아리 수정 성공',
   NO_CREW: '존재하지 않는 동아리입니다.',
   ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
   READ_REGISTER_INFO_SUCCESS: '동아리 가입정보 가져오기 성공',
@@ -73,6 +77,8 @@ module.exports = {
   LIGHT_GET_HOT_SUCCESS: 'Hot 번개 조회 성공',
   LIGHT_GET_SEARCH_SUCCESS: 'Search 번개 조회 성공',
   NOT_LIGHT_ORGANIZER: '번개 소유자가 아닙니다.',
+  EXIST_LIGHT_USER: '해당 번개에 참여중 입니다.',
+  EXIST_NOT_LIGHT_USER: '해당 번개에 참여중이 아닙니다.',
   NO_CATEGORY: '카테고리를 확인해주세요',
   NO_LIGHT: '없는 번개입니다.',
   NO_LIGHT_MEMBER: '번개에 참여한 사람이 아닙니다.',
@@ -82,4 +88,6 @@ module.exports = {
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
   SCRAP_DELETE_SUCCESS: '찜하기가 취소되었습니다.',
   NO_SCRAP: '스크랩 한적이 없습니다.',
+  EXIST_SCRAP_LIGHT: '해당 번개를 찜하는 중입니다.',
+  EXIST_NOT_SCRAP_LIGHT: '해당 번개를 찜하는 중이 아닙니다.',
 };

@@ -1,11 +1,12 @@
 const db = require('../loaders/db');
-const { crewDao, crewUserDao } = require('../db');
+const { crewDao, crewUserDao, userDao } = require('../db');
 
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const { createCrewCode } = require('../lib/createCrewCode');
 const { nicknameVerify } = require('../lib/nicknameVerify');
+const { applyKoreanTime } = require('../lib/applyKoreanTime');
 
 /**
  * createCrew
@@ -22,10 +23,10 @@ const createCrew = async (name, masterId, description) => {
     await client.query('BEGIN');
 
     // 동아리를 개설하려는 사람이 개설한 동아리의 수 확인
-    const { count: createdByUserCount } = await crewDao.getCreatedByUserCount(client, masterId);
-    if (createdByUserCount >= 5) {
-      return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
-    }
+    // const { count: createdByUserCount } = await crewDao.getCreatedByUserCount(client, masterId);
+    // if (createdByUserCount >= 5) {
+    //   return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
+    // }
 
     let code = '';
     let ok = false;
@@ -144,6 +145,26 @@ const updateCrewUserProfile = async (userId, crewId, nickname, description, firs
     client.release();
   }
 };
+const updateCrewUserProfileImage = async (userId, crewId, image) => {
+  let client;
+  const log = `crewUserDao.const updateCrewUserProfileImage = async (userId, crewId, image) => {
+    | userId = ${userId}, crewId = ${crewId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    const profile = await crewUserDao.updateCrewUserProfileImage(client, userId, crewId, image);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UPDATE_PROFILE_SUCCESS, profile);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('crewService updateCrewUserProfileImage error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 
 /**
  * getAllCrewByUserId
@@ -159,10 +180,15 @@ const getAllCrewByUserId = async (userId) => {
 
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
+    console.log(crews);
     const castedCrews = crews.map((crew) => {
+      let isAdmin = false;
+      if (crew.masterId === userId) isAdmin = true;
       return {
-        ...crew,
         id: Number(crew.id),
+        name: crew.name,
+        description: crew.description,
+        isAdmin,
       };
     });
 
@@ -214,6 +240,48 @@ const deleteCrewByCrewId = async (userId, crewCode) => {
     client.release();
   }
 };
+const putCrew = async (crewId, masterId, name, description) => {
+  let client;
+
+  const log = `crewService.putCrew | crewId = ${crewId}, name = ${name}, description = ${description}, masterId = ${masterId}`;
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+    // 존재하는 동아리인지 확인
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, masterId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 동아리를 수정하려는 사람이 master인지 검사
+    const master = await crewDao.getCrewMaster(client, crewId, masterId);
+    if (!master) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_MASTER_USER);
+    }
+    const data = await crewDao.putCrew(client, crewId, masterId, description, name);
+    const result = [data];
+    const data_result = result.map((o) => ({
+      id: Number(o.id),
+      name: o.name,
+      description: o.description,
+      isDeleted: o.isDeleted,
+      updatedAt: applyKoreanTime(o.updatedAt),
+      masterId: Number(o.masterId),
+    }));
+
+    await client.query('COMMIT');
+    return util.success(statusCode.OK, responseMessage.CREW_PUT_SUCCESS, data_result);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('lightService putLight에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 
 module.exports = {
   createCrew,
@@ -221,4 +289,6 @@ module.exports = {
   getAllCrewByUserId,
   deleteCrewByCrewId,
   updateCrewUserProfile,
+  putCrew,
+  updateCrewUserProfileImage,
 };

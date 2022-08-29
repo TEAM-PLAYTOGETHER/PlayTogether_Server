@@ -21,7 +21,24 @@ const postLightScrap = async (req, res, next) => {
     return next(new Error('postLightScrap Controller 에러: \n' + error));
   }
 };
+const existLightScrap = async (req, res, next) => {
+  const memberId = req.user.id;
+  const { lightId } = req.params;
+
+  if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
+
+  try {
+    const lights = await scrapService.existLightScrap(lightId, memberId);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('existLightScrap Controller 에러: \n' + error));
+  }
+};
 
 module.exports = {
   postLightScrap,
+  existLightScrap
 };

@@ -18,4 +18,5 @@ module.exports = {
   jwt: {
     secret: process.env.JWT_SECRET,
   },
+  slackURI: process.env.SLACK_URI,
 };

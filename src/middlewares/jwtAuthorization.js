@@ -2,9 +2,20 @@ const jwt = require('jsonwebtoken');
 const db = require('../loaders/db');
 const config = require('../config');
 const util = require('../lib/util');
+const jwtUtil = require('../lib/jwtUtil');
 const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
 const { userDao } = require('../db');
+
+const getUserIdByToken = (accessToken) => {
+  try {
+    const decoded = jwtUtil.verify(accessToken);
+
+    return decoded.decoded.id;
+  } catch (e) {
+    return null;
+  }
+};
 
 const authMiddleware = async (req, res, next) => {
   let client;
@@ -17,13 +28,12 @@ const authMiddleware = async (req, res, next) => {
   try {
     client = await db.connect(log);
     const token = req.headers.authorization;
-    const decoded = jwt.verify(token, config.jwt.secret);
-    const user = await userDao.getUserById(client, decoded.id);
-
-    // decoded된 userId가 가르키는 회원이 없는 경우
-    if (!user) {
-      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_USER));
+    const refreshToken = req.headers.refresh;
+    let userId = getUserIdByToken(token);
+    if (!userId) {
+      userId = getUserIdByToken(refreshToken);
     }
+    const user = await userDao.getUserById(client, userId);
 
     // req.user에 담아서 next()
     req.user = user;
@@ -40,5 +50,6 @@ const authMiddleware = async (req, res, next) => {
 };
 
 module.exports = {
+  getUserIdByToken,
   authMiddleware,
 };
