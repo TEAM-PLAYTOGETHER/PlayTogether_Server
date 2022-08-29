@@ -153,7 +153,7 @@ const postEnterLight = async (lightId, memberId) => {
       .messaging()
       .send(message)
       .catch(function (error) {
-        throw new Error('lightService postEnterLight push notification error 발생: \n' + error);
+        console.log('lightService postEnterLight push notification error 발생: \n' + error);
       });
 
     await client.query('COMMIT');

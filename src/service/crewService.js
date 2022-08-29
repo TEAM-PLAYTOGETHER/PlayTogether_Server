@@ -120,7 +120,7 @@ const registerMember = async (userId, crewCode) => {
       .messaging()
       .send(message)
       .catch(function (error) {
-        throw new Error('crewService registerMember push notification error 발생: \n' + error);
+        console.log('crewService registerMember push notification error 발생: \n' + error);
       });
 
     await client.query('COMMIT');

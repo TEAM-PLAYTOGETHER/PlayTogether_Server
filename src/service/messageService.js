@@ -105,7 +105,7 @@ const sendMessage = async (sendId, recvId, content) => {
       .messaging()
       .send(message)
       .catch(function (error) {
-        throw new Error('messageService sendMessage push notification error 발생: \n' + error);
+        console.log('messageService sendMessage push notification error 발생: \n' + error);
       });
 
     // 성공
