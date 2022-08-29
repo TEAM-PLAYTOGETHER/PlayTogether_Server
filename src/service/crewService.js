@@ -106,6 +106,9 @@ const registerMember = async (userId, crewCode) => {
     // 번개 신청자 정보 조회
     const user = await userDao.getUserById(client, userId);
 
+    // 번개 생성자
+    const admin = await userDao.getUserById(client, crew.masterId);
+
     // 푸시알림 정보
     const body = `${user.name}님이 ${crew.name} 동아리에 참여하였습니다.`;
     const message = {
@@ -113,7 +116,7 @@ const registerMember = async (userId, crewCode) => {
         title: 'PlayTogether 알림',
         body: body,
       },
-      token: user.deviceToken,
+      token: admin.deviceToken,
     };
 
     admin

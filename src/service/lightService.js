@@ -95,28 +95,28 @@ const putLight = async (lightId, organizerId, image, category, title, date, plac
       const data = await lightDao.putLightWhereImageFull(client, lightId, organizerId, image, category, title, date, place, people_cnt, description, time);
       const result = [data];
       const data_result = result.map((o) => ({
-      id: Number(o.id),
-      category: o.category,
-      title: o.title,
-      date: o.date,
-      place: o.place,
-      peopleCnt: o.peopleCnt,
-      description: o.description,
-      image: o.image,
-      isDeleted: o.isDeleted,
-      createdAt: applyKoreanTime(o.createdAt),
-      updatedAt: applyKoreanTime(o.updatedAt),
-      organizerId: Number(o.organizerId),
-      crewId: Number(o.crewId),
-      time: o.time,
-    }));
+        id: Number(o.id),
+        category: o.category,
+        title: o.title,
+        date: o.date,
+        place: o.place,
+        peopleCnt: o.peopleCnt,
+        description: o.description,
+        image: o.image,
+        isDeleted: o.isDeleted,
+        createdAt: applyKoreanTime(o.createdAt),
+        updatedAt: applyKoreanTime(o.updatedAt),
+        organizerId: Number(o.organizerId),
+        crewId: Number(o.crewId),
+        time: o.time,
+      }));
 
-    await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
-    } else if(1 < imageCnt < 3){
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
+    } else if (1 < imageCnt < 3) {
       for (let i = 0; i < image.length; i++) {
         let imagePathString = image[i].toString();
-        await lightDao.addLightImage(client,i + 2, imagePathString, lightId);
+        await lightDao.addLightImage(client, i + 2, imagePathString, lightId);
       }
       const data = await lightDao.putLightWhereImageNotFull(client, lightId, organizerId, category, title, date, place, people_cnt, description, time);
       const result = [data];
@@ -173,7 +173,7 @@ const postEnterLight = async (lightId, memberId) => {
     const fcmToken = await authDao.getFcmTokenById(client, organizer.id);
 
     // 푸시알림 정보
-    const body = `${organizer.name}님이 ${organizer.title} 번개에 참여하였습니다.`;
+    const body = `${exist.name}님이 ${organizer.title} 번개에 참여하였습니다.`;
     const message = {
       notification: {
         title: 'PlayTogether 알림',
