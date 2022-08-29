@@ -31,6 +31,8 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     }
 
     const data = await lightDao.addLight(client, category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
+    const lightId = data.id;
+
     const result = [data];
     const data_result = result.map((o) => ({
       id: Number(o.id),
@@ -50,7 +52,7 @@ const addLight = async (category, title, date, place, people_cnt, description, i
     }));
 
     // 번개 생성 후 번개 소유자도 번개에 참여시키기
-    await lightDao.addLightOrganizer(client, organizerId);
+    await lightDao.addLightOrganizer(client, organizerId, lightId);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.LIGHT_ADD_SUCCESS, data_result);

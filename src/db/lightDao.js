@@ -17,15 +17,14 @@ const addLight = async (client, category, title, date, place, people_cnt, descri
     throw new Error('lightdao.addLight에서 에러 발생했습니다 \n' + error);
   }
 };
-const addLightOrganizer = async (client, organizerId) => {
+const addLightOrganizer = async (client, organizerId, lightId) => {
   try {
     const { rows } = await client.query(
       `
-      INSERT into light_user (light_id, member_id)
-      select id, organizer_id from light
-      where organizer_id = $1;
+      INSERT into light_user (member_id, light_id)
+      VALUES ($1, $2)
       `,
-      [organizerId],
+      [organizerId, lightId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
