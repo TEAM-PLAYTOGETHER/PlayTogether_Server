@@ -1,6 +1,6 @@
 const db = require('../loaders/db');
 const { messageDao, userDao } = require('../db');
-
+const admin = require('firebase-admin');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const util = require('../lib/util');
@@ -88,6 +88,25 @@ const sendMessage = async (sendId, recvId, content) => {
     if (cnt !== 1) {
       return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.MESSAGE_SEND_FAIL);
     }
+
+    const user = await userDao.getUserById(client, sendId);
+
+    // 푸시알림 정보
+    const body = `${content}`;
+    const message = {
+      notification: {
+        title: `${user.name}`,
+        body: body,
+      },
+      token: user.deviceToken,
+    };
+
+    admin
+      .messaging()
+      .send(message)
+      .catch(function (error) {
+        console.log('messageService sendMessage push notification error 발생: \n' + error);
+      });
 
     // 성공
     await client.query('COMMIT');

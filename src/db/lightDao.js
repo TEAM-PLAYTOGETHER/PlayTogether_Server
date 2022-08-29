@@ -273,7 +273,7 @@ const getNewLight = async (client, crewId) => {
       order by created_at desc
       limit 5;
       `,
-      [crewId]
+      [crewId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
@@ -291,7 +291,7 @@ const getHotLight = async (client, crewId) => {
       order by scp_cnt desc
       limit 5;
       `,
-      [crewId]
+      [crewId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
@@ -309,7 +309,7 @@ const getSearchLightUseCategory = async (client, search, crewId, category, offse
       offset $4
       limit $5;
       `,
-      [search, crewId, category, offset, limit],
+      [search, category, crewId, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
@@ -377,6 +377,22 @@ const addLightImage = async (client, cnt, image, lightId) => {
   }
 };
 
+const getOrganizerByLightId = async (client, lightId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT organizer_id, title, u.name
+      FROM "light" JOIN "user" u on u.id = light.organizer_id
+      WHERE id = $1
+      `,
+      [lightId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('lightDao.getOrganizerByLightId 에러 발생했습니다. \n' + error);
+  }
+};
+
 module.exports = {
   addLight,
   deleteLight,
@@ -395,6 +411,7 @@ module.exports = {
   getSearchLightUseCategory,
   getSearchLightNotCategory,
   IsLightOrganizer,
+  getOrganizerByLightId,
   getLightImage,
   putLightWhereImageFull,
   putLightWhereImageNotFull,

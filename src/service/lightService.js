@@ -1,4 +1,4 @@
-const { lightDao, lightUserDao, userDao, crewDao } = require('../db');
+const { lightDao, lightUserDao, userDao, crewDao, authDao } = require('../db');
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
@@ -7,6 +7,7 @@ const dayjs = require('dayjs');
 const { calculateAge } = require('../lib/calculateAge');
 const { applyKoreanTime } = require('../lib/applyKoreanTime');
 const pageNation = require('../lib/pageNation');
+const admin = require('firebase-admin');
 
 const addLight = async (category, title, date, place, people_cnt, description, image, organizerId, crewId, time) => {
   let client;
@@ -94,28 +95,28 @@ const putLight = async (lightId, organizerId, image, category, title, date, plac
       const data = await lightDao.putLightWhereImageFull(client, lightId, organizerId, image, category, title, date, place, people_cnt, description, time);
       const result = [data];
       const data_result = result.map((o) => ({
-      id: Number(o.id),
-      category: o.category,
-      title: o.title,
-      date: o.date,
-      place: o.place,
-      peopleCnt: o.peopleCnt,
-      description: o.description,
-      image: o.image,
-      isDeleted: o.isDeleted,
-      createdAt: applyKoreanTime(o.createdAt),
-      updatedAt: applyKoreanTime(o.updatedAt),
-      organizerId: Number(o.organizerId),
-      crewId: Number(o.crewId),
-      time: o.time,
-    }));
+        id: Number(o.id),
+        category: o.category,
+        title: o.title,
+        date: o.date,
+        place: o.place,
+        peopleCnt: o.peopleCnt,
+        description: o.description,
+        image: o.image,
+        isDeleted: o.isDeleted,
+        createdAt: applyKoreanTime(o.createdAt),
+        updatedAt: applyKoreanTime(o.updatedAt),
+        organizerId: Number(o.organizerId),
+        crewId: Number(o.crewId),
+        time: o.time,
+      }));
 
-    await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
-    } else if(1 < imageCnt < 3){
+      await client.query('COMMIT');
+      return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
+    } else if (1 < imageCnt < 3) {
       for (let i = 0; i < image.length; i++) {
         let imagePathString = image[i].toString();
-        await lightDao.addLightImage(client,i + 2, imagePathString, lightId);
+        await lightDao.addLightImage(client, i + 2, imagePathString, lightId);
       }
       const data = await lightDao.putLightWhereImageNotFull(client, lightId, organizerId, category, title, date, place, people_cnt, description, time);
       const result = [data];
@@ -165,6 +166,29 @@ const postEnterLight = async (lightId, memberId) => {
     }
     await lightUserDao.postEnterLight(client, lightId, memberId);
 
+    // 해당 번개 생성자 아이디 조회
+    const organizer = await lightDao.getOrganizerByLightId(client, lightId);
+
+    // 번개 생성자의 fcm 토큰 조회
+    const fcmToken = await authDao.getFcmTokenById(client, organizer.id);
+
+    // 푸시알림 정보
+    const body = `${exist.name}님이 ${organizer.title} 번개에 참여하였습니다.`;
+    const message = {
+      notification: {
+        title: 'PlayTogether 알림',
+        body: body,
+      },
+      token: fcmToken.deviceToken,
+    };
+
+    admin
+      .messaging()
+      .send(message)
+      .catch(function (error) {
+        console.log('lightService postEnterLight push notification error 발생: \n' + error);
+      });
+
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_ENTER_SUCCESS);
   } catch (error) {
@@ -205,6 +229,7 @@ const getEnterLightMember = async (lightId, memberId) => {
   try {
     client = await db.connect(log);
     const data = await lightUserDao.getEnterLightMember(client, lightId, memberId);
+
     return data;
   } catch (error) {
     throw new Error('lightService getEnterLightMember error 발생: \n' + error);
@@ -307,7 +332,7 @@ const getEnterLight = async (memberId, crewId, offset, limit) => {
     if (!exist) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
-    
+
     // 존재 하는 동아리인지 검사
     const existCrew = await crewDao.getExistCrew(client, crewId);
     if (!existCrew) {
@@ -367,7 +392,7 @@ const getScrapLight = async (memberId, crewId, offset, limit) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const result = await lightDao.getScrapLight(client, memberId,crewId, offset, limit);
+    const result = await lightDao.getScrapLight(client, memberId, crewId, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -408,7 +433,7 @@ const getCategoryLight = async (crewId, category, sort, offset, limit) => {
   if (!category) {
     return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
   }
-  
+
   try {
     client = await db.connect(log);
     // 존재 하는 동아리인지 검사
@@ -417,7 +442,7 @@ const getCategoryLight = async (crewId, category, sort, offset, limit) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const result = await lightDao.getCategoryLight(client,crewId, category, sort, offset, limit);
+    const result = await lightDao.getCategoryLight(client, crewId, category, sort, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -630,7 +655,7 @@ const getSearchLight = async (memberId, crewId, search, category, offset, limit)
     }
 
     if (category) {
-      const result = await lightDao.getSearchLightUseCategory(client, search, crewId,  category, offset, limit);
+      const result = await lightDao.getSearchLightUseCategory(client, search, crewId, category, offset, limit);
 
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -714,22 +739,21 @@ const existLightUser = async (lightId, memberId) => {
     const is_organizer = await lightDao.IsLightOrganizer(client, lightId, memberId);
     // 본인이 참여한 번개인지 확인
     const is_entered = await lightUserDao.existLightUser(client, lightId, memberId);
-    if(is_entered && is_organizer){
+    if (is_entered && is_organizer) {
       const is_organizer = true;
       const is_entered = true;
       return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
     }
-    if(!is_entered && !is_organizer){
+    if (!is_entered && !is_organizer) {
       const is_organizer = false;
       const is_entered = false;
       return util.success(statusCode.OK, responseMessage.EXIST_NOT_LIGHT_USER, { is_entered, is_organizer });
     }
-    if(is_entered && !is_organizer){
+    if (is_entered && !is_organizer) {
       const is_organizer = false;
       const is_entered = true;
       return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
     }
-    
   } catch (error) {
     throw new Error('lightService getEnterLightMember error 발생: \n' + error);
   } finally {
