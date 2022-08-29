@@ -1,6 +1,6 @@
 const db = require('../loaders/db');
-const { crewDao, crewUserDao, userDao } = require('../db');
-
+const { crewDao, crewUserDao, userDao, authDao } = require('../db');
+const admin = require('firebase-admin');
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
@@ -83,7 +83,6 @@ const registerMember = async (userId, crewCode) => {
 
     // 해당 회원이 가입한 동아리 갯수 확인하기
     const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
-    console.log(userRegisteredCount);
     if (userRegisteredCount >= 10) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.LIMIT_EXCEED);
     }
@@ -103,6 +102,26 @@ const registerMember = async (userId, crewCode) => {
     // 해당 회원을 동아리에 가입시킴
     const cnt = await crewUserDao.registerCrewMember(client, crew.id, userId);
     if (cnt !== 1) throw new Error('registerMember 회원 등록과정에서 오류 발생');
+
+    // 번개 신청자 정보 조회
+    const user = await userDao.getUserById(client, userId);
+
+    // 푸시알림 정보
+    const body = `${user.name}님이 ${crew.name} 동아리에 참여하였습니다.`;
+    const message = {
+      notification: {
+        title: 'PlayTogether 알림',
+        body: body,
+      },
+      token: user.deviceToken,
+    };
+
+    admin
+      .messaging()
+      .send(message)
+      .catch(function (error) {
+        throw new Error('crewService registerMember push notification error 발생: \n' + error);
+      });
 
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
