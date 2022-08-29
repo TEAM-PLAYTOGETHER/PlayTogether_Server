@@ -124,7 +124,7 @@ const registerMember = async (userId, crewCode) => {
       });
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewName: crew.name });
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewId: Number(crew.id), crewName: crew.name });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('crewService registerMember에서 error 발생: \n' + error);
@@ -199,7 +199,6 @@ const getAllCrewByUserId = async (userId) => {
 
     // 가입된 crew 정보들을 가져옴
     const crews = await crewUserDao.getAllCrewByUserId(client, userId);
-    console.log(crews);
     const castedCrews = crews.map((crew) => {
       let isAdmin = false;
       if (crew.masterId === userId) isAdmin = true;
