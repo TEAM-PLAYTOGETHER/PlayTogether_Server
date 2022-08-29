@@ -309,7 +309,7 @@ const getSearchLightUseCategory = async (client, search, crewId, category, offse
       offset $4
       limit $5;
       `,
-      [search, crewId, category, offset, limit],
+      [search, category, crewId, offset, limit],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
