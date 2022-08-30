@@ -18,7 +18,8 @@ const imageUploader = multer({
       if (!allowedExtensions.includes(extension)) {
         return callback(new Error('잘못된 파일입니다.'));
       }
-      callback(null, `${Date.now()}_${file.originalname.split('.').pop()}`);
+	    console.log(file)
+      callback(null, `${Date.now()}.${file.originalname.split('.').pop()}`);
     },
     acl: 'public-read-write',
   }),
