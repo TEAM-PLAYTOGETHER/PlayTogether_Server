@@ -30,6 +30,7 @@ const addLight = async (req, res, next) => {
 };
 const putLight = async (req, res, next) => {
   const organizerId = req.user.id;
+
   let image = '';
   if (req.file) {
     image = req.file.location;
