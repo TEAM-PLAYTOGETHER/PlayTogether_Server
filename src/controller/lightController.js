@@ -7,7 +7,7 @@ const responseMessage = require('../constants/responseMessage');
 const addLight = async (req, res, next) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
-  var image = null;
+  let image = "";
   if (req.file) {
     image = req.file.location;
   }
