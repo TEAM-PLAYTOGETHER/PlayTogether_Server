@@ -75,6 +75,7 @@ app.use(function (err, req, res, next) {
   if (process.env.NODE_ENV !== 'development') {
     slackWebhook(req, err);
   }
+  console.log(err);
   return res.status(statusCode.INTERNAL_SERVER_ERROR).json(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
 });
 
