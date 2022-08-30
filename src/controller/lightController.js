@@ -8,10 +8,9 @@ const addLight = async (req, res, next) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
   let image = null;
-  if (req.files) {
-    image = req.files;
+  if (req.file) {
+    image = req.file.location;
   }
-  const path = image.map((img) => img.location);
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러
@@ -22,7 +21,7 @@ const addLight = async (req, res, next) => {
     return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW));
   }
   try {
-    const result = await lightService.addLight(category, title, date, place, people_cnt, description, path, organizerId, crewId, time);
+    const result = await lightService.addLight(category, title, date, place, people_cnt, description, image, organizerId, crewId, time);
 
     return res.status(result.status).json(result);
   } catch (error) {
@@ -32,17 +31,16 @@ const addLight = async (req, res, next) => {
 const putLight = async (req, res, next) => {
   const organizerId = req.user.id;
   let image = null;
-  if (req.files) {
-    image = req.files;
+  if (req.file) {
+    image = req.file.location;
   }
-  const path = image.map((img) => img.location);
   const { lightId } = req.params;
   const { category, title, date, place, people_cnt, description, time } = req.body;
 
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const updatedPost = await lightService.putLight(lightId, organizerId, path, category, title, date, place, people_cnt, description, time);
+    const updatedPost = await lightService.putLight(lightId, organizerId, image, category, title, date, place, people_cnt, description, time);
 
     // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
     // if (!(updatedPost.category == "먹을래") || !(updatedPost.category == "갈래") || !(updatedPost.category == "할래")) {

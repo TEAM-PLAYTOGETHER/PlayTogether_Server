@@ -60,34 +60,6 @@ const putLightWhereImageFull = async (client, lightId, organizerId, image, categ
     throw new Error('lightdao.putLight에서 에러 발생했습니다 \n' + error);
   }
 };
-const putLightWhereImageNotFull = async (client, lightId, organizerId, category, title, date, place, people_cnt, description, time) => {
-  try {
-    const { rows: existingRows } = await client.query(
-      `
-      SELECT * FROM light l
-      WHERE id = $1 and organizer_id = $2
-      `,
-      [lightId, organizerId],
-    );
-
-    if (existingRows.length === 0) return false;
-
-    const data = _.merge({}, convertSnakeToCamel.keysToCamel(existingRows[0]), { category, title, date, place, people_cnt, description, time });
-
-    const { rows } = await client.query(
-      `
-      UPDATE light l
-      SET category = $1, title = $2, date = $3, place = $4, people_cnt = $5, description = $6, time = $7, updated_at = now()
-      WHERE id = $8 and organizer_id = $9
-      RETURNING * 
-      `,
-      [data.category, data.title, data.date, data.place, data.people_cnt, data.description, data.time, lightId, organizerId],
-    );
-    return convertSnakeToCamel.keysToCamel(rows[0]);
-  } catch (error) {
-    throw new Error('lightdao.putLight에서 에러 발생했습니다 \n' + error);
-  }
-};
 
 const deleteLight = async (client, lightId, organizerId) => {
   try {
@@ -414,6 +386,5 @@ module.exports = {
   getOrganizerByLightId,
   getLightImage,
   putLightWhereImageFull,
-  putLightWhereImageNotFull,
   addLightImage
 };
