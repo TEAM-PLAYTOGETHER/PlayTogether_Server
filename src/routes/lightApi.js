@@ -1,12 +1,12 @@
 const express = require('express');
 const { lightController } = require('../controller');
-const uploader = require('../middlewares/imageUpload');
+const upload = require('../middlewares/multer');
 const { authMiddleware } = require('../middlewares/jwtAuthorization');
 
 const router = express.Router();
 
-router.post('/add/:crewId', authMiddleware, uploader.imageUploader.single('image'), lightController.addLight);
-router.put('/:lightId', authMiddleware, uploader.imageUploader.single('image'), lightController.putLight);
+router.post('/add/:crewId', authMiddleware, upload.single('image'), lightController.addLight);
+router.put('/:lightId', authMiddleware, upload.single('image'), lightController.putLight);
 router.post('/enter/:lightId', authMiddleware, lightController.postEnterLight);
 router.post('/remove/:lightId', authMiddleware, lightController.deleteLight);
 router.get('/:crewId/open', authMiddleware, lightController.getOrganizerLight);
