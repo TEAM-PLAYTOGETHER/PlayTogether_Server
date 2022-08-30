@@ -7,10 +7,8 @@ const responseMessage = require('../constants/responseMessage');
 const addLight = async (req, res, next) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
-  let image = null;
-  if (req.file) {
-    image = req.file.location;
-  }
+  
+  const image = req.file.location;
   const { category, title, date, time, description, place, people_cnt } = req.body;
 
   // 번개 내용 미입력 시 에러
@@ -30,10 +28,7 @@ const addLight = async (req, res, next) => {
 };
 const putLight = async (req, res, next) => {
   const organizerId = req.user.id;
-  let image = null;
-  if (req.file) {
-    image = req.file.location;
-  }
+  const image = req.file.location;
   const { lightId } = req.params;
   const { category, title, date, place, people_cnt, description, time } = req.body;
 
