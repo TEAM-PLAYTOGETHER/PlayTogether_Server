@@ -94,7 +94,7 @@ const signup = async (client, userId, gender, birth) => {
     const { rows } = await client.query(
       `
       UPDATE "user"
-      SET gender = $1, birth_day = $2
+      SET gender = $1, birth = $2
       WHERE id = $3
       `,
       [gender, birthDay, userId],
