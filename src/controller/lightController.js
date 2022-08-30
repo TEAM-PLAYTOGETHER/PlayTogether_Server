@@ -7,7 +7,7 @@ const responseMessage = require('../constants/responseMessage');
 const addLight = async (req, res, next) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
-  let image = "";
+  let image = '';
   if (req.file) {
     image = req.file.location;
   }
@@ -30,7 +30,8 @@ const addLight = async (req, res, next) => {
 };
 const putLight = async (req, res, next) => {
   const organizerId = req.user.id;
-  let image = "";
+
+  let image = '';
   if (req.file) {
     image = req.file.location;
   }
@@ -240,7 +241,7 @@ const ExistLightUser = async (req, res, next) => {
   const { lightId } = req.params;
 
   if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-  
+
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
 
   try {
@@ -265,5 +266,5 @@ module.exports = {
   getNewLight,
   getHotLight,
   getSearchLight,
-  ExistLightUser
+  ExistLightUser,
 };
