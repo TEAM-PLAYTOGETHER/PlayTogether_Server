@@ -7,7 +7,7 @@ const responseMessage = require('../constants/responseMessage');
 const addLight = async (req, res, next) => {
   const organizerId = req.user.id;
   const { crewId } = req.params;
-  let image = null;
+  var image = null;
   if (req.file) {
     image = req.file.location;
   }
@@ -30,7 +30,7 @@ const addLight = async (req, res, next) => {
 };
 const putLight = async (req, res, next) => {
   const organizerId = req.user.id;
-  let image = null;
+  var image = null;
   if (req.file) {
     image = req.file.location;
   }
