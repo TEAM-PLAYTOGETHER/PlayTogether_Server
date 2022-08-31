@@ -13,6 +13,19 @@ const util = require('./lib/util');
 const responseMessage = require('./constants/responseMessage');
 const slackWebhook = require('./lib/slack');
 
+// push notification
+const admin = require('firebase-admin');
+const serviceAccount = require('./play-together-66ddb-firebase-adminsdk-bx7fx-3d83e6876a.json');
+
+let firebase;
+if (admin.apps.length === 0) {
+  firebase = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} else {
+  firebase = admin.app();
+}
+
 // const sentry = require('@sentry/node');
 // const tracing = require('@sentry/tracing');
 

@@ -107,24 +107,26 @@ const registerMember = async (userId, crewCode) => {
     const user = await userDao.getUserById(client, userId);
 
     // 번개 생성자
-    const admin = await userDao.getUserById(client, crew.masterId);
+    const lightAdmin = await userDao.getUserById(client, crew.masterId);
 
-    // 푸시알림 정보
-    const body = `${user.name}님이 ${crew.name} 동아리에 참여하였습니다.`;
-    const message = {
-      notification: {
-        title: 'PlayTogether 알림',
-        body: body,
-      },
-      token: admin.deviceToken,
-    };
+    if (lightAdmin.deviceToken) {
+      // 푸시알림 정보
+      const body = `${user.name}님이 ${crew.name} 동아리에 참여하였습니다.`;
+      const message = {
+        notification: {
+          title: 'PlayTogether 알림',
+          body: body,
+        },
+        token: lightAdmin.deviceToken,
+      };
 
-    admin
-      .messaging()
-      .send(message)
-      .catch(function (error) {
-        console.log('crewService registerMember push notification error 발생: \n' + error);
-      });
+      admin
+        .messaging()
+        .send(message)
+        .catch(function (error) {
+          console.log('messageService sendMessage push notification error 발생: \n' + error);
+        });
+    }
 
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.CREW_REGISTER_SUCCESS, { crewId: Number(crew.id), crewName: crew.name });

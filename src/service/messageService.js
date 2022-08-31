@@ -91,22 +91,24 @@ const sendMessage = async (sendId, recvId, content) => {
 
     const user = await userDao.getUserById(client, sendId);
 
-    // 푸시알림 정보
-    const body = `${content}`;
-    const message = {
-      notification: {
-        title: `${user.name}`,
-        body: body,
-      },
-      token: user.deviceToken,
-    };
+    if (user.deviceToken) {
+      // 푸시알림 정보
+      const body = `${content}`;
+      const message = {
+        notification: {
+          title: `${user.name}`,
+          body: body,
+        },
+        token: user.deviceToken,
+      };
 
-    admin
-      .messaging()
-      .send(message)
-      .catch(function (error) {
-        console.log('messageService sendMessage push notification error 발생: \n' + error);
-      });
+      admin
+        .messaging()
+        .send(message)
+        .catch(function (error) {
+          console.log('messageService sendMessage push notification error 발생: \n' + error);
+        });
+    }
 
     // 성공
     await client.query('COMMIT');
