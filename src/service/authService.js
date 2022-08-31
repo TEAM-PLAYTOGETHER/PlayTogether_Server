@@ -48,8 +48,10 @@ const snsLogin = async (snsId, email, provider, name, picture) => {
       user = await authDao.createSnsUser(client, snsId, email, provider, name, picture);
     }
 
+    console.log(user);
+
     // 회원가입이 완료된 유저인지 확인
-    if (user.gender && user.birthDay) {
+    if (user.gender && user.birth) {
       isSignup = true;
     }
 
