@@ -22,6 +22,7 @@ module.exports = {
   LOGIN_FAIL: '로그인 실패',
   NO_USER: '존재하지 않는 회원입니다.',
   MISS_MATCH_PW: '비밀번호가 맞지 않습니다.',
+  LOGIN_RETRY: '재로그인이 필요합니다',
 
   // 유저
   GET_USER_SUCCESS: '사용자 조회 성공',
