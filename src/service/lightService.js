@@ -88,26 +88,26 @@ const putLight = async (lightId, organizerId, image, category, title, date, plac
     if (!organizer) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_LIGHT_ORGANIZER);
     }
-      const data = await lightDao.putLightWhereImageFull(client, lightId, organizerId, image, category, title, date, place, people_cnt, description, time);
-      const result = [data];
-      const data_result = result.map((o) => ({
-        id: Number(o.id),
-        category: o.category,
-        title: o.title,
-        date: o.date,
-        place: o.place,
-        peopleCnt: o.peopleCnt,
-        image: o.image,
-        description: o.description,
-        isDeleted: o.isDeleted,
-        createdAt: applyKoreanTime(o.createdAt),
-        updatedAt: applyKoreanTime(o.updatedAt),
-        organizerId: Number(o.organizerId),
-        crewId: Number(o.crewId),
-        time: o.time,
-      }));
-      await client.query('COMMIT');
-      return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
+    const data = await lightDao.putLightWhereImageFull(client, lightId, organizerId, image, category, title, date, place, people_cnt, description, time);
+    const result = [data];
+    const data_result = result.map((o) => ({
+      id: Number(o.id),
+      category: o.category,
+      title: o.title,
+      date: o.date,
+      place: o.place,
+      peopleCnt: o.peopleCnt,
+      image: o.image,
+      description: o.description,
+      isDeleted: o.isDeleted,
+      createdAt: applyKoreanTime(o.createdAt),
+      updatedAt: applyKoreanTime(o.updatedAt),
+      organizerId: Number(o.organizerId),
+      crewId: Number(o.crewId),
+      time: o.time,
+    }));
+    await client.query('COMMIT');
+    return util.success(statusCode.OK, responseMessage.LIGHT_PUT_SUCCESS, data_result);
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('lightService putLight에서 error 발생: \n' + error);
@@ -140,22 +140,24 @@ const postEnterLight = async (lightId, memberId) => {
     // 번개 생성자의 fcm 토큰 조회
     const fcmToken = await authDao.getFcmTokenById(client, organizer.id);
 
-    // 푸시알림 정보
-    const body = `${exist.name}님이 ${organizer.title} 번개에 참여하였습니다.`;
-    const message = {
-      notification: {
-        title: 'PlayTogether 알림',
-        body: body,
-      },
-      token: fcmToken.deviceToken,
-    };
+    if (fcmToken) {
+      // 푸시알림 정보
+      const body = `${exist.name}님이 ${organizer.title} 번개에 참여하였습니다.`;
+      const message = {
+        notification: {
+          title: 'PlayTogether 알림',
+          body: body,
+        },
+        token: fcmToken.deviceToken,
+      };
 
-    admin
-      .messaging()
-      .send(message)
-      .catch(function (error) {
-        console.log('lightService postEnterLight push notification error 발생: \n' + error);
-      });
+      admin
+        .messaging()
+        .send(message)
+        .catch(function (error) {
+          console.log('lightService postEnterLight push notification error 발생: \n' + error);
+        });
+    }
 
     await client.query('COMMIT');
     return util.success(statusCode.OK, responseMessage.LIGHT_ENTER_SUCCESS);
