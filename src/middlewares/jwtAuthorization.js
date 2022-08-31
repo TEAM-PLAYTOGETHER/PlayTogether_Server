@@ -10,6 +10,7 @@ const { userDao } = require('../db');
 const getUserIdByToken = (accessToken) => {
   try {
     const decoded = jwtUtil.verify(accessToken);
+    console.log(decoded);
 
     return decoded.decoded.id;
   } catch (e) {
@@ -30,8 +31,12 @@ const authMiddleware = async (req, res, next) => {
     const token = req.headers.authorization;
     const refreshToken = req.headers.refresh;
     let userId = getUserIdByToken(token);
+    console.log(userId);
     if (!userId) {
       userId = getUserIdByToken(refreshToken);
+      if (!userId) {
+        return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_RETRY));
+      }
     }
     const user = await userDao.getUserById(client, userId);
 
