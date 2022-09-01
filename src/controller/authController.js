@@ -105,9 +105,22 @@ const refresh = async (req, res, next) => {
   }
 };
 
+const withDraw = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const withDraw = await authService.withDraw(userId);
+
+    return res.status(withDraw.status).json(withDraw);
+  } catch (error) {
+    return next(new Error('AuthController withDraw error 발생: \n' + error));
+  }
+};
+
 module.exports = {
   kakaoLogin,
   googleLogin,
   appleLogin,
   refresh,
+  withDraw,
 };
