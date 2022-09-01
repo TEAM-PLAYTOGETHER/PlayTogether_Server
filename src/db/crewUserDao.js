@@ -158,11 +158,32 @@ const withdrawAllMemberByCrewId = async (client, crewId) => {
   }
 };
 
+/**
+ * withDrawCrew
+ * 동아리 탈퇴
+ * @param {*} userId - 유저 아이디
+ * @param {*} crewId - 탈퇴하고자 하는 동아리 아이디
+ */
+const withDrawCrew = async (client, userId, crewId) => {
+  try {
+    const { rowCount } = await client.query(
+      `
+      DELETE FROM crew_user
+      WHERE member_id = $1 AND crew_id = $2
+      `,
+      [userId, crewId],
+    );
+  } catch (error) {
+    throw new Error('crewUserDao.withDrawCrew에서 오류 발생: \n' + error);
+  }
+};
+
 module.exports = {
   registerCrewMember,
   getRegisteredMember,
   getAllCrewByUserId,
   withdrawAllMemberByCrewId,
+  withDrawCrew,
   getUserRegisteredCount,
   updateCrewUserProfile,
   updateCrewUserProfileImage,

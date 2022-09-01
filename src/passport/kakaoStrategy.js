@@ -13,11 +13,12 @@ module.exports = () => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           const existUser = await authService.isSnsUser(profile.id, 'kakao');
+          console.log(accessToken);
 
           if (existUser.data) {
             return done(null, existUser.data);
           } else {
-            const newUser = await authService.createSnsUser(profile.id, profile._json.kakao_account.email, 'kakao', profile.displayName);
+            const newUser = await authService.createSnsUser(profile.id, profile._json.kakao_account.email, 'kakao', profile.displayName, profile._json.properties.profile_image);
             return done(null, newUser.data);
           }
         } catch (error) {

@@ -32,23 +32,22 @@ const signup = async (req, res, next) => {
 };
 
 /**
- * GET ~/:crewId
+ * GET ~/:crewId/:userId
  * 유저 아이디로 유저 조회
  * @public
  */
-const getCrewUserByEmail = async (req, res, next) => {
+const getCrewUserById = async (req, res, next) => {
   try {
-    const { crewId } = req.params;
-    const { email } = req.query;
+    const { crewId, userId } = req.params;
 
-    if (!crewId || !email) {
+    if (!crewId || !userId) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
     // 유저 조회
-    const getUserByEmail = await userService.getCrewUserByEmail(crewId, email);
+    const getUserById = await userService.getCrewUserById(crewId, userId);
 
-    return res.status(getUserByEmail.status).json(getUserByEmail);
+    return res.status(getUserById.status).json(getUserById);
   } catch (error) {
     return next(new Error('getUserByUserId Controller 에러: \n' + error));
   }
@@ -120,7 +119,7 @@ const updateUserProfileImage = async (req, res, next) => {
 
 module.exports = {
   signup,
-  getCrewUserByEmail,
+  getCrewUserById,
   updateUserProfile,
   nicknameCheck,
   updateUserProfileImage,
