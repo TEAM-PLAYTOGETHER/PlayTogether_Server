@@ -395,7 +395,7 @@ const getScrapLight = async (memberId, crewId, offset, limit) => {
     client.release();
   }
 };
-const getCategoryLight = async (crewId, category, sort, offset, limit) => {
+const getCategoryLight = async (userId, crewId, category, sort, offset, limit) => {
   let client;
 
   const log = `lightService.getCategoryLight | category = ${category}, sort = ${sort}, crewId = ${crewId}`;
@@ -412,7 +412,7 @@ const getCategoryLight = async (crewId, category, sort, offset, limit) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const result = await lightDao.getCategoryLight(client, crewId, category, sort, offset, limit);
+    const result = await lightDao.getCategoryLight(client, userId, crewId, category, sort, offset, limit);
 
     const totalCount = result.length;
     const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -444,7 +444,7 @@ const getCategoryLight = async (crewId, category, sort, offset, limit) => {
     client.release();
   }
 };
-const getLightDetail = async (lightId) => {
+const getLightDetail = async (userId, lightId) => {
   let client;
 
   const log = `lightService.getLightDetail | lightId = ${lightId}`;
@@ -452,7 +452,7 @@ const getLightDetail = async (lightId) => {
     client = await db.connect(log);
     await client.query('BEGIN');
     // 존재하는 번개인지 확인
-    const existLight = await lightDao.getExistLight(client, lightId);
+    const existLight = await lightDao.getExistLight(client, userId, lightId);
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
@@ -524,7 +524,7 @@ const getNewLight = async (memberId, crewId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const result = await lightDao.getNewLight(client, crewId);
+    const result = await lightDao.getNewLight(client, memberId, crewId);
 
     const lightData = result.map((light) => {
       const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
@@ -574,7 +574,7 @@ const getHotLight = async (memberId, crewId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
 
-    const result = await lightDao.getHotLight(client, crewId);
+    const result = await lightDao.getHotLight(client, memberId, crewId);
 
     const lightData = result.map((light) => {
       const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
@@ -625,7 +625,7 @@ const getSearchLight = async (memberId, crewId, search, category, offset, limit)
     }
 
     if (category) {
-      const result = await lightDao.getSearchLightUseCategory(client, search, crewId, category, offset, limit);
+      const result = await lightDao.getSearchLightUseCategory(client, search, crewId, category, offset, limit, memberId);
 
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, limit);
@@ -654,7 +654,7 @@ const getSearchLight = async (memberId, crewId, search, category, offset, limit)
       return util.success(statusCode.OK, responseMessage.LIGHT_GET_SEARCH_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
     }
     if (!category) {
-      const result = await lightDao.getSearchLightNotCategory(client, search, crewId, offset, limit);
+      const result = await lightDao.getSearchLightNotCategory(client, search, crewId, offset, limit, memberId);
 
       const totalCount = result.length;
       const totalPage = pageNation.getTotalPage(totalCount, limit);

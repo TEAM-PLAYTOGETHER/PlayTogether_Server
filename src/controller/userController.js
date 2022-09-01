@@ -32,20 +32,25 @@ const signup = async (req, res, next) => {
 };
 
 /**
- * GET ~/:crewId/:userId
+ * GET ~/:crewId/:memberId
  * 유저 아이디로 유저 조회
  * @public
  */
 const getCrewUserById = async (req, res, next) => {
   try {
-    const { crewId, userId } = req.params;
+    const userId = req.user.id;
+    const { crewId, memberId } = req.params;
 
-    if (!crewId || !userId) {
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    if (!crewId || !memberId) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
     // 유저 조회
-    const getUserById = await userService.getCrewUserById(crewId, userId);
+    const getUserById = await userService.getCrewUserById(userId, crewId, memberId);
 
     return res.status(getUserById.status).json(getUserById);
   } catch (error) {

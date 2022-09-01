@@ -1,6 +1,6 @@
 const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
-const { userDao } = require('../db');
+const { userDao, blockUserDao } = require('../db');
 const util = require('../lib/util');
 const db = require('../loaders/db');
 
@@ -26,18 +26,18 @@ const signup = async (userId, gender, birth) => {
   }
 };
 
-const getCrewUserById = async (crewId, userId) => {
+const getCrewUserById = async (userId, crewId, memberId) => {
   let client;
-  const log = `userService.getUserByEmail | crewId = ${crewId}, email = ${userId}`;
+  const log = `userService.getUserByEmail | userId = ${userId}, crewId = ${crewId}, memberId = ${memberId}`;
 
   try {
     client = await db.connect(log);
 
-    const user = await userDao.getCrewUserById(client, crewId, userId);
+    const user = await userDao.getCrewUserById(client, crewId, memberId, userId);
 
     // 해당 유저가 없는 경우
     if (!user) {
-      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_CREW_USER);
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW_USER);
     }
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, user);

@@ -145,6 +145,7 @@ const getScrapLight = async (req, res, next) => {
   }
 };
 const getCategoryLight = async (req, res, next) => {
+  const userId = req.user.id;
   const { crewId } = req.params;
   const category = req.query.category;
   const sort = req.query.sort;
@@ -155,6 +156,11 @@ const getCategoryLight = async (req, res, next) => {
   let offset = (curpage - 1) * Number(pageSize);
   let limit = Number(pageSize);
 
+  // 유저 인증 에러
+  if (!userId) {
+    return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+  }
+
   // 카테고리가 먹을래, 갈래, 할래가 아니면 오류.
   if (!(category == '먹을래' || category == '갈래' || category == '할래')) {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
@@ -163,19 +169,20 @@ const getCategoryLight = async (req, res, next) => {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_SORT_VALUE));
   }
   try {
-    const lights = await lightService.getCategoryLight(crewId, category, sort, offset, limit);
+    const lights = await lightService.getCategoryLight(userId, crewId, category, sort, offset, limit);
     return res.status(lights.status).json(lights);
   } catch (error) {
     return next(new Error('getCategoryLight Controller 에러: \n' + error));
   }
 };
 const getLightDetail = async (req, res, next) => {
+  const userId = req.user.id;
   const { lightId } = req.params;
 
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
 
   try {
-    const lights = await lightService.getLightDetail(lightId);
+    const lights = await lightService.getLightDetail(userId, lightId);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
