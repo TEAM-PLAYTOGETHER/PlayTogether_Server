@@ -57,11 +57,14 @@ module.exports = {
   CREW_REGISTER_SUCCESS: '동아리 가입 성공',
   CREW_DELETE_SUCCESS: '동아리 삭제 성공',
   CREW_PUT_SUCCESS: '동아리 수정 성공',
+  CREW_WITHDRAW_SUCCESS: '동아리 탈퇴 성공',
   NO_CREW: '존재하지 않는 동아리입니다.',
   ALREADY_REGISTERED: '이미 가입한 동아리입니다.',
   READ_REGISTER_INFO_SUCCESS: '동아리 가입정보 가져오기 성공',
   NO_MASTER_USER: '동아리장이 아닙니다.',
   LIMIT_EXCEED: '갯수 제한을 초과했습니다.',
+  NO_CREW_USER: '해당 동아리원이 아닙니다.',
+  ADMIN_CANNOT_WITHDRAW: '동아리장은 탍퇴할 수 없습니다.',
 
   // 번개
   LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',
