@@ -8,15 +8,15 @@ const jwtConstants = require('../constants/jwt');
 const redisClient = require('../lib/redis');
 const db = require('../loaders/db');
 
-const createSnsUser = async (snsId, email, provider, name) => {
+const createSnsUser = async (snsId, email, provider, name, picture) => {
   let client;
-  const log = `authService.createSnsUser | snsId = ${snsId}, email = ${email}, provider = ${provider}, name = ${name}`;
+  const log = `authService.createSnsUser | snsId = ${snsId}, email = ${email}, provider = ${provider}, name = ${name}, picture = ${picture}`;
 
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
 
-    const newUser = await authDao.createSnsUser(client, snsId, email, provider, name);
+    const newUser = await authDao.createSnsUser(client, snsId, email, provider, name, picture);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
