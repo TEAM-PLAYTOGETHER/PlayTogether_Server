@@ -26,23 +26,23 @@ const signup = async (userId, gender, birth) => {
   }
 };
 
-const getCrewUserByEmail = async (crewId, email) => {
+const getCrewUserById = async (crewId, userId) => {
   let client;
-  const log = `userService.getUserByEmail | crewId = ${crewId}, email = ${email}`;
+  const log = `userService.getUserByEmail | crewId = ${crewId}, email = ${userId}`;
 
   try {
     client = await db.connect(log);
 
-    const user = await userDao.getCrewUserByEmail(client, crewId, email);
+    const user = await userDao.getCrewUserById(client, crewId, userId);
 
     // 해당 유저가 없는 경우
     if (!user) {
-      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER);
+      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_CREW_USER);
     }
 
     return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, user);
   } catch (error) {
-    throw new Error('userService getUserByLoginId에서 error 발생: \n' + error);
+    throw new Error('userService getCrewUserById에서 error 발생: \n' + error);
   } finally {
     client.release();
   }
@@ -93,7 +93,7 @@ const getUserByNickname = async (crewId, nickname) => {
 
 module.exports = {
   signup,
-  getCrewUserByEmail,
+  getCrewUserById,
   getUserById,
   getUserByNickname,
 };

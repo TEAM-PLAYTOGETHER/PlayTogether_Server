@@ -64,7 +64,7 @@ module.exports = {
   NO_MASTER_USER: '동아리장이 아닙니다.',
   LIMIT_EXCEED: '갯수 제한을 초과했습니다.',
   NO_CREW_USER: '해당 동아리원이 아닙니다.',
-  ADMIN_CANNOT_WITHDRAW: '동아리장은 탍퇴할 수 없습니다.',
+  ADMIN_CANNOT_WITHDRAW: '동아리장은 탈퇴할 수 없습니다.',
 
   // 번개
   LIGHT_ADD_SUCCESS: '번개 생성이 완료되었습니다.',
