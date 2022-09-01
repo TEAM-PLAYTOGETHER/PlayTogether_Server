@@ -8,15 +8,15 @@ const jwtConstants = require('../constants/jwt');
 const redisClient = require('../lib/redis');
 const db = require('../loaders/db');
 
-const createSnsUser = async (snsId, email, provider, name) => {
+const createSnsUser = async (snsId, email, provider, name, picture) => {
   let client;
-  const log = `authService.createSnsUser | snsId = ${snsId}, email = ${email}, provider = ${provider}, name = ${name}`;
+  const log = `authService.createSnsUser | snsId = ${snsId}, email = ${email}, provider = ${provider}, name = ${name}, picture = ${picture}`;
 
   try {
     client = await db.connect(log);
     await client.query('BEGIN');
 
-    const newUser = await authDao.createSnsUser(client, snsId, email, provider, name);
+    const newUser = await authDao.createSnsUser(client, snsId, email, provider, name, picture);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.CREATED_USER, newUser);
@@ -152,6 +152,31 @@ const refresh = async (user, authToken, refreshToken) => {
   }
 };
 
+const withDraw = async (userId) => {
+  let client;
+  const log = `authService.withDraw | userId = ${userId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    const isUser = await userDao.getUserById(client, userId);
+    if (!isUser) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+
+    await authDao.deleteUser(client, userId);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.DELETE_USER);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('authService withDraw에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   createSnsUser,
   snsLogin,
@@ -159,4 +184,5 @@ module.exports = {
   isSnsUser,
   updateFcmToken,
   refresh,
+  withDraw,
 };

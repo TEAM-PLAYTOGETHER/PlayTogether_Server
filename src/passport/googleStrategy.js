@@ -14,11 +14,12 @@ module.exports = () => {
       async (req, accessToken, refreshToken, profile, done) => {
         try {
           const existUser = await authService.isSnsUser(profile.id, 'google');
+          console.log(accessToken);
 
           if (existUser.data) {
             done(null, existUser.data);
           } else {
-            const newUser = await authService.createSnsUser(profile.id, profile.email, 'google', profile.displayName);
+            const newUser = await authService.createSnsUser(profile.id, profile.email, 'google', profile.displayName, profile.picture);
             done(null, newUser.data);
           }
         } catch (error) {

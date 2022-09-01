@@ -24,5 +24,6 @@ router.post('/kakao-login', authController.kakaoLogin);
 // PUT
 
 // DELETE
+router.delete('/withdraw', authMiddleware, authController.withDraw);
 
 module.exports = router;

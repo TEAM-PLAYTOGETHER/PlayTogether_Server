@@ -84,15 +84,16 @@ const deleteCrewByCrewId = async (req, res, next) => {
     return next(new Error('deleteCrewByCrewId Controller 에러: \n' + error));
   }
 };
+
 const putCrew = async (req, res, next) => {
   const masterId = req.user.id;
   const { crewId } = req.params;
-  const { name, description} = req.body;
+  const { name, description } = req.body;
 
   if (!crewId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
 
   try {
-    const updatedPost = await crewService.putCrew(crewId, masterId, name,description);
+    const updatedPost = await crewService.putCrew(crewId, masterId, name, description);
 
     if (!updatedPost) return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_POST));
 
@@ -102,10 +103,35 @@ const putCrew = async (req, res, next) => {
   }
 };
 
+/**
+ * DELETE ~/crew/:crewId
+ * 동아리 탈퇴
+ * @private
+ */
+const withDrawCrew = async (req, res, next) => {
+  const userId = req.user.id;
+  const { crewId } = req.params;
+
+  // 유저 인증 토큰관련 에러
+  if (!userId) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_EMPTY));
+
+  // crewId가 없을 경우
+  if (!crewId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  try {
+    const withDraw = await crewService.withDrawCrew(userId, crewId);
+
+    return res.status(withDraw.status).json(withDraw);
+  } catch (error) {
+    return next(new Error('withDraw Controller 에러: \n' + error));
+  }
+};
+
 module.exports = {
   createCrew,
   registerMember,
   getAllCrewByUserId,
   deleteCrewByCrewId,
-  putCrew
+  withDrawCrew,
+  putCrew,
 };

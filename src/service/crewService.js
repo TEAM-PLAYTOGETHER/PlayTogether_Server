@@ -263,6 +263,7 @@ const deleteCrewByCrewId = async (userId, crewCode) => {
     client.release();
   }
 };
+
 const putCrew = async (crewId, masterId, name, description) => {
   let client;
 
@@ -306,11 +307,61 @@ const putCrew = async (crewId, masterId, name, description) => {
   }
 };
 
+/**
+ * withDrawCrew
+ * 동아리 탈퇴 서비스
+ * @param userId - 유저 아이디
+ * @param crewId - 탈퇴할 동아리 아이디
+ */
+const withDrawCrew = async (userId, crewId) => {
+  let client;
+  const log = `crewService.withDrawCrew | userId = ${userId}, crewId = ${crewId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 존재하는 동아리인지 확인
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
+
+    // 존재하는 유저인지 확인
+    const exist = await userDao.getUserById(client, userId);
+    if (!exist) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+
+    // 해당 동아리원인지 확인
+    const isCrewUser = await crewUserDao.getRegisteredMember(client, crewId, userId);
+    if (!isCrewUser) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW_USER);
+    }
+
+    // 해당 동아리의 운영진인지 확인 -> 운영진이면 탈퇴 불가
+    const isCrewAdmin = await crewDao.getCrewMaster(client, crewId, userId);
+    if (isCrewAdmin) {
+      return util.fail(statusCode.BAD_REQUEST.BAD_REQUEST, responseMessage.ADMIN_CANNOT_WITHDRAW);
+    }
+
+    await crewUserDao.withDrawCrew(client, userId, crewId);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.CREW_WITHDRAW_SUCCESS);
+  } catch (error) {
+    await client.query('ROLLBACK');
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   createCrew,
   registerMember,
   getAllCrewByUserId,
   deleteCrewByCrewId,
+  withDrawCrew,
   updateCrewUserProfile,
   putCrew,
   updateCrewUserProfileImage,

@@ -70,10 +70,24 @@ const updateFcmToken = async (client, snsId, fcmToken) => {
 };
 
 // DELETE
+const deleteUser = async (client, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      DELETE FROM "user"
+      WHERE id = $1
+      `,
+      [userId],
+    );
+  } catch (error) {
+    throw new Error('authDao.deleteUser에서 오류 발생: \n' + error);
+  }
+};
 
 module.exports = {
   createSnsUser,
   getFcmTokenById,
   updateSnsUser,
   updateFcmToken,
+  deleteUser,
 };

@@ -21,15 +21,15 @@ const getUserById = async (client, userId) => {
   }
 };
 
-const getCrewUserByEmail = async (client, crewId, email) => {
+const getCrewUserById = async (client, crewId, userId) => {
   try {
     const { rows } = await client.query(
       `
       SELECT u.id, u.is_deleted, nickname, description, first_station, second_station, profile_image, gender, birth
       FROM "crew_user" JOIN "user" u on u.id = crew_user.member_id
-      WHERE crew_id = $1 AND email = $2
+      WHERE crew_id = $1 AND member_id = $2
       `,
-      [crewId, email],
+      [crewId, userId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
@@ -110,7 +110,7 @@ const signup = async (client, userId, gender, birth) => {
 module.exports = {
   signup,
   getUserById,
-  getCrewUserByEmail,
+  getCrewUserById,
   getUserBySnsId,
   getUserByNickname,
   updateUserMbti,
