@@ -15,8 +15,8 @@ router.get('/:crewId/scrap', authMiddleware, lightController.getScrapLight);
 router.get('/:crewId/new', authMiddleware, lightController.getNewLight);
 router.get('/:crewId/search', authMiddleware, lightController.getSearchLight);
 router.get('/:crewId/hot', authMiddleware, lightController.getHotLight);
-router.get('/:crewId', lightController.getCategoryLight);
-router.get('/detail/:lightId', lightController.getLightDetail);
+router.get('/:crewId', authMiddleware, lightController.getCategoryLight);
+router.get('/detail/:lightId', authMiddleware, lightController.getLightDetail);
 router.get('/exist/:lightId', authMiddleware, lightController.ExistLightUser);
 
 module.exports = router;

@@ -4,6 +4,7 @@ const messageDao = require('./messageDao');
 // 유저 관련 dao
 const authDao = require('./authDao');
 const userDao = require('./userDao');
+const blockUserDao = require('./blockUserDao');
 
 // 동아리 관련 dao
 const crewDao = require('./crewDao');
@@ -19,6 +20,7 @@ const scrapDao = require('./scrapDao');
 module.exports = {
   authDao,
   userDao,
+  blockUserDao,
   lightDao,
   messageDao,
   crewDao,

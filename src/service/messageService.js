@@ -1,5 +1,5 @@
 const db = require('../loaders/db');
-const { messageDao, userDao } = require('../db');
+const { messageDao, userDao, blockUserDao } = require('../db');
 const admin = require('firebase-admin');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
@@ -78,6 +78,13 @@ const sendMessage = async (sendId, recvId, content) => {
     // 만약 room이 없다면 생성
     if (!roomExist) {
       roomExist = await messageDao.createRoom(client, sendId, recvId);
+    }
+
+    // 차단 유저면 메시지 전송 실패
+    const getSendBlockUser = await blockUserDao.getBlockUsers(client, sendId, recvId);
+    const getReceiveBlockUser = await blockUserDao.getBlockUsers(client, recvId, sendId);
+    if (getSendBlockUser || getReceiveBlockUser) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
 
     // messageDao에서 message 보내기
