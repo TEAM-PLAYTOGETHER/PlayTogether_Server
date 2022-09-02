@@ -94,4 +94,7 @@ module.exports = {
   NO_SCRAP: '스크랩 한적이 없습니다.',
   EXIST_SCRAP_LIGHT: '해당 번개를 찜하는 중입니다.',
   EXIST_NOT_SCRAP_LIGHT: '해당 번개를 찜하는 중이 아닙니다.',
+
+  //번개 테스트 시 주의사항
+  ERROR_LIGHT: '해당 번개 생성자이신데 번개를 나가셨군요! 다시 테스트 해주세요!',
 };

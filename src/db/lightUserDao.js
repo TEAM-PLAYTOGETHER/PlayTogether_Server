@@ -78,5 +78,5 @@ module.exports = {
   getEnterLightMember,
   deleteCancelLight,
   deleteLightUser,
-  existLightUser
+  existLightUser,
 };
