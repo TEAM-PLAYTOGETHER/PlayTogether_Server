@@ -6,8 +6,8 @@ const { authMiddleware } = require('../middlewares/jwtAuthorization');
 const router = express.Router();
 
 // GET
-router.get('/:crewId/:userId', userController.getCrewUserById);
-router.get('/crew/:crewId', userController.nicknameCheck);
+router.get('/:crewId/:memberId', authMiddleware, userController.getCrewUserById);
+router.get('/crew/:crewId/nickname', userController.nicknameCheck);
 
 // POST
 

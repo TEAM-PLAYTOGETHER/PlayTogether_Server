@@ -21,15 +21,19 @@ const getUserById = async (client, userId) => {
   }
 };
 
-const getCrewUserById = async (client, crewId, userId) => {
+const getCrewUserById = async (client, crewId, memberId, userId) => {
   try {
     const { rows } = await client.query(
       `
       SELECT u.id, u.is_deleted, nickname, description, first_station, second_station, profile_image, gender, birth
       FROM "crew_user" JOIN "user" u on u.id = crew_user.member_id
-      WHERE crew_id = $1 AND member_id = $2
+      WHERE crew_id = $1 AND member_id = $2 AND member_id NOT IN (
+        SELECT block_user_id
+        FROM block_user
+        WHERE user_id = $3
+      )
       `,
-      [crewId, userId],
+      [crewId, memberId, userId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {

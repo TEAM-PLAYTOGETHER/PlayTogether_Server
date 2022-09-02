@@ -128,7 +128,15 @@ const getAllMessageById = async (client, userId) => {
                       from message
                       where room_id in (select id from room where member_one_id = $1 or member_two_id = $1)
                   ) as ranking
-              where ranking.rn = 1)
+              where ranking.rn = 1) and m.send_id not in (
+                select block_user_id
+                from block_user
+                where user_id = $1
+              ) and m.recv_id not in (
+                select block_user_id
+                from block_user
+                where user_id = $1
+              )
           order by created_at desc;
       `,
       [userId],
