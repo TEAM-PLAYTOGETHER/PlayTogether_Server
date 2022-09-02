@@ -1,9 +1,9 @@
 const nicknameVerify = (nickname) => {
-  if (nickname.length > 20 || nickname.length < 5) {
+  if (nickname.length > 10 || nickname.length < 2) {
     return true;
   }
 
-  const regex = /[^a-z0-9]/;
+  const regex = /[^가-힣a-zA-Z0-9_]/;
   return regex.test(nickname);
 };
 
