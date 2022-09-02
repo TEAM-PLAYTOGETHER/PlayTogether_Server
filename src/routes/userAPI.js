@@ -7,7 +7,7 @@ const router = express.Router();
 
 // GET
 router.get('/:crewId/:userId', userController.getCrewUserById);
-router.get('/crew/:crewId', userController.nicknameCheck);
+router.get('/crew/:crewId/nickname', userController.nicknameCheck);
 
 // POST
 
