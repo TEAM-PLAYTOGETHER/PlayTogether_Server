@@ -707,8 +707,10 @@ const existLightUser = async (lightId, memberId) => {
     }
     // 본인이 그 번개의 소유자인지 확인
     const is_organizer = await lightDao.IsLightOrganizer(client, lightId, memberId);
+
     // 본인이 참여한 번개인지 확인
     const is_entered = await lightUserDao.existLightUser(client, lightId, memberId);
+
     if (is_entered && is_organizer) {
       const is_organizer = true;
       const is_entered = true;
@@ -723,6 +725,9 @@ const existLightUser = async (lightId, memberId) => {
       const is_organizer = false;
       const is_entered = true;
       return util.success(statusCode.OK, responseMessage.EXIST_LIGHT_USER, { is_entered, is_organizer });
+    }
+    if (!is_entered && is_organizer) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.ERROR_LIGHT);
     }
   } catch (error) {
     throw new Error('lightService getEnterLightMember error 발생: \n' + error);
