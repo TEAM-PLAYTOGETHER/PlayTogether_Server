@@ -237,13 +237,13 @@ const getExistLight = async (client, userId, lightId) => {
     const { rows } = await client.query(
       `
       select * from light
-      where id = $2 AND organizer_id not in (
+      where light.id = $1 AND organizer_id not in (
         select block_user_id
         from block_user
-        where user_id = $1
+        where user_id = $2
       )
       `,
-      [userId, lightId],
+      [lightId, userId],
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
