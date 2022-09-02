@@ -13,7 +13,7 @@ const addLightScrap = async (lightId, memberId) => {
     client = await db.connect(log);
     await client.query('BEGIN');
     // 존재하는 번개인지 확인
-    const existLight = await lightDao.getExistLight(client, lightId);
+    const existLight = await lightDao.getExistLight(client, memberId, lightId);
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
@@ -83,15 +83,15 @@ const existLightScrap = async (lightId, memberId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
     // 존재하는 번개인지 확인
-    const existLight = await lightDao.getExistLight(client, lightId);
+    const existLight = await lightDao.getExistLight(client, memberId, lightId);
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
-    if(data){
+    if (data) {
       const is_scraped = true;
       return util.success(statusCode.OK, responseMessage.EXIST_SCRAP_LIGHT, is_scraped);
     }
-    if(!data){
+    if (!data) {
       const is_scraped = false;
       return util.fail(statusCode.BAD_REQUEST, responseMessage.EXIST_NOT_SCRAP_LIGHT, is_scraped);
     }
@@ -106,5 +106,5 @@ module.exports = {
   addLightScrap,
   getLightScrap,
   deleteLightScrap,
-  existLightScrap
+  existLightScrap,
 };

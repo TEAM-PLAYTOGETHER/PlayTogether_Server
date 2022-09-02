@@ -123,7 +123,7 @@ const postEnterLight = async (lightId, memberId) => {
     client = await db.connect(log);
     await client.query('BEGIN');
     // 존재하는 번개인지 확인
-    const existLight = await lightDao.getExistLight(client, lightId);
+    const existLight = await lightDao.getExistLight(client, memberId, lightId);
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
@@ -701,7 +701,7 @@ const existLightUser = async (lightId, memberId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
     }
     // 존재하는 번개인지 확인
-    const existLight = await lightDao.getExistLight(client, lightId);
+    const existLight = await lightDao.getExistLight(client, memberId, lightId);
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
