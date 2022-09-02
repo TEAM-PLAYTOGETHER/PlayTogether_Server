@@ -355,7 +355,7 @@ const getOrganizerByLightId = async (client, lightId) => {
       `
       SELECT organizer_id, title, u.name
       FROM "light" JOIN "user" u on u.id = light.organizer_id
-      WHERE id = $1
+      WHERE light.id = $1
       `,
       [lightId],
     );
@@ -386,5 +386,5 @@ module.exports = {
   getOrganizerByLightId,
   getLightImage,
   putLightWhereImageFull,
-  addLightImage
+  addLightImage,
 };
