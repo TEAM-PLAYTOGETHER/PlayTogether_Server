@@ -220,7 +220,7 @@ const deleteLight = async (lightId, organizerId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NOT_LIGHT_ORGANIZER);
     }
     // 존재하는 번개인지 확인
-    const existLight = await lightDao.getExistLight(client, lightId);
+    const existLight = await lightDao.getExistLight(client, organizerId, lightId);
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
