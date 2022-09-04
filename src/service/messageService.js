@@ -89,12 +89,27 @@ const sendMessage = async (sendId, recvId, content) => {
 
     // messageDao에서 message 보내기
     const roomId = roomExist.id;
-    const cnt = await messageDao.sendMessage(client, roomId, sendId, recvId, content);
+    const resSendMessage = await messageDao.sendMessage(client, roomId, sendId, recvId, content);
 
     // insert 쿼리의 결과가 1이 아니라면 에러 처리
-    if (cnt !== 1) {
+    if (resSendMessage.rowCount !== 1) {
       return util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.MESSAGE_SEND_FAIL);
     }
+
+    // 방금 전송한 메시지의 id를 통해 response로 넘길 데이터 가져옴
+    const sendedMessageId = resSendMessage.rows[0].id;
+    const messageData = await messageDao.getMessageByMessageId(client, sendedMessageId);
+
+    const sendedMessage = messageData.map((rowMessage) => {
+      let message = {
+        messageId: Number(rowMessage.id),
+        send: true,
+        read: false,
+        createdAt: applyKoreanTime(rowMessage.createdAt),
+        content: rowMessage.content,
+      };
+      return message;
+    });
 
     const user = await userDao.getUserById(client, sendId);
 
@@ -119,7 +134,7 @@ const sendMessage = async (sendId, recvId, content) => {
 
     // 성공
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { roomId });
+    return util.success(statusCode.OK, responseMessage.MESSAGE_SEND_SUCCESS, { message: sendedMessage[0] });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('messageService sendMessage에서 error 발생: \n' + error);
@@ -150,6 +165,7 @@ const getAllMessageById = async (userId) => {
         roomId: Number(rowMessage.roomId),
         audience: rowMessage.audience,
         audienceId: Number(rowMessage.audienceId),
+        audienceProfile: rowMessage.profile === 'picture' ? null : rowMessage.profile,
         send: Number(rowMessage.sendId) === Number(userId),
         read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
         createdAt: applyKoreanTime(rowMessage.createdAt),

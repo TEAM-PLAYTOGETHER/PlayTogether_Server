@@ -2,12 +2,14 @@ const { Server } = require('socket.io');
 const http = require('./app');
 const util = require('./lib/util');
 const { getUserIdByToken } = require('./middlewares/jwtAuthorization');
+const { userService } = require('./service');
 const { sendMessage } = require('./service/messageService');
 const io = new Server(http);
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   let myId;
   let uMyId;
+  let myData;
 
   try {
     console.log(`Connection : SocketId = ${socket.id}`);
@@ -17,6 +19,12 @@ io.on('connection', (socket) => {
     if (!myId) {
       throw new Error('user 토큰 만료 or 잘못된 토큰');
     }
+
+    const myDataResponse = await userService.getUserById(myId);
+    if (myDataResponse.success === false) {
+      throw new Error('사용자(본인) 정보 조회 실패');
+    }
+    myData = myDataResponse.data;
 
     uMyId = 'u' + String(myId);
 
@@ -30,10 +38,12 @@ io.on('connection', (socket) => {
 
   let uid;
   let rid;
+  let roomId;
 
   socket.on('reqEnterRoom', (data) => {
     try {
-      const { recvId, roomId } = JSON.parse(data);
+      const { recvId } = JSON.parse(data);
+      roomId = JSON.parse(data).roomId;
 
       uid = 'u' + String(recvId);
       rid = 'r' + String(roomId);
@@ -57,17 +67,27 @@ io.on('connection', (socket) => {
         content,
       };
 
-      sendMessage(myId, recvId, content);
+      const sendMessageResponse = await sendMessage(myId, recvId, content);
+      if (sendMessageResponse.success === false) {
+        throw new Error(sendMessageResponse.message);
+      }
 
-      socket.broadcast.to(uid).emit('newMessageToUser', JSON.stringify(chatData));
-      socket.broadcast.to(rid).emit('newMessageToRoom', JSON.stringify(chatData));
+      const emitMessage = {
+        roomId,
+        audience: myData.name,
+        audienceId: Number(myData.id),
+        audienceProfile: myData.picture === 'picture' ? null : myData.picture,
+        content: sendMessageResponse.data.message.content,
+        createdAt: sendMessageResponse.data.message.createdAt,
+      };
+      socket.broadcast.to(uid).emit('newMessageToUser', util.success(200, 'newMessageToUser 성공', { message: emitMessage }));
+      socket.broadcast.to(rid).emit('newMessageToRoom', util.success(200, 'newMessageToRoom 성공', { message: emitMessage }));
 
-      io.to(socket.id).emit('resSendMessage', util.success(200, 'sendMessage 성공', chatData));
+      io.to(socket.id).emit('resSendMessage', util.success(200, 'sendMessage 성공', sendMessageResponse.data));
     } catch (error) {
       console.log(error);
       io.to(socket.id).emit('resSendMessage', util.fail(500, 'sendMessage 실패'));
     }
-    // 푸시알림 이벤트 트리거
   });
 
   socket.on('reqExitRoom', () => {

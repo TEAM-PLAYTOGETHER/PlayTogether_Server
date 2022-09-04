@@ -80,14 +80,15 @@ const createRoom = async (client, sendId, recvId) => {
  */
 const sendMessage = async (client, roomId, sendId, recvId, content) => {
   try {
-    const { rowCount } = await client.query(
+    const data = await client.query(
       `
           insert into message (content, room_id, send_id, recv_id)
           values ($1, $2, $3, $4)
+          RETURNING id
           `,
       [content, roomId, sendId, recvId],
     );
-    return rowCount;
+    return data;
   } catch (error) {
     throw new Error('messageDao.sendMessage에서 오류 발생: \n' + error);
   }
@@ -115,7 +116,11 @@ const getAllMessageById = async (client, userId) => {
                 case
                     when send_id = $1 then recv_id
                     else send_id
-                    end as audience_id
+                    end as audience_id,
+                case
+                    when send_id = $1 then receiver.picture
+                    else sender.picture
+                    end as profile
           from message m
                   left join "user" sender
                             on m.send_id = sender.id
@@ -195,6 +200,27 @@ const readAllMessage = async (client, roomId, userId) => {
   }
 };
 
+/**
+ * 메시지 id를 통해 메시지 정보 가져오기
+ * @param {*} messageId - 가져올 메시지의 id
+ * @returns 해당 메시지의 정보
+ */
+const getMessageByMessageId = async (client, messageId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select *
+      from message
+      where id = $1
+      `,
+      [messageId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('messageDao.getMessageByMessageId에서 오류 발생: \n' + error);
+  }
+};
+
 module.exports = {
   getRoom,
   getRoomByRoomId,
@@ -203,4 +229,5 @@ module.exports = {
   getAllMessageById,
   getAllMessageByRoomId,
   readAllMessage,
+  getMessageByMessageId,
 };
