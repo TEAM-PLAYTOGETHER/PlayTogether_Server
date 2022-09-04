@@ -115,7 +115,11 @@ const getAllMessageById = async (client, userId) => {
                 case
                     when send_id = $1 then recv_id
                     else send_id
-                    end as audience_id
+                    end as audience_id,
+                case
+                    when send_id = $1 then receiver.picture
+                    else sender.picture
+                    end as profile
           from message m
                   left join "user" sender
                             on m.send_id = sender.id

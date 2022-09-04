@@ -150,6 +150,7 @@ const getAllMessageById = async (userId) => {
         roomId: Number(rowMessage.roomId),
         audience: rowMessage.audience,
         audienceId: Number(rowMessage.audienceId),
+        audienceProfile: rowMessage.profile === 'picture' ? null : rowMessage.profile,
         send: Number(rowMessage.sendId) === Number(userId),
         read: Number(rowMessage.sendId) === Number(userId) ? true : rowMessage.read && true,
         createdAt: applyKoreanTime(rowMessage.createdAt),
