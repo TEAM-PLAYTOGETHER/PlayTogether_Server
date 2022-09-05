@@ -323,7 +323,7 @@ const getSearchLightNotCategory = async (client, search, crewId, offset, limit, 
       select l.id, category, scp_cnt, join_cnt, title, date, time, people_cnt, description, image, place from light l
       left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
       left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
-      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and l.crew_id = $2 and l.crew_id = $3 and l.organizer_id not in (
+      where (l.title LIKE CONCAT('%', $1::text, '%') or l.description Like CONCAT('%', $1::text, '%')) and l.crew_id = $2 and l.organizer_id not in (
         select block_user_id
         from block_user
         where user_id = $5
