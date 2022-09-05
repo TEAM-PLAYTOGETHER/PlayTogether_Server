@@ -191,7 +191,7 @@ const getLightDetailMember = async (client, lightId) => {
   try {
     const { rows } = await client.query(
       `
-      select u.id, gender, name from "user" u
+      select u.id, gender, name, picture from "user" u
       inner join light_user lu on u.id = lu.member_id
       inner join light l on l.id = lu.light_id
       where l.id = $1;
@@ -207,7 +207,7 @@ const getLightDetailOrganizer = async (client, lightId) => {
   try {
     const { rows } = await client.query(
       `
-      select u.id, name from "user" u
+      select u.id, name, picture from "user" u
       inner join light l on u.id = l.organizer_id
       where l.id = $1;
       `,

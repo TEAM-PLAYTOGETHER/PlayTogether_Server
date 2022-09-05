@@ -466,6 +466,7 @@ const getLightDetail = async (userId, lightId) => {
 
     const data2 = members.map((o) => ({
       user_id: Number(o.id),
+      profile_image: o.picture,
       gender: o.gender,
       name: o.name,
       age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))),
@@ -473,6 +474,7 @@ const getLightDetail = async (userId, lightId) => {
 
     const data3 = organizer.map((o) => ({
       organizer_id: Number(o.id),
+      profile_image: o.picture,
       name: o.name,
     }));
 
