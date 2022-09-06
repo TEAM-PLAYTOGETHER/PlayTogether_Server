@@ -10,6 +10,7 @@ router.get('/:crewId/:memberId', authMiddleware, userController.getCrewUserById)
 router.get('/crew/:crewId/nickname', userController.nicknameCheck);
 
 // POST
+router.post('/block/:memberId', authMiddleware, userController.blockUser);
 
 // PUT
 router.put('/signup', authMiddleware, userController.signup);
