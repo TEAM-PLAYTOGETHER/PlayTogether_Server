@@ -19,5 +19,6 @@ router.put('/:crewId', authMiddleware, userController.updateUserProfile);
 router.put('/:crewId/image', authMiddleware, uploader.imageUploader.single('image'), userController.updateUserProfileImage);
 
 // DELETE
+router.delete('/unblock/:memberId', authMiddleware, userController.unblockUser);
 
 module.exports = router;

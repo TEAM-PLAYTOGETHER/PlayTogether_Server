@@ -160,6 +160,38 @@ const blockUser = async (req, res, next) => {
   }
 };
 
+/**
+ * DELETE ~/unblock/:memberId
+ * 유저 차단 해제
+ * @private
+ */
+const unblockUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { memberId } = req.params;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    // 차단할 유저 아이디가 없는 경우
+    if (!memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    // 자기 자신을 차단하려 할 때
+    if (userId === memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.CANNOT_BLOCK_SELF));
+    }
+
+    const unblockUser = await userService.unblockUser(userId, memberId);
+    return res.status(unblockUser.status).json(unblockUser);
+  } catch (error) {
+    return next(new Error('unblockUser Controller 에러: \n' + error));
+  }
+};
+
 module.exports = {
   signup,
   getCrewUserById,
@@ -167,4 +199,5 @@ module.exports = {
   nicknameCheck,
   updateUserProfileImage,
   blockUser,
+  unblockUser,
 };

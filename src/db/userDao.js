@@ -100,6 +100,7 @@ const getBlockUser = async (client, userId, memberId) => {
       `,
       [userId, memberId],
     );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
     throw new Error('userDao.getBlockUser에서 오류 발생: \n' + error);
   }
@@ -140,6 +141,20 @@ const signup = async (client, userId, gender, birth) => {
 };
 
 // DELETE
+const unblock = async (client, userId, memberId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      DELETE FROM "block_user"
+      WHERE user_id = $1 AND block_user_id = $2
+      `,
+      [userId, memberId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('userDao.unblock에서 오류 발생: \n' + error);
+  }
+};
 
 module.exports = {
   block,
@@ -150,4 +165,5 @@ module.exports = {
   getUserByNickname,
   getBlockUser,
   updateUserMbti,
+  unblock,
 };

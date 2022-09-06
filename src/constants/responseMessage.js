@@ -32,8 +32,11 @@ module.exports = {
   UPDATE_PROFILE_SUCCESS: '사용자 프로필 업데이트 성공',
   UPDATE_DEVICE_TOKEN_SUCCESS: '사용자 디바이스 토큰 저장 성공',
   BLOCK_USER_SUCCESS: '유저 차단 성공',
+  UNBLOCK_USER_SUCCESS: '유저 차단해제 성공',
   CANNOT_BLOCK_SELF: '본인을 차단할 수 없습니다.',
+  CANNOT_UNBLOCK_SELF: '본인을 차단해제할 수 없습니다.',
   ALREADY_BLOCK_USER: '이미 차단된 유저입니다.',
+  NO_BLOCK_USER: '차단되지 않은 유저입니다.',
 
   // 서버 내 오류
   INTERNAL_SERVER_ERROR: '서버 내 오류',

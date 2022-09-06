@@ -124,10 +124,43 @@ const blockUser = async (userId, memberId) => {
   }
 };
 
+const unblockUser = async (userId, memberId) => {
+  let client;
+  const log = `userService.unblockUser | userId = ${userId}, memberId = ${memberId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 차단하려는 유저가 존재하는지 확인
+    const blockUserInfo = await userDao.getUserById(client, memberId);
+    if (!blockUserInfo) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+
+    // 차단 당한 유저인지 확인
+    const blockUserCheck = await userDao.getBlockUser(client, userId, memberId);
+    if (!blockUserCheck) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_BLOCK_USER);
+    }
+
+    await userDao.unblock(client, userId, memberId);
+    await client.query('COMMIT');
+
+    return util.success(statusCode.OK, responseMessage.UNBLOCK_USER_SUCCESS);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('userService unblockUser에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   signup,
   getCrewUserById,
   getUserById,
   getUserByNickname,
   blockUser,
+  unblockUser,
 };
