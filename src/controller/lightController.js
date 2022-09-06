@@ -260,6 +260,26 @@ const ExistLightUser = async (req, res, next) => {
   }
 };
 
+const reportLight = async (req, res, next) => {
+  const memberId = req.user.id;
+  const { lightId } = req.params;
+  const { report } = req.body;
+
+  if (!memberId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
+
+  if (!report) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_REPORT));
+
+  try {
+    const lights = await lightService.reportLight(report, lightId, memberId);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('reportLight Controller 에러: \n' + error));
+  }
+};
+
 module.exports = {
   addLight,
   putLight,
@@ -274,4 +294,5 @@ module.exports = {
   getHotLight,
   getSearchLight,
   ExistLightUser,
+  reportLight,
 };
