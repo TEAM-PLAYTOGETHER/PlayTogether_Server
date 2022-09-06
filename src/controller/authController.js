@@ -93,11 +93,10 @@ const appleLogin = async (req, res, next) => {
 
 const refresh = async (req, res, next) => {
   try {
-    const user = req.user;
     const authToken = req.headers.authorization;
     const refreshToken = req.headers.refresh;
 
-    const refresh = await authService.refresh(user, authToken, refreshToken);
+    const refresh = await authService.refresh(authToken, refreshToken);
 
     return res.status(refresh.status).json(refresh);
   } catch (error) {
