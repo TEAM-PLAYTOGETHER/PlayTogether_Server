@@ -32,27 +32,54 @@ const signup = async (req, res, next) => {
 };
 
 /**
- * GET ~/:crewId/:memberId
+ * GET ~/:crewId
  * 유저 아이디로 유저 조회
  * @public
  */
-const getCrewUserById = async (req, res, next) => {
+const getProfileByUserId = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { crewId, memberId } = req.params;
+    const { crewId } = req.params;
 
     if (!userId) {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
     }
 
-    if (!crewId || !memberId) {
+    if (!crewId) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
     // 유저 조회
-    const getUserById = await userService.getCrewUserById(userId, crewId, memberId);
+    const profile = await userService.getProfileByUserId(userId, crewId);
 
-    return res.status(getUserById.status).json(getUserById);
+    return res.status(profile.status).json(profile);
+  } catch (error) {
+    return next(new Error('getProfileByUserId Controller 에러: \n' + error));
+  }
+};
+
+/**
+ * GET ~/:crewId/:memberId/profile
+ * 동아리원 프로필 조회
+ * @private
+ */
+const getMemberProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { crewId, memberId } = req.params;
+
+    // 유저 인증 에러
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    // 파라미터 확인
+    if (!crewId || !memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    const memberProfile = await userService.getMemberProfile(userId, crewId, memberId);
+    return res.status(memberProfile.status).json(memberProfile);
   } catch (error) {
     return next(new Error('getUserByUserId Controller 에러: \n' + error));
   }
@@ -215,7 +242,8 @@ const getBlockList = async (req, res, next) => {
 
 module.exports = {
   signup,
-  getCrewUserById,
+  getProfileByUserId,
+  getMemberProfile,
   updateUserProfile,
   nicknameCheck,
   updateUserProfileImage,

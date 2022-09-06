@@ -36,7 +36,23 @@ const getUserById = async (client, userId) => {
   }
 };
 
-const getCrewUserById = async (client, crewId, memberId, userId) => {
+const getProfileByUserId = async (client, crewId, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT u.id, u.is_deleted, nickname, description, first_station, second_station, profile_image, gender, birth
+      FROM "crew_user" JOIN "user" u on u.id = crew_user.member_id
+      WHERE crew_id = $1 AND member_id = $2
+      `,
+      [crewId, userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('userDao.getProfileByUserId에서 오류 발생: \n' + error);
+  }
+};
+
+const getMemberProfile = async (client, userId, crewId, memberId) => {
   try {
     const { rows } = await client.query(
       `
@@ -52,7 +68,7 @@ const getCrewUserById = async (client, crewId, memberId, userId) => {
     );
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
-    throw new Error('userDao.getUserByLoginId에서 오류 발생: \n' + error);
+    throw new Error('userDao.getMemberProfile에서 오류 발생: \n' + error);
   }
 };
 
@@ -176,7 +192,8 @@ module.exports = {
   block,
   signup,
   getUserById,
-  getCrewUserById,
+  getProfileByUserId,
+  getMemberProfile,
   getUserBySnsId,
   getUserByNickname,
   getBlockUser,

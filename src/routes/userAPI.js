@@ -6,9 +6,10 @@ const { authMiddleware } = require('../middlewares/jwtAuthorization');
 const router = express.Router();
 
 // GET
-router.get('/:crewId/:memberId', authMiddleware, userController.getCrewUserById);
+router.get('/:crewId', authMiddleware, userController.getProfileByUserId);
+router.get('/:crewId/:memberId/profile', authMiddleware, userController.getMemberProfile);
 router.get('/crew/:crewId/nickname', userController.nicknameCheck);
-router.get('/blocks', authMiddleware, userController.getBlockList);
+router.get('/block/list', authMiddleware, userController.getBlockList);
 
 // POST
 router.post('/block/:memberId', authMiddleware, userController.blockUser);
