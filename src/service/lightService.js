@@ -1,4 +1,4 @@
-const { lightDao, lightUserDao, userDao, crewDao, authDao } = require('../db');
+const { lightDao, lightUserDao, userDao, crewDao, authDao, reportLightDao } = require('../db');
 const util = require('../lib/util');
 const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
@@ -746,7 +746,30 @@ const existLightUser = async (lightId, memberId) => {
     client.release();
   }
 };
+const reportLight = async (report, lightId, memberId) => {
+  let client;
 
+  const log = `lightService.reportLight | report = ${report}, lightId = ${lightId}, memberId = ${memberId}`;
+  try {
+    client = await db.connect(log);
+    // 존재하는 유저인지 확인
+    const existUser = await userDao.getUserById(client, memberId);
+    if (!existUser) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER);
+    }
+    // 존재하는 번개인지 확인
+    const existLight = await lightDao.getExistLight(client, memberId, lightId);
+    if (!existLight) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
+    }
+    await reportLightDao.reportLight(client, report, memberId, lightId);
+    return util.success(statusCode.OK, responseMessage.REPORT_LIGHT);
+  } catch (error) {
+    throw new Error('lightService reportLight error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 module.exports = {
   addLight,
   putLight,
@@ -763,4 +786,5 @@ module.exports = {
   getHotLight,
   getSearchLight,
   existLightUser,
+  reportLight,
 };

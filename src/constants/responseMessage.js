@@ -87,6 +87,8 @@ module.exports = {
   NO_LIGHT: '없는 번개입니다.',
   NO_LIGHT_MEMBER: '번개에 참여한 사람이 아닙니다.',
   NO_TWO_SEARCH_QUERY: '두글자 이상 입력해주세요.',
+  NO_REPORT: '신고할 내용이 없습니다.',
+  REPORT_LIGHT: '신고되었습니다.',
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',

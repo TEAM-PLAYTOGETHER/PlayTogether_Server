@@ -17,6 +17,9 @@ const lightUserDao = require('./lightUserDao');
 // 번개 찜 dao
 const scrapDao = require('./scrapDao');
 
+// 번개 신고 dao
+const reportLightDao = require('./reportLightDao');
+
 module.exports = {
   authDao,
   userDao,
@@ -27,4 +30,5 @@ module.exports = {
   crewUserDao,
   lightUserDao,
   scrapDao,
+  reportLightDao,
 };
