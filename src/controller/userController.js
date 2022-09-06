@@ -32,27 +32,54 @@ const signup = async (req, res, next) => {
 };
 
 /**
- * GET ~/:crewId/:memberId
+ * GET ~/:crewId
  * 유저 아이디로 유저 조회
  * @public
  */
-const getCrewUserById = async (req, res, next) => {
+const getProfileByUserId = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { crewId, memberId } = req.params;
+    const { crewId } = req.params;
 
     if (!userId) {
       return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
     }
 
-    if (!crewId || !memberId) {
+    if (!crewId) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
     // 유저 조회
-    const getUserById = await userService.getCrewUserById(userId, crewId, memberId);
+    const profile = await userService.getProfileByUserId(userId, crewId);
 
-    return res.status(getUserById.status).json(getUserById);
+    return res.status(profile.status).json(profile);
+  } catch (error) {
+    return next(new Error('getProfileByUserId Controller 에러: \n' + error));
+  }
+};
+
+/**
+ * GET ~/:crewId/:memberId/profile
+ * 동아리원 프로필 조회
+ * @private
+ */
+const getMemberProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { crewId, memberId } = req.params;
+
+    // 유저 인증 에러
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    // 파라미터 확인
+    if (!crewId || !memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    const memberProfile = await userService.getMemberProfile(userId, crewId, memberId);
+    return res.status(memberProfile.status).json(memberProfile);
   } catch (error) {
     return next(new Error('getUserByUserId Controller 에러: \n' + error));
   }
@@ -104,6 +131,12 @@ const updateUserProfile = async (req, res, next) => {
     return next(new Error('updateUserProfile Controller 에러: \n' + error));
   }
 };
+
+/**
+ * PUT ~/:crewId/image
+ * 동아리 프로필 이미지 등록
+ * @private
+ */
 const updateUserProfileImage = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -122,10 +155,99 @@ const updateUserProfileImage = async (req, res, next) => {
   }
 };
 
+/**
+ * POST ~/block/:memberId
+ * 유저 차단
+ * @private
+ */
+const blockUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { memberId } = req.params;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    // 차단할 유저 아이디가 없는 경우
+    if (!memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    // 자기 자신을 차단하려 할 때
+    if (userId === memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.CANNOT_BLOCK_SELF));
+    }
+
+    const blockUser = await userService.blockUser(userId, memberId);
+    return res.status(blockUser.status).json(blockUser);
+  } catch (error) {
+    return next(new Error('blockUser Controller 에러: \n' + error));
+  }
+};
+
+/**
+ * DELETE ~/unblock/:memberId
+ * 유저 차단 해제
+ * @private
+ */
+const unblockUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { memberId } = req.params;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    // 차단할 유저 아이디가 없는 경우
+    if (!memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    // 자기 자신을 차단하려 할 때
+    if (userId === memberId) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.CANNOT_BLOCK_SELF));
+    }
+
+    const unblockUser = await userService.unblockUser(userId, memberId);
+    return res.status(unblockUser.status).json(unblockUser);
+  } catch (error) {
+    return next(new Error('unblockUser Controller 에러: \n' + error));
+  }
+};
+
+/**
+ * GET ~/block/list
+ * 유저 차단 리스트 조회
+ * @private
+ */
+const getBlockList = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    const blockList = await userService.blockList(userId);
+    return res.status(blockList.status).json(blockList);
+  } catch (error) {
+    return next(new Error('unblockUser Controller 에러: \n' + error));
+  }
+};
+
 module.exports = {
   signup,
-  getCrewUserById,
+  getProfileByUserId,
+  getMemberProfile,
   updateUserProfile,
   nicknameCheck,
   updateUserProfileImage,
+  blockUser,
+  unblockUser,
+  getBlockList,
 };
