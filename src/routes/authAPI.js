@@ -6,7 +6,7 @@ const { authMiddleware } = require('../middlewares/jwtAuthorization');
 const router = express.Router();
 
 // GET
-router.get('/refresh', authMiddleware, authController.refresh);
+router.get('/refresh', authController.refresh);
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
   res.redirect('/');

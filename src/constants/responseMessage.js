@@ -39,6 +39,7 @@ module.exports = {
   ALREADY_BLOCK_USER: '이미 차단된 유저입니다.',
   NO_BLOCK_USER: '차단되지 않은 유저입니다.',
   CANNOT_READ_PROFILE: '확인할 수 없는 프로필입니다.',
+  NO_REFRESH_TOKEN_USER: '해당 토큰을 소유한 유저가 없습니다',
 
   // 서버 내 오류
   INTERNAL_SERVER_ERROR: '서버 내 오류',

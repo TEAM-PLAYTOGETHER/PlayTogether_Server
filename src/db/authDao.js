@@ -35,6 +35,22 @@ const getFcmTokenById = async (client, userId) => {
   }
 };
 
+const getUserByRefreshToken = async (client, token) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT *
+      FROM "user"
+      WHERE refresh_token = $1
+      `,
+      [token],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('authDao.getUserByRefreshToken에서 오류 발생: \n' + error);
+  }
+};
+
 // UPDATE
 const updateSnsUser = async (client, snsId, email, name, picture) => {
   try {
@@ -52,6 +68,7 @@ const updateSnsUser = async (client, snsId, email, name, picture) => {
     throw new Error('authDao.updateSnsUser에서 오류 발생: \n' + error);
   }
 };
+
 const updateFcmToken = async (client, snsId, fcmToken) => {
   try {
     const { rows } = await client.query(
@@ -66,6 +83,22 @@ const updateFcmToken = async (client, snsId, fcmToken) => {
     return convertSnakeToCamel.keysToCamel(rows[0]);
   } catch (error) {
     throw new Error('authDao.updateFcmToken에서 오류 발생: \n' + error);
+  }
+};
+
+const updateRefreshToken = async (client, userId, refreshToken) => {
+  try {
+    const { rows } = await client.query(
+      `
+      UPDATE "user"
+      SET refresh_token = $1
+      WHERE id = $2
+      `,
+      [refreshToken, userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows[0]);
+  } catch (error) {
+    throw new Error('authDao.updateRefreshToken에서 오류 발생: \n' + error);
   }
 };
 
@@ -87,7 +120,9 @@ const deleteUser = async (client, userId) => {
 module.exports = {
   createSnsUser,
   getFcmTokenById,
+  getUserByRefreshToken,
   updateSnsUser,
   updateFcmToken,
+  updateRefreshToken,
   deleteUser,
 };
