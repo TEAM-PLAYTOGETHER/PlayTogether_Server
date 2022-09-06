@@ -192,6 +192,27 @@ const unblockUser = async (req, res, next) => {
   }
 };
 
+/**
+ * GET ~/block/list
+ * 유저 차단 리스트 조회
+ * @private
+ */
+const getBlockList = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // 헤더에 유저 토큰이 없을 시 에러 처리
+    if (!userId) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED));
+    }
+
+    const blockList = await userService.blockList(userId);
+    return res.status(blockList.status).json(blockList);
+  } catch (error) {
+    return next(new Error('unblockUser Controller 에러: \n' + error));
+  }
+};
+
 module.exports = {
   signup,
   getCrewUserById,
@@ -200,4 +221,5 @@ module.exports = {
   updateUserProfileImage,
   blockUser,
   unblockUser,
+  getBlockList,
 };

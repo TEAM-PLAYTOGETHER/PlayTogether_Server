@@ -156,6 +156,22 @@ const unblockUser = async (userId, memberId) => {
   }
 };
 
+const blockList = async (userId) => {
+  let client;
+  const log = `userService.blockList | userId = ${userId}`;
+
+  try {
+    client = await db.connect(log);
+
+    const blockList = await userDao.getBlockList(client, userId);
+    return util.success(statusCode.OK, responseMessage.GET_BLOCKLIST_SUCCESS, blockList);
+  } catch (error) {
+    throw new Error('userService blockList에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   signup,
   getCrewUserById,
@@ -163,4 +179,5 @@ module.exports = {
   getUserByNickname,
   blockUser,
   unblockUser,
+  blockList,
 };

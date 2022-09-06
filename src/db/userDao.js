@@ -106,6 +106,22 @@ const getBlockUser = async (client, userId, memberId) => {
   }
 };
 
+const getBlockList = async (client, userId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT *
+      FROM "block_user"
+      WHERE user_id = $1
+      `,
+      [userId],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('userDao.getBlockList에서 오류 발생: \n' + error);
+  }
+};
+
 // UPDATE
 const updateUserMbti = async (client, userId, mbit) => {
   try {
@@ -164,6 +180,7 @@ module.exports = {
   getUserBySnsId,
   getUserByNickname,
   getBlockUser,
+  getBlockList,
   updateUserMbti,
   unblock,
 };

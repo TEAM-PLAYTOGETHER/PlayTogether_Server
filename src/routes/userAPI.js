@@ -8,6 +8,7 @@ const router = express.Router();
 // GET
 router.get('/:crewId/:memberId', authMiddleware, userController.getCrewUserById);
 router.get('/crew/:crewId/nickname', userController.nicknameCheck);
+router.get('/blocks', authMiddleware, userController.getBlockList);
 
 // POST
 router.post('/block/:memberId', authMiddleware, userController.blockUser);
