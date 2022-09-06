@@ -4,8 +4,6 @@ const { userDao, authDao } = require('../db');
 const util = require('../lib/util');
 const jwtUtil = require('../lib/jwtUtil');
 const jwt = require('jsonwebtoken');
-const jwtConstants = require('../constants/jwt');
-const redisClient = require('../lib/redis');
 const db = require('../loaders/db');
 
 const createSnsUser = async (snsId, email, provider, name, picture) => {
@@ -58,7 +56,7 @@ const snsLogin = async (snsId, email, provider, name, picture) => {
     const accessToken = jwtUtil.sign(user);
     const refreshToken = jwtUtil.refresh(user);
 
-    redisClient.set(user.id, refreshToken);
+    await authDao.updateRefreshToken(client, user.id, refreshToken);
     await client.query('COMMIT');
 
     return util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { userName: user.name, accessToken: accessToken, refreshToken: refreshToken, isSignup: isSignup });
@@ -129,26 +127,44 @@ const updateFcmToken = async (snsId, fcmToken) => {
   }
 };
 
-const refresh = async (user, authToken, refreshToken) => {
-  // access token과 refresh token의 존재여부 확인
-  if (authToken && refreshToken) {
-    // access token 검증
-    const authResult = jwtUtil.verify(authToken);
-    const refreshResult = jwtUtil.verify(refreshToken);
+const refresh = async (accessToken, refreshToken) => {
+  let client;
+  const log = `authService.refresh | authToken = ${accessToken}, refreshToken = ${refreshToken}`;
 
-    // accessToken이 만료 됐을 경우
-    if (authResult.message === jwtConstants.TOKEN_EXPIRED || authResult.message === jwtConstants.TOKEN_INVALID) {
-      // refreshToken도 만료 됐을 경우
-      if (refreshResult.message === jwtConstants.TOKEN_EXPIRED || refreshResult.message === jwtConstants.TOKEN_INVALID) {
-        return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
+  try {
+    client = await db.connect(log);
+
+    const user = await authDao.getUserByRefreshToken(client, refreshToken);
+    if (!user) {
+      return util.fail(statusCode.NOT_FOUND, responseMessage.NO_REFRESH_TOKEN_USER);
+    }
+
+    if (accessToken && refreshToken) {
+      const accessTokenVerify = jwtUtil.verify(accessToken);
+      const refreshTokenVerify = jwtUtil.refreshVerify(refreshToken);
+      if (accessTokenVerify === 'jwt expired') {
+        // accessToken & refreshToken 둘다 만료됐을 경우 재로그인 요청
+        if (refreshTokenVerify === false) {
+          return util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_RETRY);
+
+          // refreshToken이 정상적일 경우 accessToken 재발급
+        } else {
+          const getUser = await userDao.getUserById(client, user.id);
+          const newAccessToken = jwtUtil.sign(getUser);
+
+          return util.success(statusCode.OK, responseMessage.CREATED_TOKEN, { accessToken: newAccessToken, refreshToken: refreshToken });
+        }
+        // accessToken이 만료되지 않았을 경우
       } else {
-        const newAccessToken = jwtUtil.sign(user);
-
-        return util.success(statusCode.OK, responseMessage.CREATED_TOKEN, { accessToken: newAccessToken, refreshToken: refreshToken });
+        return util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_UNEXPIRED);
       }
     } else {
-      return util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN_UNEXPIRED);
+      return util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN_EMPTY);
     }
+  } catch (error) {
+    throw new Error('authService refresh에서 error 발생: \n' + error);
+  } finally {
+    client.release();
   }
 };
 

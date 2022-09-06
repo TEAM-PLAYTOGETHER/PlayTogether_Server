@@ -1,8 +1,8 @@
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const redisClient = require('./redis');
 const secret = process.env.JWT_SECRET;
-const { TOKEN_EXPIRED, TOKEN_INVALID } = require('../constants/jwt');
+const db = require('../loaders/db');
+const { authDao } = require('../db');
 
 const accessTokenOptions = {
   algorithm: 'HS256',
@@ -30,47 +30,25 @@ const verify = (token) => {
   let decoded;
   try {
     decoded = jwt.verify(token, secret);
-    return {
-      ok: true,
-      decoded: decoded,
-    };
+    return decoded;
   } catch (error) {
-    let jwtErrorCode;
-    if (error.message === 'jwt expired') {
-      jwtErrorCode = TOKEN_EXPIRED;
-    } else if (error.message === 'invalid token') {
-      jwtErrorCode = TOKEN_INVALID;
-    } else {
-      jwtErrorCode = TOKEN_INVALID;
-    }
-    return {
-      ok: false,
-      decoded: decoded,
-      message: jwtErrorCode,
-    };
+    return error.message;
   }
 };
 
-const refresh = (user) => {
-  return jwt.sign(
-    {
-      id: user.id,
-    },
-    secret,
-    refreshTokenOptions,
-  );
+const refresh = () => {
+  return jwt.sign({}, secret, refreshTokenOptions);
 };
 
-const refreshVerify = async (token, userId) => {
-  /*
-  redis 모듈은 기본적으로 promise를 반환하지 않습니다.
-  promisify를 이용하여 promise를 반환하게 해줍니다.
-  */
-  const getAsync = promisify(redisClient.get).bind(redisClient);
+const refreshVerify = async (token) => {
+  let client;
+  const log = `jwtUtil.refreshVerify | token = ${token}`;
 
   try {
-    const data = await getAsync(userId);
-    if (token === data) {
+    client = await db.connect(log);
+
+    const dbRefreshToken = await authDao.getUserByRefreshToken(client, token);
+    if (token === dbRefreshToken.refreshToken) {
       try {
         jwt.verify(token, secret);
         return true;
@@ -84,6 +62,8 @@ const refreshVerify = async (token, userId) => {
   } catch (error) {
     console.log(error);
     return false;
+  } finally {
+    client.release();
   }
 };
 
