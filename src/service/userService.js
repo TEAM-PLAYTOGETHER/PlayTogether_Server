@@ -34,13 +34,14 @@ const getProfileByUserId = async (userId, crewId) => {
     client = await db.connect(log);
 
     const user = await userDao.getProfileByUserId(client, crewId, userId);
+    const crew = await crewDao.getExistCrew(client, crewId);
 
     // 해당 유저가 없는 경우
     if (!user) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW_USER);
     }
 
-    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, user);
+    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, { profile: user, crewName: crew.name });
   } catch (error) {
     throw new Error('userService getProfileByUserId에서 error 발생: \n' + error);
   } finally {
@@ -57,6 +58,7 @@ const getMemberProfile = async (userId, crewId, memberId) => {
 
     const isUserInCrew = await crewUserDao.getRegisteredMember(client, crewId, userId);
     const isMemberInCrew = await crewUserDao.getRegisteredMember(client, crewId, memberId);
+    const crew = await crewDao.getExistCrew(client, crewId);
 
     if (!isUserInCrew || !isMemberInCrew) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW_USER);
@@ -67,7 +69,7 @@ const getMemberProfile = async (userId, crewId, memberId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.CANNOT_READ_PROFILE);
     }
 
-    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, memberProfile);
+    return util.success(statusCode.OK, responseMessage.GET_USER_SUCCESS, { profile: memberProfile, crewName: crew.name });
   } catch (error) {
     throw new Error('userService getMemberProfile에서 error 발생: \n' + error);
   } finally {
