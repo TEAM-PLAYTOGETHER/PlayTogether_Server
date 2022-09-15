@@ -1,7 +1,7 @@
 const { Server } = require('socket.io');
 const http = require('./app');
 const util = require('./lib/util');
-const { getUserIdByToken } = require('./middlewares/jwtAuthorization');
+const jwtUtil = require('./lib/jwtUtil');
 const { userService } = require('./service');
 const { sendMessage } = require('./service/messageService');
 const io = new Server(http);
@@ -15,9 +15,13 @@ io.on('connection', async (socket) => {
     console.log(`Connection : SocketId = ${socket.id}`);
 
     const token = socket.handshake.headers.authorization;
-    myId = getUserIdByToken(token);
+    const decoded = jwtUtil.verify(token);
+    if (decoded === 'jwt expired' || decoded === 'jwt invalid') {
+      throw new Error('만료되거나 검증되지 않은 토큰');
+    }
+    myId = decoded.id;
     if (!myId) {
-      throw new Error('user 토큰 만료 or 잘못된 토큰');
+      throw new Error('확인할 수 없는 유저');
     }
 
     const myDataResponse = await userService.getUserById(myId);
