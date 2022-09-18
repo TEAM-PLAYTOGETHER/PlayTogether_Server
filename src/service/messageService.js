@@ -111,17 +111,19 @@ const sendMessage = async (sendId, recvId, content) => {
       return message;
     });
 
-    const user = await userDao.getUserById(client, recvId);
+    const recvUser = await userDao.getUserById(client, recvId);
+    const sendUser = await userDao.getUserById(client, sendId);
 
-    if (user.deviceToken) {
+    if (recvUser.deviceToken) {
       // 푸시알림 정보
       const body = `${content}`;
       const message = {
         notification: {
-          title: `${user.name}`,
+          title: `${sendUser.name}`,
           body: body,
         },
-        token: user.deviceToken,
+        token: recvUser.deviceToken,
+        roomId: roomId,
       };
 
       admin
