@@ -111,7 +111,7 @@ const sendMessage = async (sendId, recvId, content) => {
       return message;
     });
 
-    const user = await userDao.getUserById(client, sendId);
+    const user = await userDao.getUserById(client, recvId);
 
     if (user.deviceToken) {
       // 푸시알림 정보
