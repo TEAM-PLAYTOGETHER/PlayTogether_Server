@@ -126,8 +126,8 @@ const getBlockList = async (client, userId) => {
   try {
     const { rows } = await client.query(
       `
-      SELECT *
-      FROM "block_user"
+      SELECT user_id, block_user_id, name
+      FROM "block_user" JOIN "user" u ON u.id = block_user.block_user_id
       WHERE user_id = $1
       `,
       [userId],
