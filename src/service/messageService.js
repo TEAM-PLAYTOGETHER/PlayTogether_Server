@@ -122,8 +122,11 @@ const sendMessage = async (sendId, recvId, content) => {
           title: `${sendUser.name}`,
           body: body,
         },
+        data: {
+          sendId: sendId,
+          roomId: roomId,
+        },
         token: recvUser.deviceToken,
-        roomId: roomId,
       };
 
       admin
