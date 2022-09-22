@@ -165,7 +165,7 @@ const getCategoryLight = async (req, res, next) => {
   if (!(category == '먹을래' || category == '갈래' || category == '할래')) {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_CATEGORY));
   }
-  if (!(sort == 'createdAt' || sort == 'peopleCnt')) {
+  if (!(sort == 'createdAt' || sort == 'peopleCnt' || sort == 'scpCnt')) {
     return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_SORT_VALUE));
   }
   try {
