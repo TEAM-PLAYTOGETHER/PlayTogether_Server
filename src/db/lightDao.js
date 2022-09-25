@@ -159,7 +159,7 @@ const getCategoryLight = async (client, userId, crewId, category, sort, offset, 
         FROM block_user
         WHERE user_id = $6
       )
-      order by $3 DESC
+      order by $3 DESC NULLS LAST
       offset $4
       limit $5
       ;
