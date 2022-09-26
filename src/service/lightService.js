@@ -414,6 +414,34 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
     if (!existCrew) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
     }
+    if (sort == 'scpCnt') {
+      const result = await lightDao.getCategoryLightByScpCnt(client, userId, crewId, category, offset, limit);
+
+      const totalCount = result.length;
+      const totalPage = pageNation.getTotalPage(totalCount, limit);
+
+      const lightData = result.map((light) => {
+        const nowDate = new Date();
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+        const time = light.time == null ? null : light.time.slice(0, -3);
+        const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
+        const place = light.place == null ? null : light.place;
+        const people_cnt = light.peopleCnt == null ? null : light.peopleCnt;
+        return {
+          light_id: Number(light.id),
+          title: light.title,
+          category: light.category,
+          scp_cnt: light.scpCnt,
+          date,
+          time,
+          people_cnt,
+          place,
+          LightMemberCnt: Number(light.joinCnt),
+          is_opened,
+        };
+      });
+      return util.success(statusCode.OK, responseMessage.LIGHT_GET_CATEGORY_SUCCESS, { lightData, offset, limit, totalCount, totalPage });
+    }
 
     const result = await lightDao.getCategoryLight(client, userId, crewId, category, sort, offset, limit);
 
@@ -431,7 +459,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
-        scp_cnt: Number(light.scpCnt),
+        scp_cnt: light.scpCnt,
         date,
         time,
         people_cnt,

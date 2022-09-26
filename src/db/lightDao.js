@@ -166,6 +166,32 @@ const getCategoryLight = async (client, userId, crewId, category, sort, offset, 
       `,
       [category, crewId, sort, offset, limit, userId],
     );
+    console.log(rows);
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);
+  }
+};
+const getCategoryLightByScpCnt = async (client, userId, crewId, category, offset, limit) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select l.id, l.category, scp_cnt, l.title, join_cnt, l.date, l.place, l.people_cnt, l.time from light l
+      left join (select light_id, count(id) join_cnt from light_user group by light_id) ls on l.id = ls.light_id
+      left join (select light_id, count(id) scp_cnt from scrap group by light_id) ld on l.id = ld.light_id
+      where category = $1 and l.crew_id = $2 and organizer_id not in (
+        SELECT block_user_id
+        FROM block_user
+        WHERE user_id = $5
+      )
+      order by scp_cnt DESC NULLS LAST
+      offset $3
+      limit $4
+      ;
+      `,
+      [category, crewId, offset, limit, userId],
+    );
+    console.log(rows);
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);
@@ -419,4 +445,5 @@ module.exports = {
   getLightImage,
   putLightWhereImageFull,
   addLightImage,
+  getCategoryLightByScpCnt,
 };
