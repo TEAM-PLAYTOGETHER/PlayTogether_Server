@@ -118,11 +118,9 @@ const sendMessage = async (sendId, recvId, content) => {
       // 푸시알림 정보
       const body = `${content}`;
       const message = {
-        notification: {
+        data: {
           title: `${sendUser.name}`,
           body: body,
-        },
-        data: {
           sendId: sendId,
           roomId: roomId,
         },
