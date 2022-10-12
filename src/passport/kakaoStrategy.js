@@ -13,7 +13,6 @@ module.exports = () => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           const existUser = await authService.isSnsUser(profile.id, 'kakao');
-          console.log(accessToken);
 
           if (existUser.data) {
             return done(null, existUser.data);
