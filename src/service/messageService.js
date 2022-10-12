@@ -5,6 +5,7 @@ const statusCode = require('../constants/statusCode');
 const responseMessage = require('../constants/responseMessage');
 const util = require('../lib/util');
 const { applyKoreanTime } = require('../lib/applyKoreanTime');
+const pageNation = require('../lib/pageNation');
 
 /**
  * getRoomIdByUserId
@@ -192,7 +193,7 @@ const getAllMessageById = async (userId) => {
  * @param {*} userId - 유저 id값
  * @returns 모든 메시지
  */
-const getAllMessageByRoomId = async (roomId, userId) => {
+const getAllMessageByRoomId = async (roomId, userId, offset, limit) => {
   let client;
   const log = `messageService.getAllMessageByRoomId | roomId = ${roomId}, userId = ${userId}`;
 
@@ -215,7 +216,11 @@ const getAllMessageByRoomId = async (roomId, userId) => {
     await messageDao.readAllMessage(client, roomId, userId);
 
     // 채팅방의 메시지를 가져옴
-    const rowMessages = await messageDao.getAllMessageByRoomId(client, roomId);
+    const rowMessages = await messageDao.getAllMessageByRoomId(client, roomId, offset, limit);
+
+    // 페이지네이션 총 갯수 확인
+    const totalCount = await messageDao.getAllMessageCountByRoomId(client, roomId);
+    const totalPage = pageNation.getTotalPage(totalCount, limit);
 
     // 가져온 메시지를 용도에 맞게 매핑
     const messages = rowMessages.map((rowMessage) => {
@@ -230,7 +235,7 @@ const getAllMessageByRoomId = async (roomId, userId) => {
     });
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages });
+    return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS, { messages, totalCount, totalPage });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('messageService getAllMessageByRoomId에서 error 발생: \n' + error);

@@ -166,7 +166,6 @@ const getCategoryLight = async (client, userId, crewId, category, sort, offset, 
       `,
       [category, crewId, sort, offset, limit, userId],
     );
-    console.log(rows);
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);
@@ -191,7 +190,6 @@ const getCategoryLightByScpCnt = async (client, userId, crewId, category, offset
       `,
       [category, crewId, offset, limit, userId],
     );
-    console.log(rows);
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);

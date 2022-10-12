@@ -158,7 +158,7 @@ const getAllMessageById = async (client, userId) => {
  * @param {*} roomId - 채팅방 id값
  * @returns - 해당 채팅방의 모든 메시지
  */
-const getAllMessageByRoomId = async (client, roomId) => {
+const getAllMessageByRoomId = async (client, roomId, offset, limit) => {
   try {
     const { rows } = await client.query(
       `
@@ -167,11 +167,35 @@ const getAllMessageByRoomId = async (client, roomId) => {
                left join message m
                          on r.id = m.room_id
       where r.id = $1
-      order by created_at;
+      order by created_at
+      offset $2
+      limit $3;
+      `,
+      [roomId, offset, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: \n' + error);
+  }
+};
+
+/**
+ * getAllMessageByRoomId
+ * roomId에 해당하는 채팅방의 모든 채팅을 가져오는 메서드
+ * @param {*} roomId - 채팅방 id값
+ * @returns - 해당 채팅방의 모든 메시지
+ */
+const getAllMessageCountByRoomId = async (client, roomId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select count(*)
+      from message
+      where room_id = $1;
       `,
       [roomId],
     );
-    return convertSnakeToCamel.keysToCamel(rows);
+    return Number(rows[0].count);
   } catch (error) {
     throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: \n' + error);
   }
@@ -230,4 +254,5 @@ module.exports = {
   getAllMessageByRoomId,
   readAllMessage,
   getMessageByMessageId,
+  getAllMessageCountByRoomId,
 };
