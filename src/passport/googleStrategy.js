@@ -14,7 +14,6 @@ module.exports = () => {
       async (req, accessToken, refreshToken, profile, done) => {
         try {
           const existUser = await authService.isSnsUser(profile.id, 'google');
-          console.log(accessToken);
 
           if (existUser.data) {
             done(null, existUser.data);
