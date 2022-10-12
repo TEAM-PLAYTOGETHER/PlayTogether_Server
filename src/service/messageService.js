@@ -239,9 +239,48 @@ const getAllMessageByRoomId = async (roomId, userId) => {
   }
 };
 
+/**
+ * readAllMessageByRoomId
+ * 채팅방의 모든 메시지를 읽음처리하는 메서드 (소켓 전용)
+ * @param {*} roomId - 채팅방 id값
+ * @param {*} userId - 유저 id값
+ * @returns 모든 메시지
+ */
+const readAllMessageByRoomId = async (roomId, userId) => {
+  let client;
+  const log = `messageService.readAllMessageByRoomId | roomId = ${roomId}, userId = ${userId}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 방이 존재하는지 확인
+    const existRoom = await messageDao.getRoomByRoomId(client, roomId);
+    if (!existRoom) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_ROOM);
+    }
+
+    // 유저가 해당 채팅방에 접근권한이 있는지 확인
+    if (Number(existRoom.memberOneId) !== userId && Number(existRoom.memberTwoId) !== userId) {
+      return util.fail(statusCode.UNAUTHORIZED, responseMessage.NO_AUTHENTICATED);
+    }
+
+    // 채팅방의 메시지를 가져오기 전에, 상대방이 보낸 모든 메시지 읽음처리
+    await messageDao.readAllMessage(client, roomId, userId);
+
+    return util.success(statusCode.OK, responseMessage.MESSAGE_READ_SUCCESS);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('messageService readAllMessageByRoomId에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getRoomIdByUserId,
   sendMessage,
   getAllMessageById,
   getAllMessageByRoomId,
+  readAllMessageByRoomId,
 };
