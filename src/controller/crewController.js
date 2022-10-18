@@ -27,6 +27,27 @@ const createCrew = async (req, res, next) => {
 };
 
 /**
+ * GET ~/crew/checkExist/:crewCode
+ * 동아리 가입 가능성 확인
+ * @private
+ */
+const checkCrewRegisterAvailable = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { crewCode } = req.params;
+
+    if (!crewCode) {
+      return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+    }
+
+    const result = await crewService.checkCrewRegisterAvailable(userId, crewCode);
+    return res.status(result.status).json(result);
+  } catch (error) {
+    return next(new Error('checkCrewRegisterAvailable Controller 에러: \n' + error));
+  }
+};
+
+/**
  * POST ~/crew/register
  * 동아리 만들기
  * @private
@@ -129,6 +150,7 @@ const withDrawCrew = async (req, res, next) => {
 
 module.exports = {
   createCrew,
+  checkCrewRegisterAvailable,
   registerMember,
   getAllCrewByUserId,
   deleteCrewByCrewId,
