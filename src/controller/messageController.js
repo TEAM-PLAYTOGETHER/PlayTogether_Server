@@ -90,10 +90,9 @@ const getAllMessageByRoomId = async (req, res, next) => {
   try {
     const { roomId } = req.params;
 
-    const curPage = req.query.curPage || 1;
+    const messageId = req.query.messageId || null;
     const pageSize = req.query.pageSize || 5;
 
-    let offset = (curPage - 1) * Number(pageSize);
     let limit = Number(pageSize);
 
     const userId = Number(req.user.id);
@@ -102,7 +101,7 @@ const getAllMessageByRoomId = async (req, res, next) => {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
-    const result = await messageService.getAllMessageByRoomId(roomId, userId, offset, limit);
+    const result = await messageService.getAllMessageByRoomId(roomId, userId, messageId, limit);
 
     return res.status(result.status).json(result);
   } catch (error) {
