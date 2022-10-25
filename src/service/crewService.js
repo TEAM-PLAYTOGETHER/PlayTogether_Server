@@ -94,7 +94,7 @@ const checkCrewRegisterAvailable = async (userId, crewCode) => {
     }
 
     await client.query('COMMIT');
-    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_AVAILABLE, { available: true, message: responseMessage.CREW_REGISTER_AVAILABLE });
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_AVAILABLE, { id: Number(crew.id), name: crew.name, available: true, message: responseMessage.CREW_REGISTER_AVAILABLE });
   } catch (error) {
     await client.query('ROLLBACK');
     throw new Error('crewService checkCrewRegisterAvailable에서 error 발생: \n' + error);
