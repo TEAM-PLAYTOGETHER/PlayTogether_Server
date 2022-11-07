@@ -77,7 +77,7 @@ const getAllCrewByUserId = async (client, userId) => {
   try {
     const { rows } = await client.query(
       `
-      select c.id, c.name, c.description, c.master_id
+      select c.id, c.code, c.name, c.description, c.master_id
       from crew_user cu
       left join crew c on cu.crew_id = c.id
       where member_id = $1;

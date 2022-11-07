@@ -245,6 +245,7 @@ const getAllCrewByUserId = async (userId) => {
       if (crew.masterId === userId) isAdmin = true;
       return {
         id: Number(crew.id),
+        crewCode: crew.code,
         name: crew.name,
         description: crew.description,
         isAdmin,
