@@ -476,7 +476,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
     client.release();
   }
 };
-const getLightDetail = async (userId, lightId) => {
+const getLightDetail = async (userId, crewId, lightId) => {
   let client;
 
   const log = `lightService.getLightDetail | lightId = ${lightId}`;
@@ -489,12 +489,12 @@ const getLightDetail = async (userId, lightId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
     const result = await lightDao.getLightDetail(client, lightId);
-    const members = await lightDao.getLightDetailMember(client, lightId);
-    const organizer = await lightDao.getLightDetailOrganizer(client, lightId);
+    const members = await lightDao.getLightDetailMember(client, crewId, lightId);
+    const organizer = await lightDao.getLightDetailOrganizer(client, crewId, lightId);
 
     const data2 = members.map((o) => ({
       user_id: Number(o.id),
-      profile_image: o.picture,
+      profile_image: o.profileImage,
       gender: o.gender,
       name: o.name,
       age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))),
@@ -502,7 +502,7 @@ const getLightDetail = async (userId, lightId) => {
 
     const data3 = organizer.map((o) => ({
       organizer_id: Number(o.id),
-      profile_image: o.picture,
+      profile_image: o.profileImage,
       name: o.name,
     }));
 
