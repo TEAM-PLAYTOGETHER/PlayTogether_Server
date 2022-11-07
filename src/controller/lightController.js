@@ -177,12 +177,13 @@ const getCategoryLight = async (req, res, next) => {
 };
 const getLightDetail = async (req, res, next) => {
   const userId = req.user.id;
-  const { lightId } = req.params;
+  const { crewId, lightId } = req.params;
 
   if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
+  if (!crewId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW));
 
   try {
-    const lights = await lightService.getLightDetail(userId, lightId);
+    const lights = await lightService.getLightDetail(userId, crewId, lightId);
 
     return res.status(lights.status).json(lights);
   } catch (error) {
