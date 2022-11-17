@@ -524,7 +524,7 @@ const getLightDetail = async (userId, crewId, lightId) => {
         image: light.image,
         people_cnt,
         place,
-        LightMemberCnt: Number(light.joinCnt),
+        LightMemberCnt: Number(members.length),
         is_opened,
         members: data2,
         organizer: data3,
