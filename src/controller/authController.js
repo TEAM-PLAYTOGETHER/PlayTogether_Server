@@ -2,6 +2,9 @@ const axios = require('axios');
 const responseMessage = require('../constants/responseMessage');
 const statusCode = require('../constants/statusCode');
 const util = require('../lib/util');
+const jwt_decode = require('jwt-decode');
+const jwt = require('jsonwebtoken');
+const { jwksClient, JwksClient } = require('jwks-rsa');
 const { authService } = require('../service');
 
 const googleLogin = async (req, res, next) => {
@@ -71,21 +74,24 @@ const appleLogin = async (req, res, next) => {
   }
 
   try {
-    const profile = await axios.get('https://kapi.kakao.com/v2/user/me', {
-      headers: {
-        authorization: 'Bearer ' + accessToken,
-        'Content-Type': 'application/json',
-      },
+    const decodedToken = jwt.decode(accessToken, { complete: true });
+    const keyIdFromToken = decodedToken.header.kid;
+    // apple 공개 키
+    const applePublicKeyUrl = 'https://appleid.apple.com/auth/keys';
+
+    const jwksClient = new JwksClient({ jwksUri: applePublicKeyUrl });
+
+    const key = await jwksClient.getSigningKey(keyIdFromToken);
+    const publicKey = key.getPublicKey();
+
+    const verifiedDecodedToken = jwt.verify(accessToken, publicKey, {
+      algorithms: [decodedToken.header.alg],
     });
 
-    const snsLogin = await authService.snsLogin(profile.data.id, profile.data.kakao_account.email, 'kakao', profile.data.properties.nickname, profile.data.properties.profile_image);
-    if (!snsLogin) {
-      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
-    }
+    const username = verifiedDecodedToken.email.split('@');
+    const snsLogin = await authService.createSnsUser(verifiedDecodedToken.sub, verifiedDecodedToken.email, 'apple', username, null);
 
-    await authService.updateFcmToken(profile.data.id, fcmToken);
-
-    return res.status(snsLogin.status).json(snsLogin);
+    return res.status(statusCode.OK).json(verifiedDecodedToken);
   } catch (error) {
     return next(new Error('AuthController appleLogin error 발생: \n' + error));
   }
