@@ -12,7 +12,6 @@ const statusCode = require('./constants/statusCode');
 const util = require('./lib/util');
 const responseMessage = require('./constants/responseMessage');
 const slackWebhook = require('./lib/slack');
-const expressSession = require('express-session');
 
 // push notification
 const admin = require('firebase-admin');
@@ -70,8 +69,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(expressSession);
 
 app.use('/api', require('./routes'));
 
