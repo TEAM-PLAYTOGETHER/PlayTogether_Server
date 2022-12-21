@@ -90,8 +90,11 @@ const appleLogin = async (req, res, next) => {
 
     const username = verifiedDecodedToken.email.split('@');
     const snsLogin = await authService.createSnsUser(verifiedDecodedToken.sub, verifiedDecodedToken.email, 'apple', username, null);
+    if (!snsLogin) {
+      return res.status(statusCode.UNAUTHORIZED).json(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
+    }
 
-    return res.status(statusCode.OK).json(verifiedDecodedToken);
+    return res.status(snsLogin.status).json(snsLogin);
   } catch (error) {
     return next(new Error('AuthController appleLogin error 발생: \n' + error));
   }
