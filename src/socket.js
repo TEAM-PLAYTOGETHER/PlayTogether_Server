@@ -3,7 +3,7 @@ const http = require('./app');
 const util = require('./lib/util');
 const jwtUtil = require('./lib/jwtUtil');
 const { userService } = require('./service');
-const { sendMessage } = require('./service/messageService');
+const { sendMessage, readAllMessageByRoomId } = require('./service/messageService');
 const io = new Server(http);
 
 io.on('connection', async (socket) => {
@@ -94,12 +94,14 @@ io.on('connection', async (socket) => {
     }
   });
 
-  socket.on('reqExitRoom', () => {
+  socket.on('reqExitRoom', async () => {
     try {
       socket.leave(uid);
       socket.leave(rid);
       uid = null;
       rid = null;
+
+      await readAllMessageByRoomId(roomId, myId);
 
       io.to(socket.id).emit('resExitRoom', util.success(200, 'exitRoom 성공'));
     } catch (e) {

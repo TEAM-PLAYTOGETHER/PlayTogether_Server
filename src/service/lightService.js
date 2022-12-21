@@ -261,8 +261,7 @@ const getOrganizerLight = async (organizerId, crewId, offset, limit) => {
     const totalPage = pageNation.getTotalPage(totalCount, limit);
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -316,8 +315,7 @@ const getEnterLight = async (memberId, crewId, offset, limit) => {
     const totalPage = pageNation.getTotalPage(totalCount, limit);
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -370,8 +368,7 @@ const getScrapLight = async (memberId, crewId, offset, limit) => {
     const totalPage = pageNation.getTotalPage(totalCount, limit);
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -421,8 +418,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
       const totalPage = pageNation.getTotalPage(totalCount, limit);
 
       const lightData = result.map((light) => {
-        const nowDate = new Date();
-        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
         const time = light.time == null ? null : light.time.slice(0, -3);
         const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
         const place = light.place == null ? null : light.place;
@@ -431,7 +427,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
           light_id: Number(light.id),
           title: light.title,
           category: light.category,
-          scp_cnt: light.scpCnt,
+          scp_cnt: Number(light.scpCnt),
           date,
           time,
           people_cnt,
@@ -449,8 +445,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
     const totalPage = pageNation.getTotalPage(totalCount, limit);
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -459,7 +454,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
         light_id: Number(light.id),
         title: light.title,
         category: light.category,
-        scp_cnt: light.scpCnt,
+        scp_cnt: Number(light.scpCnt),
         date,
         time,
         people_cnt,
@@ -476,7 +471,7 @@ const getCategoryLight = async (userId, crewId, category, sort, offset, limit) =
     client.release();
   }
 };
-const getLightDetail = async (userId, lightId) => {
+const getLightDetail = async (userId, crewId, lightId) => {
   let client;
 
   const log = `lightService.getLightDetail | lightId = ${lightId}`;
@@ -489,12 +484,12 @@ const getLightDetail = async (userId, lightId) => {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
     const result = await lightDao.getLightDetail(client, lightId);
-    const members = await lightDao.getLightDetailMember(client, lightId);
-    const organizer = await lightDao.getLightDetailOrganizer(client, lightId);
+    const members = await lightDao.getLightDetailMember(client, crewId, lightId);
+    const organizer = await lightDao.getLightDetailOrganizer(client, crewId, lightId);
 
     const data2 = members.map((o) => ({
       user_id: Number(o.id),
-      profile_image: o.picture,
+      profile_image: o.profileImage,
       gender: o.gender,
       name: o.name,
       age: Number(calculateAge(dayjs(o.birthDay).format('YYYY-MM-DD'))),
@@ -502,13 +497,12 @@ const getLightDetail = async (userId, lightId) => {
 
     const data3 = organizer.map((o) => ({
       organizer_id: Number(o.id),
-      profile_image: o.picture,
+      profile_image: o.profileImage,
       name: o.name,
     }));
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -524,7 +518,7 @@ const getLightDetail = async (userId, lightId) => {
         image: light.image,
         people_cnt,
         place,
-        LightMemberCnt: Number(light.joinCnt),
+        LightMemberCnt: Number(members.length),
         is_opened,
         members: data2,
         organizer: data3,
@@ -562,8 +556,7 @@ const getNewLight = async (memberId, crewId) => {
     const result = await lightDao.getNewLight(client, memberId, crewId);
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -613,8 +606,7 @@ const getHotLight = async (memberId, crewId) => {
     const result = await lightDao.getHotLight(client, memberId, crewId);
 
     const lightData = result.map((light) => {
-      const nowDate = new Date();
-      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+      const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
       const time = light.time == null ? null : light.time.slice(0, -3);
       const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
       const place = light.place == null ? null : light.place;
@@ -668,8 +660,7 @@ const getSearchLight = async (memberId, crewId, search, category, offset, limit)
       const totalPage = pageNation.getTotalPage(totalCount, limit);
 
       const lightData = result.map((light) => {
-        const nowDate = new Date();
-        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
         const time = light.time == null ? null : light.time.slice(0, -3);
         const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
         const place = light.place == null ? null : light.place;
@@ -698,8 +689,7 @@ const getSearchLight = async (memberId, crewId, search, category, offset, limit)
       const totalPage = pageNation.getTotalPage(totalCount, limit);
 
       const lightData = result.map((light) => {
-        const nowDate = new Date();
-        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() || light.time < nowDate.toLocaleTimeString() ? false : true;
+        const is_opened = light.joinCnt >= light.peopleCnt || light.date < new Date() ? false : true;
         const time = light.time == null ? null : light.time.slice(0, -3);
         const date = light.date == null ? null : dayjs(light.date).format('YYYY-MM-DD');
         const place = light.place == null ? null : light.place;

@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/', authMiddleware, crewController.createCrew);
 router.delete('/', authMiddleware, crewController.deleteCrewByCrewId);
 router.delete('/:crewId', authMiddleware, crewController.withDrawCrew);
+router.get('/checkExist/:crewCode', authMiddleware, crewController.checkCrewRegisterAvailable);
 router.post('/register', authMiddleware, crewController.registerMember);
 router.get('/list', authMiddleware, crewController.getAllCrewByUserId);
 router.put('/:crewId', authMiddleware, crewController.putCrew);

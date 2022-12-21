@@ -1,11 +1,11 @@
 const getTotalPage = (totalCount, pageSize) => {
-    let totalPage = (totalCount / pageSize);
-    if ((totalCount % pageSize) !== 0) {
-        totalPage += 1;
-    }
-    return Math.round(totalPage);
+  let totalPage = Math.floor(totalCount / pageSize);
+  if (totalCount % pageSize !== 0) {
+    totalPage += 1;
+  }
+  return totalPage;
 };
 
 module.exports = {
-    getTotalPage
+  getTotalPage,
 };

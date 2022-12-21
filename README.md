@@ -5,7 +5,7 @@
 
 > 30th SOPT-TERM PROJECT
 > 
-> 프로젝트 기간 2021.03.21 ~ Now(데모데이 이후 릴리즈까지)
+> 프로젝트 기간 2022.03.21 ~ Now(데모데이 이후 릴리즈까지)
 
 ### 🛠 Development Environment
 

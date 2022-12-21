@@ -166,7 +166,6 @@ const getCategoryLight = async (client, userId, crewId, category, sort, offset, 
       `,
       [category, crewId, sort, offset, limit, userId],
     );
-    console.log(rows);
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);
@@ -191,7 +190,6 @@ const getCategoryLightByScpCnt = async (client, userId, crewId, category, offset
       `,
       [category, crewId, offset, limit, userId],
     );
-    console.log(rows);
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getCategoryLight에서 에러 발생했습니다 \n' + error);
@@ -213,31 +211,33 @@ const getLightDetail = async (client, lightId) => {
     throw new Error('lightdao.getLightDetail에서 에러 발생했습니다 \n' + error);
   }
 };
-const getLightDetailMember = async (client, lightId) => {
+const getLightDetailMember = async (client, crewId, lightId) => {
   try {
     const { rows } = await client.query(
       `
-      select u.id, gender, name, picture from "user" u
+      select u.id, gender, name, cu.profile_image from "user" u
       inner join light_user lu on u.id = lu.member_id
       inner join light l on l.id = lu.light_id
-      where l.id = $1;
+      inner join crew_user cu on u.id = cu.member_id
+      where cu.crew_id = $1 and l.id = $2;
       `,
-      [lightId],
+      [crewId, lightId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {
     throw new Error('lightdao.getLightDetailMember에서 에러 발생했습니다 \n' + error);
   }
 };
-const getLightDetailOrganizer = async (client, lightId) => {
+const getLightDetailOrganizer = async (client, crewId, lightId) => {
   try {
     const { rows } = await client.query(
       `
-      select u.id, name, picture from "user" u
+      select u.id, name, cu.profile_image from "user" u
       inner join light l on u.id = l.organizer_id
-      where l.id = $1;
+      inner join crew_user cu on l.organizer_id = cu.member_id
+      where l.id =  $1 and cu.crew_id = $2;
       `,
-      [lightId],
+      [lightId, crewId],
     );
     return convertSnakeToCamel.keysToCamel(rows);
   } catch (error) {

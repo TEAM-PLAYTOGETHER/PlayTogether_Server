@@ -67,6 +67,42 @@ const createCrew = async (name, masterId, description) => {
   }
 };
 
+const checkCrewRegisterAvailable = async (userId, crewCode) => {
+  let client;
+  const log = `crewDao.checkCrewRegisterAvailable | userId = ${userId}, crewCode = ${crewCode}`;
+
+  try {
+    client = await db.connect(log);
+    await client.query('BEGIN');
+
+    // 해당 회원이 가입한 동아리 갯수 확인하기
+    const { count: userRegisteredCount } = await crewUserDao.getUserRegisteredCount(client, userId);
+    if (userRegisteredCount >= 10) {
+      return util.success(statusCode.OK, responseMessage.LIMIT_EXCEED, { available: false, message: responseMessage.LIMIT_EXCEED });
+    }
+
+    // 인자로 받은 가입코드와 일치하는 동아리 찾기
+    const crew = await crewDao.getCrewByCode(client, crewCode);
+    if (!crew) {
+      return util.success(statusCode.OK, responseMessage.NO_CREW, { available: false, message: responseMessage.NO_CREW });
+    }
+
+    // 해당 회원이 이미 그 동아리에 가입했는지 확인
+    const alreadyRegistered = await crewUserDao.getRegisteredMember(client, crew.id, userId);
+    if (alreadyRegistered) {
+      return util.success(statusCode.OK, responseMessage.ALREADY_REGISTERED, { available: false, message: responseMessage.ALREADY_REGISTERED });
+    }
+
+    await client.query('COMMIT');
+    return util.success(statusCode.OK, responseMessage.CREW_REGISTER_AVAILABLE, { id: Number(crew.id), name: crew.name, available: true, message: responseMessage.CREW_REGISTER_AVAILABLE });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error('crewService checkCrewRegisterAvailable에서 error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
+
 /**
  * registerMember
  * 동아리에 회원 등록시키는 서비스
@@ -209,6 +245,7 @@ const getAllCrewByUserId = async (userId) => {
       if (crew.masterId === userId) isAdmin = true;
       return {
         id: Number(crew.id),
+        crewCode: crew.code,
         name: crew.name,
         description: crew.description,
         isAdmin,
@@ -359,6 +396,7 @@ const withDrawCrew = async (userId, crewId) => {
 module.exports = {
   createCrew,
   registerMember,
+  checkCrewRegisterAvailable,
   getAllCrewByUserId,
   deleteCrewByCrewId,
   withDrawCrew,

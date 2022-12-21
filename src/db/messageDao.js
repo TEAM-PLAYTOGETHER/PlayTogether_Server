@@ -154,24 +154,82 @@ const getAllMessageById = async (client, userId) => {
 
 /**
  * getAllMessageByRoomId
- * roomId에 해당하는 채팅방의 모든 채팅을 가져오는 메서드
+ * roomId에 해당하는 채팅방의 모든 채팅을 가져오는 메서드 (커서기반 페이지네이션)
  * @param {*} roomId - 채팅방 id값
- * @returns - 해당 채팅방의 모든 메시지
+ * @param {*} messageId - 커서 메시지 id값
+ * @param {*} limit - 읽어올 메시지 수
+ * @returns - 해당 채팅방의 커서 기반 메시지
  */
-const getAllMessageByRoomId = async (client, roomId) => {
+const getAllMessageByRoomId = async (client, roomId, messageId, limit) => {
   try {
     const { rows } = await client.query(
       `
       select m.id, m.created_at, m.content, m.send_id, m.read
       from room r
-               left join message m
-                         on r.id = m.room_id
+              left join message m
+                        on r.id = m.room_id
       where r.id = $1
-      order by created_at;
+          and m.created_at < (select created_at
+                              from message
+                              where id = $2)
+        or (m.created_at = (select created_at
+                            from message
+                            where id = $2) and m.id < $2)
+      order by created_at desc, id
+      limit $3;
+      `,
+      [roomId, messageId, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: \n' + error);
+  }
+};
+
+/**
+ * getFirstMessageByRoomId
+ * roomId에 해당하는 채팅방의 모든 채팅을 가져오는 메서드 (첫 요청 시)
+ * @param {*} roomId - 채팅방 id값
+ * @param {*} limit - 읽어올 메시지 수
+ * @returns - 해당 채팅방의 첫 메시지
+ */
+const getFirstMessageByRoomId = async (client, roomId, limit) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select m.id, m.created_at, m.content, m.send_id, m.read
+      from room r
+              left join message m
+                        on r.id = m.room_id
+      where r.id = $1
+      order by created_at desc, id
+      limit $2;
+      `,
+      [roomId, limit],
+    );
+    return convertSnakeToCamel.keysToCamel(rows);
+  } catch (error) {
+    throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: \n' + error);
+  }
+};
+
+/**
+ * getAllMessageByRoomId
+ * roomId에 해당하는 채팅방의 모든 채팅을 가져오는 메서드
+ * @param {*} roomId - 채팅방 id값
+ * @returns - 해당 채팅방의 모든 메시지
+ */
+const getAllMessageCountByRoomId = async (client, roomId) => {
+  try {
+    const { rows } = await client.query(
+      `
+      select count(*)
+      from message
+      where room_id = $1;
       `,
       [roomId],
     );
-    return convertSnakeToCamel.keysToCamel(rows);
+    return Number(rows[0].count);
   } catch (error) {
     throw new Error('messageDao.getAllMessageByRoomId에서 오류 발생: \n' + error);
   }
@@ -228,6 +286,8 @@ module.exports = {
   sendMessage,
   getAllMessageById,
   getAllMessageByRoomId,
+  getFirstMessageByRoomId,
   readAllMessage,
   getMessageByMessageId,
+  getAllMessageCountByRoomId,
 };

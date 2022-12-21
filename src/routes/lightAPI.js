@@ -16,7 +16,7 @@ router.get('/:crewId/new', authMiddleware, lightController.getNewLight);
 router.get('/:crewId/search', authMiddleware, lightController.getSearchLight);
 router.get('/:crewId/hot', authMiddleware, lightController.getHotLight);
 router.get('/:crewId', authMiddleware, lightController.getCategoryLight);
-router.get('/detail/:lightId', authMiddleware, lightController.getLightDetail);
+router.get('/:crewId/:lightId/detail', authMiddleware, lightController.getLightDetail);
 router.get('/exist/:lightId', authMiddleware, lightController.ExistLightUser);
 router.post('/report/:lightId', authMiddleware, lightController.reportLight);
 

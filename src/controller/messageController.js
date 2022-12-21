@@ -82,20 +82,26 @@ const getAllMessageById = async (req, res, next) => {
 };
 
 /**
- * GET ~/message/:roomId
+ * GET ~/message/:roomId?curPage=&pageSize=
  * 톡방 메시지 읽어오기
  * @private
  */
 const getAllMessageByRoomId = async (req, res, next) => {
   try {
     const { roomId } = req.params;
+
+    const messageId = req.query.messageId || null;
+    const pageSize = req.query.pageSize || 5;
+
+    let limit = Number(pageSize);
+
     const userId = Number(req.user.id);
 
     if (!roomId) {
       return res.status(statusCode.BAD_REQUEST).json(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
-    const result = await messageService.getAllMessageByRoomId(roomId, userId);
+    const result = await messageService.getAllMessageByRoomId(roomId, userId, messageId, limit);
 
     return res.status(result.status).json(result);
   } catch (error) {
