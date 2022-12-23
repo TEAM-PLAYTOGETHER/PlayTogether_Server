@@ -788,6 +788,25 @@ const reportLight = async (report, lightId, memberId) => {
     client.release();
   }
 };
+
+const checkLightOpen = async (lightId) => {
+  let client;
+
+  const log = `lightService.checkLightOpen | lightId = ${lightId}`;
+  try {
+    client = await db.connect(log);
+    const light = lightDao.getLightDetail(client, lightId);
+    if (light.joinCnt == light.peopleCnt) {
+      return util.success(statusCode.OK, responseMessage.BLOCK_LIGHT, false);
+    } else {
+      return util.success(statusCode.OK, responseMessage.OPEN_LIGHT, true);
+    }
+  } catch (error) {
+    throw new Error('lightService checkLightOpen error 발생: \n' + error);
+  } finally {
+    client.release();
+  }
+};
 module.exports = {
   addLight,
   putLight,
@@ -805,4 +824,5 @@ module.exports = {
   getSearchLight,
   existLightUser,
   reportLight,
+  checkLightOpen,
 };

@@ -281,6 +281,20 @@ const reportLight = async (req, res, next) => {
   }
 };
 
+const checkLightOpen = async (req, res, next) => {
+  const { lightId } = req.params;
+
+  if (!lightId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT));
+
+  try {
+    const lights = await lightService.checkLightOpen(lightId);
+
+    return res.status(lights.status).json(lights);
+  } catch (error) {
+    return next(new Error('existLightUser Controller 에러: \n' + error));
+  }
+};
+
 module.exports = {
   addLight,
   putLight,
@@ -296,4 +310,5 @@ module.exports = {
   getSearchLight,
   ExistLightUser,
   reportLight,
+  checkLightOpen,
 };

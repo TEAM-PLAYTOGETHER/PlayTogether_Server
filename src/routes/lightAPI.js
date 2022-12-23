@@ -19,5 +19,6 @@ router.get('/:crewId', authMiddleware, lightController.getCategoryLight);
 router.get('/:crewId/:lightId/detail', authMiddleware, lightController.getLightDetail);
 router.get('/exist/:lightId', authMiddleware, lightController.ExistLightUser);
 router.post('/report/:lightId', authMiddleware, lightController.reportLight);
+router.get('/check/:lightId', lightController.checkLightOpen);
 
 module.exports = router;
