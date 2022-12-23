@@ -99,6 +99,8 @@ module.exports = {
   NO_TWO_SEARCH_QUERY: '두글자 이상 입력해주세요.',
   NO_REPORT: '신고할 내용이 없습니다.',
   REPORT_LIGHT: '신고되었습니다.',
+  BLOCK_LIGHT: '번개는 닫혀있습니다.',
+  OPEN_LIGHT: '번개는 열려있습니다.',
 
   // 스크랩
   SCRAP_SUCCESS: '찜하기가 완료되었습니다.',
