@@ -483,6 +483,11 @@ const getLightDetail = async (userId, crewId, lightId) => {
     if (!existLight) {
       return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_LIGHT);
     }
+    // 존재 하는 동아리인지 검사
+    const existCrew = await crewDao.getExistCrew(client, crewId);
+    if (!existCrew) {
+      return util.fail(statusCode.BAD_REQUEST, responseMessage.NO_CREW);
+    }
     const result = await lightDao.getLightDetail(client, lightId);
     const members = await lightDao.getLightDetailMember(client, crewId, lightId);
     const organizer = await lightDao.getLightDetailOrganizer(client, crewId, lightId);
