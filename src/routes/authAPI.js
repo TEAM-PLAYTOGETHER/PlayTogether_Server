@@ -20,6 +20,7 @@ router.get('/kakao/callback', passport.authenticate('kakao', { failureRedirect: 
 // POST
 router.post('/google-login', authController.googleLogin);
 router.post('/kakao-login', authController.kakaoLogin);
+router.post('/apple-login', authController.appleLogin);
 
 // PUT
 
